@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_respond">
+    <fragment
+        android:id="@+id/navigation_respond"
+        android:name="uk.mrs.saralarm.ui.respond.RespondFragment"
+        android:label="@string/app_name">
+        <action
+            android:id="@+id/action_navigation_respond_to_navigation_settings"
+            app:destination="@+id/navigation_settings" />
+        <action
+            android:id="@+id/action_navigation_respond_to_SMSNumbersFragment"
+            app:destination="@id/SMSNumbersFragment" />
+        <action
+            android:id="@+id/action_navigation_respond_to_triggersFragment"
+            app:destination="@id/triggersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_settings"
+        android:name="uk.mrs.saralarm.ui.settings.SettingsFragment"
+        android:label="@string/app_name">
+        <action
+            android:id="@+id/action_navigation_setting_to_customMessagesFragment"
+            app:destination="@+id/customMessagesFragment" />
+        <action
+            android:id="@+id/action_navigation_settings_to_customiseAlarmFragment"
+            app:destination="@+id/customiseAlarmFragment" />
+        <action
+            android:id="@+id/action_navigation_settings_to_SMSNumbersFragment"
+            app:destination="@+id/SMSNumbersFragment" />
+        <action
+            android:id="@+id/action_navigation_settings_to_triggersFragment"
+            app:destination="@id/triggersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/customMessagesFragment"
+        android:name="uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesFragment"
+        android:label="Predefined Message Editor" />
+    <fragment
+        android:id="@+id/customiseAlarmFragment"
+        android:name="uk.mrs.saralarm.ui.settings.deepui.CustomiseAlarmFragment"
+        android:label="Customise Alarm" />
+    <fragment
+        android:id="@+id/SMSNumbersFragment"
+        android:name="uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersFragment"
+        android:label="SMS Numbers Editor" />
+    <fragment
+        android:id="@+id/triggersFragment"
+        android:name="uk.mrs.saralarm.ui.settings.deepui.triggers.TriggersFragment"
+        android:label="Custom Keywords Editor" />
+</navigation>

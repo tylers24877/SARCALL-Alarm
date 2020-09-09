@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fadeScrollbars="false"
+    android:scrollbars="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/respond_dialog_sar_a_constraint_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingBottom="100.0dip">
+
+        <SeekBar
+            android:id="@+id/respond_dialog_sar_a_seek"
+            style="@android:style/Widget.DeviceDefault.SeekBar"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50.0dip"
+            android:layout_marginLeft="50.0dip"
+            android:layout_marginTop="4.0dip"
+            android:layout_marginEnd="50.0dip"
+            android:layout_marginRight="50.0dip"
+            android:indeterminate="false"
+            android:max="9"
+            android:maxHeight="6.0dip"
+            android:minHeight="6.0dip"
+            android:paddingTop="10.0dip"
+            android:paddingBottom="10.0dip"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_seek_eta_txtview" />
+
+        <TextView
+            android:id="@+id/dialog_sar_a_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7.0dip"
+            android:text="@string/SAR_A_attending_txtview"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/respond_dialog_sar_a_message_inputlayout"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32.0dip"
+            android:layout_marginRight="32.0dip"
+            app:counterEnabled="true"
+            app:counterMaxLength="135"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_title_txtview">
+
+            <EditText
+                android:id="@+id/respond_dialog_sar_a_message_editview"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center|top"
+                android:hint="@string/sar_a_response_message_editview"
+                android:inputType="textMultiLine"
+                android:maxLength="135"
+                android:scrollbars="vertical" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/respond_dialog_sar_a_submit_button"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50.0dip"
+            android:layout_marginLeft="50.0dip"
+            android:layout_marginTop="37.0dip"
+            android:layout_marginEnd="50.0dip"
+            android:layout_marginRight="50.0dip"
+            android:text="@string/sar_a_send_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_inputlayout" />
+
+        <TextView
+            android:id="@+id/respond_dialog_sar_a_seek_eta_txtview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32.0dip"
+            android:layout_marginLeft="32.0dip"
+            android:layout_marginTop="24.0dip"
+            android:text="@string/sar_a_response_rv_txt_placeholder"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_a_seek"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dialog_sar_a_title" />
+
+        <TextView
+            android:id="@+id/respond_dialog_sar_a_message_title_txtview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16.0dip"
+            android:text="@string/sar_a_response_message_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_a_message_inputlayout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
+            app:layout_constraintTop_toBottomOf="@id/sar_a_spinner" />
+
+        <TextView
+            android:id="@+id/dialog_sar_a_lower_spinner_txtview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sar_a_seek_bar_low_time"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintBottom_toBottomOf="@id/respond_dialog_sar_a_seek"
+            app:layout_constraintEnd_toStartOf="@id/respond_dialog_sar_a_seek"
+            app:layout_constraintTop_toTopOf="@id/respond_dialog_sar_a_seek" />
+
+        <TextView
+            android:id="@+id/dialog_sar_a_higher_spinner_txtview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sar_a_seek_bar_high_time"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintBottom_toBottomOf="@id/respond_dialog_sar_a_seek"
+            app:layout_constraintStart_toEndOf="@id/respond_dialog_sar_a_seek"
+            app:layout_constraintTop_toTopOf="@id/respond_dialog_sar_a_seek" />
+
+        <TextView
+            android:id="@+id/respond_dialog_sar_a_pre_message_title_txtview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16.0dip"
+            android:text="Predefined Message:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_a_message_inputlayout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_seek" />
+
+        <Spinner
+            android:id="@+id/sar_a_spinner"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32.0dip"
+            android:layout_marginLeft="32.0dip"
+            android:layout_marginTop="8.0dip"
+            android:layout_marginEnd="32.0dip"
+            android:layout_marginRight="32.0dip"
+            android:singleLine="false"
+            android:spinnerMode="dialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_pre_message_title_txtview" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
