@@ -14,10 +14,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
-import android.widget.EditText
-import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
@@ -26,18 +25,18 @@ import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.android.synthetic.main.settings_sms_numbers_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
 import kotlin.jvm.internal.Intrinsics
 
 
-class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberObject>) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>(){
+class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
-    private val mData: ArrayList<SMSNumberObject> = data
+    private val mData: ArrayList<String> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
 
     override fun getItemCount(): Int {
         return mData.size
     }
+
     fun swapItems(fromPosition: Int, toPosition: Int) {
         val original = mData[fromPosition]
         mData.removeAt(fromPosition)
@@ -48,25 +47,19 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
     fun removeItems(adapterPosition: Int) {
         mData.removeAt(adapterPosition)
         notifyItemRemoved(adapterPosition)
-        if (mData.isEmpty()) {
-            val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
-            val editor: SharedPreferences.Editor = sharedPrefs.edit()
-            editor.putBoolean("prefUsePhoneNumber", false)
-            editor.apply()
-        }
     }
 
     fun addItem() {
-        mData.add(SMSNumberObject("", false))
+        mData.add("")
         notifyDataSetChanged()
     }
 
     fun saveData() {
-        val list = ArrayList<SMSNumberObject>()
-        val it: Iterator<SMSNumberObject> = mData.iterator()
+        val list = ArrayList<String>()
+        val it: Iterator<String> = mData.iterator()
         while (it.hasNext()) {
             val t = it.next()
-            if (Intrinsics.areEqual(t.phoneNumber as Any, "" as Any)) {
+            if (t == "") {
                 list.add(t)
             }
         }
@@ -74,7 +67,11 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        editor.putString("SMSNumbersJSON", Gson().toJson(mData as Any))
+        if (mData.isEmpty())
+            editor.putString("respondSMSNumbersJSON", "")
+        else
+            editor.putString("respondSMSNumbersJSON", Gson().toJson(mData as Any))
+
         editor.apply()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -84,12 +81,11 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
-        if (mData[holder.adapterPosition].phoneNumber.isBlank()) {
+        if (mData[holder.adapterPosition].isBlank()) {
             holder.myTextView.setText("")
-            holder.SARCheckBox.isChecked = false
         } else {
             try {
-                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.adapterPosition].phoneNumber, "GB"))) {
+                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.adapterPosition], "GB"))) {
                     holder.textInput.error = "SMS Number is in the wrong format"
                 } else {
                     holder.textInput.error = ""
@@ -97,17 +93,12 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
             } catch (e: NumberParseException) {
                 holder.textInput.error = "SMS Number is in the wrong format"
             }
-            holder.myTextView.setText(mData[holder.adapterPosition].phoneNumber)
-            holder.SARCheckBox.isChecked = mData[holder.adapterPosition].defaultReply
+            holder.myTextView.setText(mData[holder.adapterPosition])
         }
         holder.myTextView.inputType = 3
         holder.myTextView.maxLines = 1
-        holder.myTextView.hint = "07 . . . . . . . . ."
         holder.myTextView.filters = arrayOf<InputFilter>(LengthFilter(16))
 
-        holder.SARCheckBox.setOnCheckedChangeListener{ _, isChecked ->
-            mData[holder.adapterPosition].defaultReply = isChecked
-        }
 
         holder.myTextView.addTextChangedListener(object : TextWatcher {
             var editing = false
@@ -120,7 +111,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
                             holder.textInput.error = "SMS Number is in the wrong format"
                         } else {
                             editing = true
-                            val prevSelection: Int =holder.myTextView.selectionStart
+                            val prevSelection: Int = holder.myTextView.selectionStart
                             val prevLength: Int = holder.myTextView.length()
                             holder.myTextView.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
                             holder.myTextView.setSelection(holder.myTextView.length() - prevLength + prevSelection)
@@ -131,8 +122,9 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
                     }
                     editing = false
                 }
-                    mData[holder.adapterPosition].phoneNumber= holder.myTextView.text.toString()
+                mData[holder.adapterPosition] = holder.myTextView.text.toString()
             }
+
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -140,8 +132,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<SMSNumberO
     }
 
     inner class ViewHolder(v: SMSNumbersRecyclerViewAdapter, itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-        var SARCheckBox: AppCompatCheckBox = itemView.SMSNumbersSARCheckbox
-        var myTextView: EditText = itemView.SMSNumbersCustomMessageEditText
+        var myTextView: TextInputEditText = itemView.SMSNumbersCustomMessageEditText
         var textInput: TextInputLayout = itemView.SMSNumbersRecyclerTextInput
 
         override fun onItemSelected() {

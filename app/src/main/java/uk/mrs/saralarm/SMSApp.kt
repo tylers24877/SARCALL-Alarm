@@ -17,12 +17,13 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
+import com.google.i18n.phonenumbers.Phonenumber
 import uk.mrs.saralarm.ActivationNotification.notify
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.lang.reflect.Type
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.collections.HashSet
 
 
@@ -32,25 +33,38 @@ class SMSApp : BroadcastReceiver() {
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         if (pref.getBoolean("prefEnabled", true)) {
             val phoneUtil = PhoneNumberUtil.getInstance()
-            val phoneNumberSet = HashSet<PhoneNumber>()
 
-            val type: Type = object : TypeToken<ArrayList<SMSNumberObject>?>() {}.type
-            val fromJson: ArrayList<SMSNumberObject> = Gson().fromJson(pref.getString("SMSNumbersJSON", ""), type)
+            val typeRuleObject: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
+            val rulesFromJson: ArrayList<RulesObject>? = Gson().fromJson(pref.getString("rulesJSON", ""), typeRuleObject)
 
-            val it: Iterator<*> = fromJson.iterator()
-            while (it.hasNext()) {
-                try {
-                    phoneNumberSet.add(phoneUtil.parse((it.next() as SMSNumberObject).phoneNumber, "GB"))
-                } catch (e: NumberParseException) {}
-            }
+            val rulesBothSet: HashSet<RulesObject> = HashSet()
+            val rulesSMSSet: HashSet<RulesObject> = HashSet()
+            val rulesPhraseSet: HashSet<RulesObject> = HashSet()
 
-            if (VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ) {
-                if (intent.action.equals("android.provider.Telephony.SMS_RECEIVED")) {
-                    for (smsMessage in Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                       checkMessages(pref,smsMessage,phoneNumberSet,phoneUtil,context)
+            if (rulesFromJson.isNullOrEmpty()) {
+                return
+            } else {
+                for (r in rulesFromJson) {
+                    if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
+                        try {
+                            rulesBothSet.add(r)
+                        } catch (e: NumberParseException) {
+                        }
+                    } else if (r.choice == RulesChoice.SMS_NUMBER && r.smsNumber.isNotBlank()) {
+                        rulesSMSSet.add(r)
+                    } else if (r.choice == RulesChoice.PHRASE && r.phrase.isNotBlank()) {
+                        rulesPhraseSet.add(r)
                     }
                 }
-            }else {
+            }
+
+            if (VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                if (intent.action.equals("android.provider.Telephony.SMS_RECEIVED")) {
+                    for (smsMessage in Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
+                        checkMessages(pref, smsMessage, rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
+                    }
+                }
+            } else {
                 //get bundle of extras from intent.
                 val bundle = intent.extras
                 //check whether the bundle is not null
@@ -58,54 +72,80 @@ class SMSApp : BroadcastReceiver() {
                     //if true, get the string of the text message content.
                     val plusObj = (bundle["pdus"] as Array<*>?)!!
                     for (aPlusObj in plusObj) {
-                        checkMessages(pref,SmsMessage.createFromPdu(aPlusObj as ByteArray),phoneNumberSet,phoneUtil,context)
+                        checkMessages(pref, SmsMessage.createFromPdu(aPlusObj as ByteArray), rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
                     }
                 }
             }
         }
     }
 
-    private fun checkMessages(pref: SharedPreferences, smsMessage : SmsMessage,phoneNumberSet : Set<PhoneNumber>,phoneUtil: PhoneNumberUtil, context: Context){
-
-        val skip: Boolean
-        val usePhoneNumber = pref.getBoolean("prefUsePhoneNumber", false)
-        val customTrigger = pref.getString("prefUseCustomTrigger", "")
-
-        //if use Custom Trigger Message without phone number
-        if (!usePhoneNumber) {
-            if (!customTrigger.isNullOrBlank()) {
-                if (smsMessage.messageBody.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), "")
-                        .contains(customTrigger.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), ""))
-                ) {
-                    if (checkScreenState(context)) {
-                        ActivationNotification.notifyPostAlarm(context)
-                    } else {
-                        notify(context)
-                    }
+    private fun checkMessages(
+        pref: SharedPreferences,
+        smsMessage: SmsMessage,
+        rulesBothSet: HashSet<RulesObject>,
+        rulesSMSSet: HashSet<RulesObject> = HashSet(),
+        rulesPhraseSet: HashSet<RulesObject>,
+        phoneUtil: PhoneNumberUtil,
+        context: Context
+    ) {
+        when {
+            checkRulesBoth(rulesBothSet, smsMessage.messageBody, smsMessage.originatingAddress.toString(), phoneUtil) -> {
+                if (checkScreenState(context)) {
+                    ActivationNotification.notifyPostAlarm(context)
+                } else {
+                    notify(context)
                 }
             }
-        } else {
-            skip = if (!customTrigger.isNullOrBlank())
-                !smsMessage.messageBody.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), "")
-                    .contains(customTrigger.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), ""))
-            else false
-
-            if (!skip) {
-                if (checkSMSNumberSet(phoneNumberSet, smsMessage.displayOriginatingAddress, phoneUtil)) {
-                    if (checkScreenState(context)) {
-                        ActivationNotification.notifyPostAlarm(context)
-                    } else {
-                        notify(context)
-                    }
+            checkRulesSMSNumber(rulesSMSSet, smsMessage.originatingAddress.toString(), phoneUtil) -> {
+                if (checkScreenState(context)) {
+                    ActivationNotification.notifyPostAlarm(context)
+                } else {
+                    notify(context)
+                }
+            }
+            checkRulesPhrase(rulesPhraseSet, smsMessage.messageBody) -> {
+                if (checkScreenState(context)) {
+                    ActivationNotification.notifyPostAlarm(context)
+                } else {
+                    notify(context)
                 }
             }
         }
+
     }
 
-    private fun checkSMSNumberSet(SS: Set<PhoneNumber>, m: String, phoneUtil: PhoneNumberUtil): Boolean {
+    private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Boolean {
         for (s in SS) {
-            if (PhoneNumberUtils.compare(phoneUtil.format(s, PhoneNumberFormat.INTERNATIONAL), m)) {
+            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
                 return true
+            }
+        }
+        return false
+    }
+
+    private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Boolean {
+        for (s in rulesSMSSet) {
+            try {
+                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+                if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
+                    return true
+                }
+            } catch (e: NumberParseException) {
+            }
+        }
+        return false
+    }
+
+    private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Boolean {
+        for (s in SS) {
+            try {
+                if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
+                    val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+                    if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
+                        return true
+                    }
+                }
+            } catch (e: NumberParseException) {
             }
         }
         return false

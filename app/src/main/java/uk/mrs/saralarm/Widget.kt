@@ -6,10 +6,10 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.preference.PreferenceManager
 import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.core.internal.view.SupportMenu
+import androidx.preference.PreferenceManager
 
 
 class Widget : AppWidgetProvider() {
@@ -20,7 +20,7 @@ class Widget : AppWidgetProvider() {
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
         for (appWidgetID in appWidgetIds) {
-            val remoteViews = RemoteViews(context.getPackageName(), R.layout.widget_app)
+            val remoteViews = RemoteViews(context.packageName, R.layout.widget_app)
             remoteViews.setOnClickPendingIntent(
                 R.id.appwidget_sarcall_button,
                 getPendingSelfIntent(context, WIDGET_CLICK)
@@ -36,7 +36,7 @@ class Widget : AppWidgetProvider() {
             appWidgetManager,
             appWidgetManager.getAppWidgetIds(
                 ComponentName(
-                    context.getPackageName(),
+                    context.packageName,
                     javaClass.name
                 )
             )
@@ -49,24 +49,21 @@ class Widget : AppWidgetProvider() {
         super.onReceive(context, intent)
         if (WIDGET_CLICK == intent.action) {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
+
             if (pref.getBoolean("prefEnabled", false)) {
                 pref.edit().putBoolean("prefEnabled", false).apply()
-                Toast.makeText(context, "SARCALL activity_alarm disabled", Toast.LENGTH_SHORT).show()
-            } else if (pref.getBoolean(
-                    "prefUsePhoneNumber",
-                    false
-                ) || !pref.getString("prefUseCustomTrigger", "")!!
-                    .isEmpty()
-            ) {
-                pref.edit().putBoolean("prefEnabled", true).apply()
-                Toast.makeText(context, "SARCALL activity_alarm enabled", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(
-                    context,
-                    "Unable to activate activity_alarm. No activation method chosen in app settings.",
-                    0
-                ).show()
-            }
+                Toast.makeText(context, "SARCALL Alarm disabled", Toast.LENGTH_SHORT).show()
+            } else
+                if (pref.getBoolean("prefUsePhoneNumber", false) || pref.getString("triggersJSON", "")!!.isNotEmpty()) {
+                    pref.edit().putBoolean("prefEnabled", true).apply()
+                    Toast.makeText(context, "SARCALL Alarm enabled", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Unable to activate SARCALL Alarm. No activation method chosen in app settings.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             onUpdate(context)
         }
     }

@@ -25,7 +25,8 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import uk.mrs.saralarm.support.UpdateWorker
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 import kotlin.jvm.internal.Intrinsics
@@ -76,14 +77,15 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE")
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V1")
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V2")
             val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-                .addTag("SARCALL_CHECK_UPDATE_V2_TAG").build()
-                WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V2", ExistingPeriodicWorkPolicy.KEEP, build)
+                .addTag("SARCALL_CHECK_UPDATE_V3_TAG").build()
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V3", ExistingPeriodicWorkPolicy.KEEP, build)
         }
         upgradePreferences(pref)
 
-        if (pref.getBoolean("prefEnabled", false) && !pref.getBoolean("prefUsePhoneNumber", false)) {
-            val string = pref.getString("prefUseCustomTrigger", "")
+        if (pref.getBoolean("prefEnabled", false)) {
+            val string = pref.getString("rulesJSON", "")
             if (string!!.isEmpty()) {
                 pref.edit().putBoolean("prefEnabled", false).apply()
             }
@@ -91,37 +93,47 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun upgradePreferences(pref: SharedPreferences) {
-        val edit =  pref.edit()
-        val smsNumbersNewArray: ArrayList<SMSNumberObject>
+        val edit = pref.edit()
+        val rulesNewObjectArray: ArrayList<RulesObject>
         val oldSMSNumber = pref.getString("prefSetPhoneNumber", "")
-        if (!oldSMSNumber.isNullOrBlank()) {
-            val json = pref.getString("SMSNumbersJSON", "")
-            if (json.isNullOrBlank()) {
-                smsNumbersNewArray = ArrayList()
-                smsNumbersNewArray.add(SMSNumberObject(oldSMSNumber, true))
-            } else {
-                val type: Type = object : TypeToken<ArrayList<SMSNumberObject>?>() {}.type
-                val fromJson: ArrayList<SMSNumberObject> = Gson().fromJson(json, type)
-                fromJson.add(SMSNumberObject(oldSMSNumber, true))
-                smsNumbersNewArray = fromJson
-            }
-           edit.putString("SMSNumbersJSON", Gson().toJson(smsNumbersNewArray)).remove("prefSetPhoneNumber")
-        }
-
-        val triggersNewArray: ArrayList<String>
         val oldTrigger = pref.getString("prefUseCustomTrigger", "")
-        if (!oldTrigger.isNullOrBlank()) {
-            val json = pref.getString("triggersJSON", "")
+
+        if (!oldSMSNumber.isNullOrBlank() && !oldTrigger.isNullOrBlank()) {
+            val json = pref.getString("rulesJSON", "")
             if (json.isNullOrBlank()) {
-                triggersNewArray = ArrayList()
-                triggersNewArray.add(oldTrigger)
+                rulesNewObjectArray = ArrayList()
+                rulesNewObjectArray.add(RulesObject(smsNumber = oldSMSNumber, phrase = oldTrigger))
             } else {
-                val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
-                val fromJson: ArrayList<String> = Gson().fromJson(json, type)
-                fromJson.add(oldTrigger)
-                triggersNewArray = fromJson
+                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
+                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
+                fromJson.add(RulesObject(smsNumber = oldSMSNumber, phrase = oldTrigger))
+                rulesNewObjectArray = fromJson
             }
-            edit.putString("triggersJSON", Gson().toJson(triggersNewArray)).remove("prefUseCustomTrigger")
+            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
+        } else if (!oldSMSNumber.isNullOrBlank()) {
+            val json = pref.getString("rulesJSON", "")
+            if (json.isNullOrBlank()) {
+                rulesNewObjectArray = ArrayList()
+                rulesNewObjectArray.add(RulesObject(choice = RulesChoice.SMS_NUMBER, smsNumber = oldSMSNumber))
+            } else {
+                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
+                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
+                fromJson.add(RulesObject(choice = RulesChoice.SMS_NUMBER, smsNumber = oldSMSNumber))
+                rulesNewObjectArray = fromJson
+            }
+            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
+        } else if (!oldTrigger.isNullOrBlank()) {
+            val json = pref.getString("rulesJSON", "")
+            if (json.isNullOrBlank()) {
+                rulesNewObjectArray = ArrayList()
+                rulesNewObjectArray.add(RulesObject(choice = RulesChoice.PHRASE, phrase = oldTrigger))
+            } else {
+                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
+                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
+                fromJson.add(RulesObject(choice = RulesChoice.PHRASE, phrase = oldTrigger))
+                rulesNewObjectArray = fromJson
+            }
+            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
         }
         edit.apply()
     }

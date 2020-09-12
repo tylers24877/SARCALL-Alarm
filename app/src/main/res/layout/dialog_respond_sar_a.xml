@@ -53,11 +53,13 @@
             android:layout_marginRight="32.0dip"
             app:counterEnabled="true"
             app:counterMaxLength="135"
+            android:background="@android:color/transparent"
+            app:boxBackgroundColor="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
             app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_title_txtview">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/respond_dialog_sar_a_message_editview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -68,7 +70,7 @@
                 android:scrollbars="vertical" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_dialog_sar_a_submit_button"
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"

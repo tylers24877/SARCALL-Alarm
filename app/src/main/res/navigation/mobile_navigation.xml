@@ -14,8 +14,8 @@
             android:id="@+id/action_navigation_respond_to_SMSNumbersFragment"
             app:destination="@id/SMSNumbersFragment" />
         <action
-            android:id="@+id/action_navigation_respond_to_triggersFragment"
-            app:destination="@id/triggersFragment" />
+            android:id="@+id/action_navigation_respond_to_rulesFragment"
+            app:destination="@id/rulesFragment" />
     </fragment>
     <fragment
         android:id="@+id/navigation_settings"
@@ -31,23 +31,20 @@
             android:id="@+id/action_navigation_settings_to_SMSNumbersFragment"
             app:destination="@+id/SMSNumbersFragment" />
         <action
-            android:id="@+id/action_navigation_settings_to_triggersFragment"
-            app:destination="@id/triggersFragment" />
+            android:id="@+id/action_navigation_settings_to_rulesFragment"
+            app:destination="@id/rulesFragment" />
     </fragment>
     <fragment
         android:id="@+id/customMessagesFragment"
         android:name="uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesFragment"
         android:label="Predefined Message Editor" />
     <fragment
-        android:id="@+id/customiseAlarmFragment"
-        android:name="uk.mrs.saralarm.ui.settings.deepui.CustomiseAlarmFragment"
-        android:label="Customise Alarm" />
-    <fragment
         android:id="@+id/SMSNumbersFragment"
         android:name="uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersFragment"
-        android:label="SMS Numbers Editor" />
+        android:label="SAR A/L/N Respond Number Editor" />
+
     <fragment
-        android:id="@+id/triggersFragment"
-        android:name="uk.mrs.saralarm.ui.settings.deepui.triggers.TriggersFragment"
-        android:label="Custom Keywords Editor" />
+        android:id="@+id/rulesFragment"
+        android:name="uk.mrs.saralarm.ui.settings.deepui.rules.RulesFragment"
+        android:label="Rules Configurator" />
 </navigation>

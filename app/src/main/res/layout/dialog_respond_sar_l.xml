@@ -52,12 +52,14 @@
             android:layout_marginEnd="32.0dip"
             android:layout_marginRight="32.0dip"
             app:counterEnabled="true"
+            android:background="@android:color/transparent"
+            app:boxBackgroundColor="@android:color/transparent"
             app:counterMaxLength="135"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_l_seek_eta_txtview"
             app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_l_message_title_txtview">
 
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/respond_dialog_sar_l_message_editview"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

@@ -12,9 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
-import android.widget.EditText
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.settings_custom_messages_recycler_view_row.view.*
@@ -53,7 +53,10 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        editor.putString("customMessageJSON", Gson().toJson(mData))
+        if (mData.isEmpty())
+            editor.putString("customMessageJSON", "")
+        else
+            editor.putString("customMessageJSON", Gson().toJson(mData))
         editor.apply()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -70,7 +73,6 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
         }
 
         holder.myTextView.addTextChangedListener(object : TextWatcher {
-            var editing = false
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
@@ -89,7 +91,7 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
     }
 
     inner class ViewHolder(v: CustomMessagesRecyclerViewAdapter, itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-        var myTextView: EditText = itemView.customMessageEditText
+        var myTextView: TextInputEditText = itemView.customMessageEditText
         var textInput: TextInputLayout = itemView.custom_message_recycler_textInput
 
         override fun onItemSelected() {

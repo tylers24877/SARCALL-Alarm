@@ -29,7 +29,6 @@ import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber
 import kotlinx.android.synthetic.main.dialog_respond_sar_a.*
 import kotlinx.android.synthetic.main.dialog_respond_sar_l.*
 import kotlinx.android.synthetic.main.fragment_respond.view.*
@@ -38,11 +37,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
 
 
 class RespondFragment : Fragment() {
@@ -71,7 +68,7 @@ class RespondFragment : Fragment() {
             dialogSARAOpen(context)
         }
         root.respond_sar_l_button.setOnClickListener{
-            dialogSARLOpen(context);
+            dialogSARLOpen(context)
         }
         root.respond_sar_n_button.setOnClickListener{
             dialogSARNOpen()
@@ -93,33 +90,22 @@ class RespondFragment : Fragment() {
                findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
            }
         } else {
-            val phoneNumberJSON: String? = pref.getString("SMSNumbersJSON", "")
+            val phoneNumberJSON: String? = pref.getString("rulesJSON", "")
             if (phoneNumberJSON.isNullOrBlank()) {
                 requireView().InfoView.visibility = View.VISIBLE
-                requireView().InfoView_txtview.text = "SARCALL reply SMS number is not set. Tap to go to settings."
+                requireView().InfoView_txtview.text = "Rules are not configured correctly, please click to check."
                 requireView().InfoView.setOnClickListener{
                     findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
                 }
             } else {
-                var defaultPhoneNumberSet = false
-                val type: Type = object : TypeToken<java.util.ArrayList<SMSNumberObject>?>() {}.type
-                val fromJson: java.util.ArrayList<SMSNumberObject>? = Gson().fromJson(pref.getString("SMSNumbersJSON", ""), type)
-                val it: Iterator<SMSNumberObject> = fromJson!!.iterator()
-                while (it.hasNext()) {
-                    try {
-                        val smsNumberObject  = it.next()
-                        if(smsNumberObject.defaultReply) {
-                            defaultPhoneNumberSet =true
-                        }
-                    } catch (e: NumberParseException) {}
-                }
-                if (!defaultPhoneNumberSet){
+
+                if (pref.getString("respondSMSNumbersJSON", "").isNullOrEmpty()) {
                     requireView().InfoView.visibility = View.VISIBLE
-                    requireView().InfoView_txtview.text = "No SMS number is configured for use with the SAR A/L/N buttons. Click to go to settings. "
+                    requireView().InfoView_txtview.text = "No SAR respond number configured. Please click to setup."
                     requireView().InfoView.setOnClickListener {
                         findNavController().navigate(R.id.action_navigation_respond_to_SMSNumbersFragment)
                     }
-                }else{
+                } else {
                     requireView().InfoView.visibility = View.GONE
                 }
             }
@@ -148,7 +134,7 @@ class RespondFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         dialog.sar_a_spinner.adapter = adapter
-        dialog.respond_dialog_sar_a_seek.progress = 6
+
 
         dialog.sar_a_spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -217,6 +203,7 @@ class RespondFragment : Fragment() {
                 }
             }
         })
+        dialog.respond_dialog_sar_a_seek.progress = 5
         dialog.respond_dialog_sar_a_submit_button.setOnClickListener {
             val progressCal = dialog.respond_dialog_sar_a_seek.progress * 5
             if(dialog.sar_a_spinner.selectedItem=="Enter Custom Message...") {
@@ -249,7 +236,6 @@ class RespondFragment : Fragment() {
 
 
         dialog.sar_l_spinner.adapter = adapter
-        dialog.respond_dialog_sar_l_seek.progress = 6
 
         dialog.sar_l_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -288,6 +274,7 @@ class RespondFragment : Fragment() {
             requireView().performClick()
             v?.onTouchEvent(event) ?: true
         }
+
         dialog.respond_dialog_sar_l_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
@@ -321,6 +308,7 @@ class RespondFragment : Fragment() {
                 }
             }
         })
+        dialog.respond_dialog_sar_l_seek.progress = 5
         dialog.respond_dialog_sar_l_submit_button.setOnClickListener {
             val progressCal = dialog.respond_dialog_sar_l_seek.progress * 5
             if(dialog.sar_l_spinner.selectedItem=="Enter Custom Message...") {
@@ -349,24 +337,9 @@ class RespondFragment : Fragment() {
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
         val phoneUtil = PhoneNumberUtil.getInstance()
         try {
-            val phoneNumberSet = HashSet<PhoneNumber>()
-
-            val type: Type = object : TypeToken<java.util.ArrayList<SMSNumberObject>?>() {}.type
-            val fromJson: java.util.ArrayList<SMSNumberObject>? = Gson().fromJson(pref.getString("SMSNumbersJSON", ""), type)
-            if (fromJson.isNullOrEmpty()){
-                Toast.makeText(context, "Failed! No SARCALL number chosen. Please check/add number in settings.", Toast.LENGTH_LONG).show()
-                return
-            }
-            val it: Iterator<SMSNumberObject> = fromJson.iterator()
-            while (it.hasNext()) {
-                try {
-                    val smsNumberObject  = it.next()
-                    if(smsNumberObject.defaultReply) {
-                        phoneNumberSet.add(phoneUtil.parse(smsNumberObject.phoneNumber, "GB"))
-                    }
-                } catch (e: NumberParseException) {}
-            }
-            if (phoneNumberSet.isEmpty()){
+            val type: Type = object : TypeToken<java.util.ArrayList<String>?>() {}.type
+            val phoneNumberSet: java.util.ArrayList<String>? = Gson().fromJson(pref.getString("respondSMSNumbersJSON", ""), type)
+            if (phoneNumberSet.isNullOrEmpty()) {
                 Toast.makeText(context, "Failed! No SARCALL number chosen. Please check/add number in settings.", Toast.LENGTH_LONG).show()
                 return
             }
@@ -380,14 +353,14 @@ class RespondFragment : Fragment() {
                         sb.append(' ')
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
-                            smsManager.sendTextMessage(phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
+                            smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
                         }
                     } else {
                         sb = StringBuilder()
                         sb.append("SAR A  ")
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
-                            smsManager.sendTextMessage(phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
+                            smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
                         }
                     }
                     Toast.makeText(context, "SAR A sent to SARCALL", Toast.LENGTH_LONG).show()
@@ -401,7 +374,7 @@ class RespondFragment : Fragment() {
                         sb.append(' ')
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
-                            smsManager.sendTextMessage(phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
+                            smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
                         }
 
                     } else {
@@ -409,7 +382,7 @@ class RespondFragment : Fragment() {
                         sb.append("SAR L ")
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
-                            smsManager.sendTextMessage(phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
+                            smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, sb.toString(), null, null)
                         }
                     }
 
@@ -418,7 +391,7 @@ class RespondFragment : Fragment() {
                 }
                 SARResponseCode.SAR_N -> {
                     for (phoneNumber in phoneNumberSet) {
-                        smsManager.sendTextMessage(phoneUtil.format(phoneNumber, PhoneNumberFormat.INTERNATIONAL), null, "SAR N", null, null)
+                        smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, "SAR N", null, null)
                     }
                     Toast.makeText(context, "SAR N sent to SARCALL", Toast.LENGTH_LONG).show()
                     dialog.cancel()

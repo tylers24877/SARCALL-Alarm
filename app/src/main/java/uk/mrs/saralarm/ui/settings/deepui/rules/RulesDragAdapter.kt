@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.ui.settings.deepui.triggers
+package uk.mrs.saralarm.ui.settings.deepui.rules
 
 import android.content.Context
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -6,10 +6,10 @@ import androidx.recyclerview.widget.RecyclerView
 import uk.mrs.saralarm.support.ItemTouchViewHolder
 
 
-class TriggersDragAdapter(adapterCustomMessages: TriggersRecyclerViewAdapter, context: Context?, dragDirs: Int, swipeDirs: Int) :
+class RulesDragAdapter(adapterCustomMessages: RulesRecyclerViewAdapter, context: Context?, dragDirs: Int, swipeDirs: Int) :
     ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
 
-    private val mAdapter: TriggersRecyclerViewAdapter = adapterCustomMessages
+    private val mAdapter: RulesRecyclerViewAdapter = adapterCustomMessages
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
         mAdapter.swapItems(viewHolder.adapterPosition, target.adapterPosition)

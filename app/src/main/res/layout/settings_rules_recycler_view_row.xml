@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rules_recycler_cardview"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    app:cardElevation="2dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/rulesDragImageView"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_baseline_drag_indicator_24"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/rules_vertical_guideline"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/rules_vertical_guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="48dp" />
+
+        <RadioGroup
+            android:id="@+id/rulesRadioGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/rules_vertical_guideline"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <RadioButton
+                android:id="@+id/rulesRadioSMSNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SMS Number" />
+
+            <RadioButton
+                android:id="@+id/rulesRadioTrigger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phrase" />
+
+            <RadioButton
+                android:id="@+id/rulesRadioBoth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Both" />
+        </RadioGroup>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/SMSNumbersRulesRecyclerTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@android:color/transparent"
+            app:boxBackgroundColor="@android:color/transparent"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/rules_vertical_guideline"
+            app:layout_constraintTop_toBottomOf="@id/rulesRadioGroup">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/SMSNumbersRulesEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Trigger SMS Number" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/phraseRulesRecyclerTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            app:errorEnabled="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/rules_vertical_guideline"
+            app:layout_constraintTop_toBottomOf="@id/SMSNumbersRulesRecyclerTextInput">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/phraseRulesEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:hint="Trigger Phrase"
+                app:boxBackgroundColor="@android:color/transparent" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/customiseAlarmRulesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="2dp"
+            android:text="Customise alarm"
+            app:drawableEndCompat="@drawable/ic_baseline_expand_more_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/rules_vertical_guideline"
+            app:layout_constraintTop_toBottomOf="@+id/phraseRulesRecyclerTextInput" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/customiseAlarmRulesConstraintLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/customiseAlarmRulesTextView">
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Custom Sound"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.943"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

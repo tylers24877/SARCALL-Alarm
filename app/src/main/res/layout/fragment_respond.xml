@@ -63,7 +63,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/respond_sms_preview_heading_txtview"
                         android:layout_width="wrap_content"
                         android:layout_height="35.0dip"
@@ -98,23 +98,26 @@
                         android:scrollbars="vertical"
                         app:layout_constraintStart_toStartOf="@id/respond_sms_preview_heading_txtview"
                         app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_heading_txtview">
+
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:layout_width="match_parent"
                             android:layout_height="match_parent">
+
                             <ProgressBar
                                 android:id="@+id/respond_sms_loading_bar"
                                 style="?android:attr/progressBarStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_centerInParent="true"
-                                android:visibility="visible"/>
-                            <TextView
+                                android:visibility="visible" />
+
+                            <com.google.android.material.textview.MaterialTextView
                                 android:id="@+id/respond_sms_preview_txtview"
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/placeholder_text"
                                 android:textSize="20.0sp"
-                                android:visibility="gone"/>
+                                android:visibility="gone" />
                         </androidx.appcompat.widget.LinearLayoutCompat>
                     </androidx.core.widget.NestedScrollView>
 
@@ -131,7 +134,7 @@
                         app:layout_constraintStart_toStartOf="@id/respond_sms_preview_scrollview"
                         app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_scrollview" />
 
-                    <TextView
+                    <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/respond_preview_date_txtview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -146,7 +149,7 @@
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </androidx.cardview.widget.CardView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_sar_a_button"
             style="@style/Widget.AppCompat.Button"
             android:layout_width="fill_parent"
@@ -165,7 +168,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_cardview" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_sar_l_button"
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"
@@ -190,7 +193,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_sar_n_button"
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"

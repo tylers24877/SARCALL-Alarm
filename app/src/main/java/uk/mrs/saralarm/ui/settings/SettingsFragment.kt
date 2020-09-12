@@ -16,12 +16,8 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.Widget
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
-import java.lang.reflect.Type
 
 
 class SettingsFragment : Fragment() {
@@ -40,11 +36,6 @@ class SettingsFragment : Fragment() {
             val findPreference1: Preference? = findPreference("prefEnabled")
             findPreference1!!.onPreferenceChangeListener = this
 
-            val findPreference2: Preference? = findPreference("prefUsePhoneNumber")
-            findPreference2!!.onPreferenceChangeListener = this
-
-            val customAlarmSound: Preference? = findPreference("customAlarm")
-            customAlarmSound!!.onPreferenceClickListener = this
         }
 
 
@@ -98,8 +89,8 @@ class SettingsFragment : Fragment() {
                     }
                 }
             }
-            if (sP.getBoolean("prefEnabled", false) && !sP.getBoolean("prefUsePhoneNumber", false)) {
-                if (sP.getString("prefUseCustomTrigger", "")!!.isEmpty()) {
+            if (sP.getBoolean("prefEnabled", false)) {
+                if (sP.getString("rulesJSON", "")!!.isEmpty()) {
                     findPreference<SwitchPreferenceCompat>("prefEnabled")!!.isChecked = false
                     Snackbar.make(requireView(), ("SARCALL Alarm is disabled! Please choose an activation method, then re-enable." as CharSequence), Snackbar.LENGTH_LONG).show()
                 }
@@ -119,17 +110,9 @@ class SettingsFragment : Fragment() {
 
         override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
             val sP: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            if (preference.key == "prefEnabled" && (newValue as Boolean) && !sP.getBoolean("prefUsePhoneNumber", false)) {
-                if (sP.getString("prefUseCustomTrigger", "")!!.isEmpty()) {
+            if (preference.key == "prefEnabled" && (newValue as Boolean)) {
+                if (sP.getString("rulesJSON", "")!!.isEmpty()) {
                     Snackbar.make(requireView(), ("Error. Please choose an activation method first."), Snackbar.LENGTH_LONG).show()
-                    return false
-                }
-            }
-            if (preference.key == "prefUsePhoneNumber" && (newValue as Boolean)) {
-                val type: Type = object : TypeToken<ArrayList<SMSNumberObject>?>() {}.type
-                val fromJson: ArrayList<SMSNumberObject>? = Gson().fromJson(sP.getString("SMSNumbersJSON", ""), type)
-                if (fromJson.isNullOrEmpty()) {
-                    Snackbar.make(requireView(), ("Please set the SARCALL SMS number to use this method."), Snackbar.LENGTH_LONG).show()
                     return false
                 }
             }

@@ -17,10 +17,12 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.ui.settings.deepui.phone_numbers.support.SMSNumberObject
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.lang.reflect.Type
 import java.text.DateFormat
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.collections.HashSet
 
 class RespondViewModel : ViewModel() {
@@ -31,32 +33,33 @@ class RespondViewModel : ViewModel() {
     fun setEta(eta: Int) {
         mEta.value = Integer.valueOf(eta)
     }
-    fun setPreviewAsync(context: Context) : Deferred<Pair<String,String>> {
+
+    fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
-            var skip: Boolean
-            var skipEmpty = false
             val phoneUtil = PhoneNumberUtil.getInstance()
-            val usePhoneNumber = pref.getBoolean("prefUsePhoneNumber", false)
-            val customTrigger = pref.getString("prefUseCustomTrigger", "")
-            val phoneNumberSet = HashSet<Phonenumber.PhoneNumber>()
+            val typeRuleObject: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
+            val rulesFromJson: ArrayList<RulesObject>? = Gson().fromJson(pref.getString("rulesJSON", ""), typeRuleObject)
 
-            var setBodyDate: Pair<String,String> = Pair("","")
+            val rulesBothSet: HashSet<RulesObject> = HashSet()
+            val rulesSMSSet: HashSet<RulesObject> = HashSet()
+            val rulesPhraseSet: HashSet<RulesObject> = HashSet()
 
-            val type: Type = object : TypeToken<ArrayList<SMSNumberObject>?>() {}.type
-            val fromJson: ArrayList<SMSNumberObject>? = Gson().fromJson(pref.getString("SMSNumbersJSON", ""), type)
+            var setBodyAndDate: Pair<String, String> = Pair("No Messages", "")
 
-            if (customTrigger.isNullOrBlank() && !usePhoneNumber) {
+            if (rulesFromJson.isNullOrEmpty()) {
                 Pair(context.getString(R.string.setup_needed), "")
-            }else {
-
-                if (!fromJson.isNullOrEmpty()) {
-                    val it: Iterator<*> = fromJson.iterator()
-                    while (it.hasNext()) {
+            } else {
+                for (r in rulesFromJson) {
+                    if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
                         try {
-                            phoneNumberSet.add(phoneUtil.parse((it.next() as SMSNumberObject).phoneNumber, "GB"))
+                            rulesBothSet.add(r)
                         } catch (e: NumberParseException) {
                         }
+                    } else if (r.choice == RulesChoice.SMS_NUMBER && r.smsNumber.isNotBlank()) {
+                        rulesSMSSet.add(r)
+                    } else if (r.choice == RulesChoice.PHRASE && r.phrase.isNotBlank()) {
+                        rulesPhraseSet.add(r)
                     }
                 }
 
@@ -71,49 +74,63 @@ class RespondViewModel : ViewModel() {
                                 val phoneNumberC: String = c.getString(c.getColumnIndexOrThrow("address"))
                                 val date = Date(smsDate.toLong())
 
-                                //if use Custom Trigger Message without phone number
-                                if (!usePhoneNumber) {
-                                    if (!customTrigger.isNullOrBlank()) {
-                                        if (body.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), "")
-                                                .contains(customTrigger.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), ""))
-                                        ) {
-                                            setBodyDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
-                                            skipEmpty = true
-                                            break@work
-                                        }
-                                    }
-                                } else {
-                                    skip = if (!customTrigger.isNullOrBlank())
-                                        !body.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), "")
-                                            .contains(customTrigger.toLowerCase(Locale.getDefault()).replace("\\s+".toRegex(), ""))
-                                    else false
 
-                                    if (!skip) {
-                                        if (checkSMSNumberSet(phoneNumberSet, phoneNumberC, phoneUtil)) {
-                                            setBodyDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
-                                            skipEmpty = true
-                                            break@work
-                                        }
-                                    }
+                                if (checkRulesBoth(rulesBothSet, body, phoneNumberC, phoneUtil)) {
+                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                    break@work
+                                } else if (checkRulesSMSNumber(rulesSMSSet, phoneNumberC, phoneUtil)) {
+                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                    break@work
+                                } else if (checkRulesPhrase(rulesPhraseSet, body)) {
+                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                    break@work
                                 }
                             }
+
                         } while (c.moveToNext())
-                        if (!skipEmpty) {
-                            setBodyDate = Pair("No Messsages", "")
-                        }
                     }
                     c.close()
                 }
-                setBodyDate
+                setBodyAndDate
             }
         }
     }
-    private fun checkSMSNumberSet(SS: Set<Phonenumber.PhoneNumber>, m: String, phoneUtil: PhoneNumberUtil): Boolean {
+
+    private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Boolean {
         for (s in SS) {
-            if (PhoneNumberUtils.compare(phoneUtil.format(s, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), m)) {
+            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
                 return true
             }
         }
         return false
     }
+
+    private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Boolean {
+        for (s in rulesSMSSet) {
+            try {
+                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+                if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
+                    return true
+                }
+            } catch (e: NumberParseException) {
+            }
+        }
+        return false
+    }
+
+    private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Boolean {
+        for (s in SS) {
+            try {
+                if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
+                    val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+                    if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
+                        return true
+                    }
+                }
+            } catch (e: NumberParseException) {
+            }
+        }
+        return false
+    }
 }
+

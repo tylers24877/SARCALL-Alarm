@@ -7,31 +7,12 @@
         android:summary="@string/pref_enabled_summary"
         android:title="@string/pref_enabled_title"
         app:icon="@drawable/ic_baseline_power_settings_new_24" />
-    <Preference
-        android:key="customAlarm"
-        android:summary="Customise some features of the alarm to your liking. Such as the alarm sound and colours."
-        android:title="Customise Alarm" />
 
-    <PreferenceCategory app:title="SARCALL Activation Methods" />
+    <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference android:title="Trigger Rules" />
 
-    <SwitchPreferenceCompat
-        android:defaultValue="false"
-        android:disableDependentsState="true"
-        android:key="prefUsePhoneNumber"
-        android:summary="Activate when an SMS is received from the SARCALL number, instead of a keyword trigger."
-        android:title="Use SARCALL SMS Number" />
-    <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference android:title="SARCALL SMS Numbers" />
-<!--    <EditTextPreference
-        android:key="prefUseCustomTrigger"
-        android:summary="If you have a common keyword which is prefixed onto all your teams&apos; callout SMS messages, use this method.\10For example...: &quot;LAKESMRT FT&quot;"
-        android:title="Use Custom Keyword Trigger" />-->
-        <uk.mrs.saralarm.ui.settings.deepui.triggers.TriggersPreference
-        android:key="prefUseCustomTriggerList"
-        android:summary="If you have a common keyword which is prefixed onto all your teams&apos; callout SMS messages, use this method.\10For example...: &quot;LAKESMRT FT&quot;"
-        android:title="Use Custom Keyword Trigger" />
 
     <PreferenceCategory android:title="Respond" />
-
+    <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference android:title="SAR A/L/N Reply Number" />
     <uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesPreference
         android:summary="Setup response messages for use when responding with SAR A/L\10For example...&quot;On my way to RV.&quot;"
         android:title="Predefined Response Messages" />
