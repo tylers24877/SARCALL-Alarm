@@ -3,7 +3,6 @@ package uk.mrs.saralarm
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
@@ -14,7 +13,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
 import android.view.View
-import androidx.preference.PreferenceManager
 import kotlinx.android.synthetic.main.activity_alarm.*
 import java.io.FileInputStream
 import java.io.IOException
@@ -24,20 +22,22 @@ class Alarm : Activity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
     private var vibrator: Vibrator? = null
-
     /* access modifiers changed from: protected */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         requestWindowFeature(1)
         window.addFlags(6816896)
         setContentView(R.layout.activity_alarm)
+
+        println(intent.getStringExtra("alarmPreviewSMSBody"))
+        alarmPreviewSMSTextView.text = if (intent.getStringExtra("alarmPreviewSMSBody") != null) intent.getStringExtra("alarmPreviewSMSBody") else "Preview not available"
+        alarmPreviewSMSNumberTextView.text = if (intent.getStringExtra("alarmPreviewSMSNumber") != null) "From: " + intent.getStringExtra("alarmPreviewSMSNumber") else ""
 
         mp = MediaPlayer()
         mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
         mp!!.isLooping = true
         try {
-            val fileInputStream = FileInputStream(pref.getString("prefSoundLocation", ""))
+            val fileInputStream = FileInputStream(intent.getStringExtra("soundFile"))
             mp!!.setDataSource(fileInputStream.fd)
             fileInputStream.close()
         } catch (e: IOException) {
@@ -48,7 +48,7 @@ class Alarm : Activity() {
             }
         }
         mp!!.prepare()
-        mp!!.start()
+        // mp!!.start()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         val maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
@@ -88,7 +88,7 @@ class Alarm : Activity() {
     /* access modifiers changed from: protected */
     public override fun onResume() {
         super.onResume()
-         mp?.start()
+        //mp?.start()
     }
 
     /* access modifiers changed from: protected */

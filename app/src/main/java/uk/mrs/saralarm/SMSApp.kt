@@ -8,7 +8,6 @@ import android.hardware.display.DisplayManager
 import android.os.Build
 import android.os.Build.VERSION
 import android.os.PowerManager
-import android.provider.Telephony
 import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.view.Display
@@ -58,111 +57,122 @@ class SMSApp : BroadcastReceiver() {
                 }
             }
 
-            if (VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (intent.action.equals("android.provider.Telephony.SMS_RECEIVED")) {
-                    for (smsMessage in Telephony.Sms.Intents.getMessagesFromIntent(intent)) {
-                        checkMessages(pref, smsMessage, rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
-                    }
-                }
-            } else {
-                //get bundle of extras from intent.
+            if (intent.action.equals("android.provider.Telephony.SMS_RECEIVED")) {
                 val bundle = intent.extras
-                //check whether the bundle is not null
-                if (bundle != null) {
-                    //if true, get the string of the text message content.
-                    val plusObj = (bundle["pdus"] as Array<*>?)!!
-                    for (aPlusObj in plusObj) {
-                        checkMessages(pref, SmsMessage.createFromPdu(aPlusObj as ByteArray), rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
+                val msgs: Array<SmsMessage?>
+                var strMessage = ""
+                var smsNumber = ""
+                val format = bundle!!.getString("format")
+                // Retrieve the SMS message received.
+                val pdus = bundle["pdus"] as Array<*>?
+                if (pdus != null) { // Check the Android version.
+                    // Fill the msgs array.
+                    msgs = arrayOfNulls(pdus.size)
+                    for (i in msgs.indices) {
+                        if (VERSION.SDK_INT >= Build.VERSION_CODES.M) { // If Android version M or newer:
+                            msgs[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray, format)
+                        } else { // If Android version L or older:
+                            msgs[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray)
+                        }
+                        // Build the message to show.
+                        strMessage += msgs[i]?.messageBody
                     }
+                    smsNumber = msgs[0]!!.displayOriginatingAddress
+                    checkMessages(strMessage, smsNumber, rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
                 }
             }
         }
     }
 
     private fun checkMessages(
-        pref: SharedPreferences,
-        smsMessage: SmsMessage,
+        strMessage: String,
+        smsNumber: String,
         rulesBothSet: HashSet<RulesObject>,
         rulesSMSSet: HashSet<RulesObject> = HashSet(),
         rulesPhraseSet: HashSet<RulesObject>,
         phoneUtil: PhoneNumberUtil,
         context: Context
     ) {
-        when {
-            checkRulesBoth(rulesBothSet, smsMessage.messageBody, smsMessage.originatingAddress.toString(), phoneUtil) -> {
-                if (checkScreenState(context)) {
-                    ActivationNotification.notifyPostAlarm(context)
-                } else {
-                    notify(context)
-                }
+
+        val checkRulesBoth = checkRulesBoth(rulesBothSet, strMessage, smsNumber, phoneUtil)
+        if (checkRulesBoth.first) {
+            if (checkScreenState(context)) {
+                ActivationNotification.notifyPostAlarm(context)
+            } else {
+                notify(context, checkRulesBoth.second, strMessage, smsNumber)
             }
-            checkRulesSMSNumber(rulesSMSSet, smsMessage.originatingAddress.toString(), phoneUtil) -> {
+        } else {
+            val checkRulesSMSNumber = checkRulesSMSNumber(rulesSMSSet, smsNumber, phoneUtil)
+            if (checkRulesSMSNumber.first) {
                 if (checkScreenState(context)) {
                     ActivationNotification.notifyPostAlarm(context)
                 } else {
-                    notify(context)
+                    notify(context, checkRulesBoth.second, strMessage, smsNumber)
                 }
-            }
-            checkRulesPhrase(rulesPhraseSet, smsMessage.messageBody) -> {
-                if (checkScreenState(context)) {
-                    ActivationNotification.notifyPostAlarm(context)
-                } else {
-                    notify(context)
+            } else {
+                val checkRulesPhrase = checkRulesPhrase(rulesPhraseSet, strMessage)
+                if (checkRulesPhrase.first) {
+                    if (checkScreenState(context)) {
+                        ActivationNotification.notifyPostAlarm(context)
+                    } else {
+                        notify(context, checkRulesBoth.second, strMessage, smsNumber)
+                    }
                 }
             }
         }
-
     }
 
-    private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Boolean {
-        for (s in SS) {
-            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
+}
+
+private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Pair<Boolean, String> {
+    for (s in SS) {
+        if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
+            return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+        }
+    }
+    return Pair(false, "")
+}
+
+private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Pair<Boolean, String> {
+    for (s in rulesSMSSet) {
+        try {
+            val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+            if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
+                return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+            }
+        } catch (e: NumberParseException) {
+        }
+    }
+    return Pair(false, "")
+}
+
+private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Pair<Boolean, String> {
+    for (s in SS) {
+        try {
+            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
+                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
+                if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
+                    return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+                }
+            }
+        } catch (e: NumberParseException) {
+        }
+    }
+    return Pair(false, "")
+}
+
+private fun checkScreenState(context: Context): Boolean {
+    return if (VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+        val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        for (display in dm.displays) {
+            if (display.state == Display.STATE_ON) {
                 return true
             }
         }
-        return false
-    }
-
-    private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Boolean {
-        for (s in rulesSMSSet) {
-            try {
-                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
-                if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
-                    return true
-                }
-            } catch (e: NumberParseException) {
-            }
-        }
-        return false
-    }
-
-    private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Boolean {
-        for (s in SS) {
-            try {
-                if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
-                    val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
-                    if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
-                        return true
-                    }
-                }
-            } catch (e: NumberParseException) {
-            }
-        }
-        return false
-    }
-
-    private fun checkScreenState(context: Context): Boolean {
-        return if (VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-            for (display in dm.displays) {
-                if (display.state == Display.STATE_ON) {
-                    return true
-                }
-            }
-            false
-        } else {
-            val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            pm.isScreenOn
-        }
+        false
+    } else {
+        val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        pm.isScreenOn
     }
 }
+

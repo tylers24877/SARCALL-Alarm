@@ -65,34 +65,35 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (mData[holder.adapterPosition].isBlank()) {
+        if (mData[holder.layoutPosition].isBlank()) {
             holder.myTextView.setText("")
-            holder.myTextView.hint ="Type Here..."
+            holder.myTextView.hint = "Type Here..."
         } else {
-            holder.myTextView.setText(mData[holder.adapterPosition])
+            holder.myTextView.setText(mData[holder.layoutPosition])
         }
-
-        holder.myTextView.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable) {
-
-                    mData[holder.adapterPosition]= holder.myTextView.text.toString()
-
-            }
-        })
-
     }
 
     inner class ViewHolder(v: CustomMessagesRecyclerViewAdapter, itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
         var myTextView: TextInputEditText = itemView.customMessageEditText
         var textInput: TextInputLayout = itemView.custom_message_recycler_textInput
+
+        init {
+            myTextView.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+                }
+
+                override fun afterTextChanged(s: Editable) {
+
+                    mData[adapterPosition] = myTextView.text.toString()
+
+                }
+            })
+        }
 
         override fun onItemSelected() {
             val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))

@@ -6,7 +6,6 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import android.text.Editable
 import android.text.InputFilter
-import android.text.InputFilter.LengthFilter
 import android.text.TextWatcher
 import android.util.DisplayMetrics
 import android.util.TypedValue
@@ -32,6 +31,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     var mContext: Context = context
     private val mData: ArrayList<String> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
 
     override fun getItemCount(): Int {
         return mData.size
@@ -51,7 +51,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
 
     fun addItem() {
         mData.add("")
-        notifyDataSetChanged()
+        notifyItemInserted(mData.size)
     }
 
     fun saveData() {
@@ -80,7 +80,6 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
         if (mData[holder.adapterPosition].isBlank()) {
             holder.myTextView.setText("")
         } else {
@@ -95,45 +94,46 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
             }
             holder.myTextView.setText(mData[holder.adapterPosition])
         }
-        holder.myTextView.inputType = 3
-        holder.myTextView.maxLines = 1
-        holder.myTextView.filters = arrayOf<InputFilter>(LengthFilter(16))
-
-
-        holder.myTextView.addTextChangedListener(object : TextWatcher {
-            var editing = false
-
-            override fun afterTextChanged(s: Editable) {
-                if (!editing) {
-                    try {
-                        val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
-                        if (!phoneUtil.isValidNumber(formattedNumber)) {
-                            holder.textInput.error = "SMS Number is in the wrong format"
-                        } else {
-                            editing = true
-                            val prevSelection: Int = holder.myTextView.selectionStart
-                            val prevLength: Int = holder.myTextView.length()
-                            holder.myTextView.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
-                            holder.myTextView.setSelection(holder.myTextView.length() - prevLength + prevSelection)
-                            holder.textInput.error = ""
-                        }
-                    } catch (e: NumberParseException) {
-                        holder.textInput.error = "SMS Number is in the wrong format"
-                    }
-                    editing = false
-                }
-                mData[holder.adapterPosition] = holder.myTextView.text.toString()
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-        })
     }
+
 
     inner class ViewHolder(v: SMSNumbersRecyclerViewAdapter, itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
         var myTextView: TextInputEditText = itemView.SMSNumbersCustomMessageEditText
         var textInput: TextInputLayout = itemView.SMSNumbersRecyclerTextInput
+
+        init {
+            myTextView.inputType = 3
+            myTextView.maxLines = 1
+            myTextView.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(16))
+            myTextView.addTextChangedListener(object : TextWatcher {
+
+                override fun afterTextChanged(editable: Editable) {
+                    if (editable.isNotBlank())
+                        try {
+                            val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(editable.toString(), "GB")
+                            if (!phoneUtil.isValidNumber(formattedNumber)) {
+                                textInput.error = "SMS Number is in the wrong format"
+                            } else {
+                                myTextView.removeTextChangedListener(this)
+                                val prevSelection: Int = myTextView.selectionStart
+                                val prevLength: Int = myTextView.length()
+                                myTextView.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
+                                myTextView.setSelection(myTextView.length() - prevLength + prevSelection)
+                                textInput.error = ""
+                                myTextView.addTextChangedListener(this)
+                            }
+                            mData[adapterPosition] = phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+                        } catch (e: NumberParseException) {
+                            textInput.error = "SMS Number is in the wrong format"
+                        }
+                    mData[adapterPosition] = myTextView.text.toString()
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            })
+        }
 
         override fun onItemSelected() {
             val animator = ObjectAnimator.ofFloat(itemView.sms_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))

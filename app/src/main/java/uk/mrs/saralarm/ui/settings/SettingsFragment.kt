@@ -38,45 +38,6 @@ class SettingsFragment : Fragment() {
 
         }
 
-
-       /* override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-            if (data != null && requestCode == 5 && resultCode == -1) {
-                val file = File(getRealPathFromURI(data.data))
-                try {
-                    val requireContext: Context = requireContext()
-                    Intrinsics.checkNotNullExpressionValue(requireContext, "requireContext()")
-                    val filesDir: File = requireContext.getFilesDir()
-                    Intrinsics.checkNotNullExpressionValue(filesDir, "requireContext().filesDir")
-                    companion.copy(file, filesDir)
-                    val sP: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                    val edit = sP.edit()
-                    val sb = StringBuilder()
-                    val requireContext2: Context = requireContext()
-                    Intrinsics.checkNotNullExpressionValue(requireContext2, "requireContext()")
-                    sb.append(requireContext2.getFilesDir().toString())
-                    sb.append(File.separator)
-                    sb.append(file.getName())
-                    edit.putString("prefSoundLocation", sb.toString()).apply()
-                    println(sP.getString("prefSoundLocation", "DOES NOT EXIST"))
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }*/
-
-       /* private fun getRealPathFromURI(contentURI: Uri?): String? {
-            val requireContext: Context = requireContext()
-            Intrinsics.checkNotNullExpressionValue(requireContext, "requireContext()")
-            val contentResolver: ContentResolver = requireContext.getContentResolver()
-            Intrinsics.checkNotNull(contentURI)
-            val cursor = contentResolver.query(contentURI!!, null as Array<String?>?, null as String?, null as Array<String?>?, null as String?)
-                ?: return contentURI.path
-            cursor.moveToFirst()
-            val result = cursor.getString(cursor.getColumnIndex("_data"))
-            cursor.close()
-            return result
-        }*/
-
         override fun onSharedPreferenceChanged(sP: SharedPreferences, key: String) {
             if (key =="prefEnabled" && context != null) {
                 val intent = Intent(context, Widget::class.java)

@@ -2,10 +2,12 @@ package uk.mrs.saralarm.ui.settings.deepui.rules
 
 import android.animation.ObjectAnimator
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
@@ -21,8 +23,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
@@ -32,25 +37,15 @@ import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
+import java.io.File
 import java.util.*
-import kotlin.jvm.internal.Intrinsics
 
 
-var TextView.drawableEnd: Drawable?
-    get() = compoundDrawablesRelative[2]
-    set(value) = setDrawables(end = value)
-
-fun TextView.setDrawables(
-    start: Drawable? = null,
-    top: Drawable? = null,
-    end: Drawable? = null,
-    bottom: Drawable? = null
-) = setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom)
-
-class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) : RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
+class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragment, data: ArrayList<RulesObject>) : RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
-    private val mData: ArrayList<RulesObject> = data
+    val mData: ArrayList<RulesObject> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
 
     override fun getItemCount(): Int {
         return mData.size
@@ -64,6 +59,7 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
     }
 
     fun removeItems(adapterPosition: Int) {
+        checkAndRemoveFile(adapterPosition)
         mData.removeAt(adapterPosition)
         notifyItemRemoved(adapterPosition)
     }
@@ -92,7 +88,10 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
                 }
             }
         }
-        mData.removeAll(list)
+        if (list.isNotEmpty()) {
+            mData.removeAll(list)
+            notifyDataSetChanged()
+        }
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
@@ -110,9 +109,7 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
-
-        when (mData[holder.adapterPosition].choice) {
+        when (mData[holder.layoutPosition].choice) {
             RulesChoice.ALL -> {
                 holder.rulesRadioGroup.check(R.id.rulesRadioBoth)
                 holder.smsNumberTextInputLayout.visibility = View.VISIBLE
@@ -130,9 +127,9 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
             }
         }
 
-        if (mData[holder.adapterPosition].smsNumber.isNotBlank()) {
+        if (mData[holder.layoutPosition].smsNumber.isNotBlank()) {
             try {
-                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.adapterPosition].smsNumber, "GB"))) {
+                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.layoutPosition].smsNumber, "GB"))) {
                     holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
                 } else {
                     holder.smsNumberTextInputLayout.error = ""
@@ -141,84 +138,21 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
                 holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
             }
         }
-        holder.smsNumberEditText.inputType = 3
-        holder.smsNumberEditText.maxLines = 1
 
-        holder.smsNumberEditText.setText(mData[holder.adapterPosition].smsNumber)
-        holder.phraseEditText.setText(mData[holder.adapterPosition].phrase)
+        holder.smsNumberEditText.setText(mData[holder.layoutPosition].smsNumber)
+        holder.phraseEditText.setText(mData[holder.layoutPosition].phrase)
 
-        holder.smsNumberEditText.addTextChangedListener(object : TextWatcher {
-            var smsNumberEditing = false
-
-            override fun afterTextChanged(s: Editable) {
-                if (!smsNumberEditing) {
-                    try {
-                        val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
-                        if (!phoneUtil.isValidNumber(formattedNumber)) {
-                            holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
-                        } else {
-                            smsNumberEditing = true
-                            val prevSelection: Int = holder.smsNumberEditText.selectionStart
-                            val prevLength: Int = holder.smsNumberEditText.length()
-                            holder.smsNumberEditText.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
-                            holder.smsNumberEditText.setSelection(holder.smsNumberEditText.length() - prevLength + prevSelection)
-                            holder.smsNumberTextInputLayout.error = ""
-                        }
-                    } catch (e: NumberParseException) {
-                        holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
-                    }
-                    smsNumberEditing = false
-                }
-                mData[holder.adapterPosition].smsNumber = holder.smsNumberEditText.text.toString()
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-        })
-
-        holder.phraseEditText.addTextChangedListener(object : TextWatcher {
-
-            override fun afterTextChanged(s: Editable) {
-                mData[holder.adapterPosition].phrase = holder.phraseEditText.text.toString()
-            }
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-        })
-
-        holder.rulesRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.rulesRadioBoth -> {
-                    mData[holder.adapterPosition].choice = RulesChoice.ALL
-                    holder.smsNumberTextInputLayout.visibility = View.VISIBLE
-                    holder.phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
-                }
-                R.id.rulesRadioTrigger -> {
-                    mData[holder.adapterPosition].choice = RulesChoice.PHRASE
-                    holder.smsNumberTextInputLayout.visibility = View.GONE
-                    holder.phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
-                }
-                R.id.rulesRadioSMSNumber -> {
-                    mData[holder.adapterPosition].choice = RulesChoice.SMS_NUMBER
-                    holder.smsNumberTextInputLayout.visibility = View.VISIBLE
-                    holder.phraseRulesRecyclerTextInputLayout.visibility = View.GONE
-                }
-            }
-        }
-
-        holder.customiseAlarmRulesTextView.setOnClickListener {
-            if (holder.customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
-                holder.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
-                holder.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
+        if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isEmpty()) {
+            holder.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
+            holder.addAlarmRulesButton.text = "Set Alarm Sound"
+        } else {
+            if (File(mData[holder.layoutPosition].customAlarmRulesObject.alarmFileLocation).exists()) {
+                holder.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                holder.addAlarmRulesButton.text = "Reset Alarm Sound"
             } else {
-                holder.customiseAlarmRulesConstraintLayout.visibility = View.GONE
-                holder.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
-
+                holder.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
+                holder.addAlarmRulesButton.text = "Set Alarm Sound"
             }
-
         }
     }
 
@@ -241,6 +175,122 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
 
         val customiseAlarmRulesTextView: TextView = itemView.customiseAlarmRulesTextView
         val customiseAlarmRulesConstraintLayout: ConstraintLayout = itemView.customiseAlarmRulesConstraintLayout
+
+        val addAlarmRulesButton: MaterialButton = itemView.addAlarmRulesButton
+        val addAlarmRulesTextView: MaterialTextView = itemView.addAlarmRulesTextView
+
+        init {
+            smsNumberEditText.inputType = 3
+            smsNumberEditText.maxLines = 1
+
+
+            smsNumberEditText.addTextChangedListener(object : TextWatcher {
+                var smsNumberEditing = false
+
+                override fun afterTextChanged(s: Editable) {
+                    if (s.isNotBlank())
+                        if (!smsNumberEditing) {
+                            try {
+                                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
+                                if (!phoneUtil.isValidNumber(formattedNumber)) {
+                                    smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                                } else {
+                                    smsNumberEditing = true
+                                    val prevSelection: Int = smsNumberEditText.selectionStart
+                                    val prevLength: Int = smsNumberEditText.length()
+                                    smsNumberEditText.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
+                                    smsNumberEditText.setSelection(smsNumberEditText.length() - prevLength + prevSelection)
+                                    smsNumberTextInputLayout.error = ""
+                                }
+                            } catch (e: NumberParseException) {
+                                smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                            }
+                            smsNumberEditing = false
+                        }
+                    mData[adapterPosition].smsNumber = smsNumberEditText.text.toString()
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            })
+
+            phraseEditText.addTextChangedListener(object : TextWatcher {
+
+                override fun afterTextChanged(s: Editable) {
+                    mData[adapterPosition].phrase = phraseEditText.text.toString()
+                }
+
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+            })
+
+            rulesRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                when (checkedId) {
+                    R.id.rulesRadioBoth -> {
+                        mData[adapterPosition].choice = RulesChoice.ALL
+                        smsNumberTextInputLayout.visibility = View.VISIBLE
+                        phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                    }
+                    R.id.rulesRadioTrigger -> {
+                        mData[adapterPosition].choice = RulesChoice.PHRASE
+                        smsNumberTextInputLayout.visibility = View.GONE
+                        phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                    }
+                    R.id.rulesRadioSMSNumber -> {
+                        mData[adapterPosition].choice = RulesChoice.SMS_NUMBER
+                        smsNumberTextInputLayout.visibility = View.VISIBLE
+                        phraseRulesRecyclerTextInputLayout.visibility = View.GONE
+                    }
+                }
+            }
+
+            customiseAlarmRulesTextView.setOnClickListener {
+                if (customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
+                    customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
+                    customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
+                } else {
+                    customiseAlarmRulesConstraintLayout.visibility = View.GONE
+                    customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
+
+                }
+
+            }
+
+            addAlarmRulesButton.setOnClickListener {
+                if (addAlarmRulesButton.text == "Set Alarm Sound") {
+                    when (mData[adapterPosition].choice) {
+                        RulesChoice.PHRASE ->
+                            if (mData[adapterPosition].phrase == "") {
+                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                return@setOnClickListener
+                            }
+                        RulesChoice.SMS_NUMBER ->
+                            if (mData[adapterPosition].smsNumber == "") {
+                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                return@setOnClickListener
+                            }
+                        RulesChoice.ALL -> {
+                            if (mData[adapterPosition].smsNumber == "" && mData[adapterPosition].phrase == "") {
+                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                return@setOnClickListener
+                            }
+                        }
+                    }
+                    val audioPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+
+                    rulesFragment.position = adapterPosition
+
+                    rulesFragment.startActivityForResult(audioPickerIntent, 5)
+                } else {
+                    checkAndRemoveFile(adapterPosition)
+                    notifyItemChanged(adapterPosition)
+                }
+            }
+        }
+
         override fun onItemSelected() {
             val animator = ObjectAnimator.ofFloat(itemView.rules_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
@@ -248,7 +298,6 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
         }
 
         override fun onItemClear() {
-            Intrinsics.checkNotNullExpressionValue(itemView, "itemView")
             val animator = ObjectAnimator.ofFloat(itemView.rules_recycler_cardview, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
@@ -260,6 +309,40 @@ class RulesRecyclerViewAdapter(context: Context, data: ArrayList<RulesObject>) :
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(1, dipValue, metrics)
         }
+
         override fun onClick(v: View?) {}
     }
+
+    fun checkAndRemoveFile(adapterPosition: Int) {
+        if (mData[adapterPosition].customAlarmRulesObject.alarmFileLocation != "") {
+            var inUse = false
+            for ((index, m) in mData.withIndex()) {
+                if (m.customAlarmRulesObject.alarmFileName == mData[adapterPosition].customAlarmRulesObject.alarmFileName && index != adapterPosition) {
+                    inUse = true
+                }
+            }
+            if (!inUse) {
+                val deleteFile = File(mData[adapterPosition].customAlarmRulesObject.alarmFileLocation)
+                if (deleteFile.isFile && deleteFile.exists()) {
+                    deleteFile.delete()
+                }
+            }
+            mData[adapterPosition].customAlarmRulesObject.alarmFileLocation = ""
+            mData[adapterPosition].customAlarmRulesObject.alarmFileName = ""
+        }
+    }
+
+
 }
+
+
+var TextView.drawableEnd: Drawable?
+    get() = compoundDrawablesRelative[2]
+    set(value) = setDrawables(end = value)
+
+fun TextView.setDrawables(
+    start: Drawable? = null,
+    top: Drawable? = null,
+    end: Drawable? = null,
+    bottom: Drawable? = null
+) = setCompoundDrawablesRelativeWithIntrinsicBounds(start, top, end, bottom)

@@ -12,10 +12,11 @@ import androidx.core.app.NotificationCompat
 
 object ActivationNotification {
 
-    fun notify(context: Context) {
+    fun notify(context: Context, soundFile: String, alarmPreviewSMSBody: String, alarmPreviewSMSNumber: String) {
         val title = context.resources.getString(R.string.activation_notification_title_template)
 
         val fullScreenIntent = Intent(context, Alarm::class.java)
+        fullScreenIntent.putExtra("soundFile", soundFile).putExtra("alarmPreviewSMSBody", alarmPreviewSMSBody).putExtra("alarmPreviewSMSNumber", alarmPreviewSMSNumber)
         fullScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY).addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         val fullScreenPendingIntent = PendingIntent.getActivity(context, 0, fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 

@@ -6,20 +6,31 @@
         android:key="prefEnabled"
         android:summary="@string/pref_enabled_summary"
         android:title="@string/pref_enabled_title"
-        app:icon="@drawable/ic_baseline_power_settings_new_24" />
+        app:iconSpaceReserved="false" />
+    <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
+        android:summary="Configure multiple rules using a phrase, SMS number or both.\nYou're also able to customise the alarm, for each rule, by setting a custom alarm sound and change the colours."
+        android:title="Trigger Rules"
+        app:iconSpaceReserved="false" />
 
-    <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference android:title="Trigger Rules" />
+    <PreferenceCategory
+        android:title="Respond"
+        app:iconSpaceReserved="false" />
 
-
-    <PreferenceCategory android:title="Respond" />
-    <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference android:title="SAR A/L/N Reply Number" />
+    <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference
+        android:summary="Set the SMS numbers to send the SAR A/L/N SMS to from the &quot;Respond&quot; Page.\nThis can be sent to multiple numbers at the same time."
+        android:title="SAR A/L/N Reply Number"
+        app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesPreference
         android:summary="Setup response messages for use when responding with SAR A/L\10For example...&quot;On my way to RV.&quot;"
-        android:title="Predefined Response Messages" />
-    <PreferenceCategory app:title="Advanced" />
+        android:title="Predefined Response Messages"
+        app:iconSpaceReserved="false" />
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:title="Advanced" />
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="betaChannel"
         android:summary="Subscribe to the beta version of this app"
-        android:title="Beta Channel" />
+        android:title="Beta Channel"
+        app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>
