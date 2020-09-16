@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.settings_rules_fragment.view.*
@@ -69,7 +71,7 @@ class RulesFragment : Fragment(), CoroutineScope {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (data != null && requestCode == 5 && resultCode == -1) {
-            val file = File(getRealPathFromURI(data.data))
+            val file = File(getRealPathFromURI(data.data)!!)
             try {
                 copy(file, requireContext().filesDir)
                 adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + file.name
@@ -77,7 +79,8 @@ class RulesFragment : Fragment(), CoroutineScope {
                 adapter!!.saveData()
                 adapter!!.notifyItemChanged(position)
             } catch (e: IOException) {
-                e.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
             }
         }
     }

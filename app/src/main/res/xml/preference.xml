@@ -8,8 +8,9 @@
         android:title="@string/pref_enabled_title"
         app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
-        android:summary="Configure as many rules as you like using a phrase, SMS number or both.\nIf the &quot;Both&quot; option is selected, a received SMS containing the phrase would've had to come from &quot;SMS Number&quot; to trigger the alarm.\n \nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)\n \nYou're also able to customise the alarm, for each rule, by setting a custom alarm sound (more customisation options coming soon)."
+        android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the phrase would've had to come from &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
         android:title="Trigger Rules"
+
         app:iconSpaceReserved="false" />
 
     <PreferenceCategory

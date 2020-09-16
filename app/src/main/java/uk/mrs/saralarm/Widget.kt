@@ -50,20 +50,23 @@ class Widget : AppWidgetProvider() {
         if (WIDGET_CLICK == intent.action) {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
 
-            if (pref.getBoolean("prefEnabled", false)) {
-                pref.edit().putBoolean("prefEnabled", false).apply()
-                Toast.makeText(context, "SARCALL Alarm disabled", Toast.LENGTH_SHORT).show()
-            } else
-                if (pref.getString("rulesJSON", "")!!.isNotEmpty()) {
+            when {
+                pref.getBoolean("prefEnabled", false) -> {
+                    pref.edit().putBoolean("prefEnabled", false).apply()
+                    Toast.makeText(context, "SARCALL Alarm disabled", Toast.LENGTH_SHORT).show()
+                }
+                pref.getString("rulesJSON", "")!!.isNotEmpty() -> {
                     pref.edit().putBoolean("prefEnabled", true).apply()
                     Toast.makeText(context, "SARCALL Alarm enabled", Toast.LENGTH_SHORT).show()
-                } else {
+                }
+                else -> {
                     Toast.makeText(
                         context,
                         "Unable to activate SARCALL Alarm. No activation method chosen in app settings.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+            }
             onUpdate(context)
         }
     }

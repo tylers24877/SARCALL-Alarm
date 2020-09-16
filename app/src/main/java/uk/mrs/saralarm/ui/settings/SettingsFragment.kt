@@ -53,7 +53,7 @@ class SettingsFragment : Fragment() {
             if (sP.getBoolean("prefEnabled", false)) {
                 if (sP.getString("rulesJSON", "")!!.isEmpty()) {
                     findPreference<SwitchPreferenceCompat>("prefEnabled")!!.isChecked = false
-                    Snackbar.make(requireView(), ("SARCALL Alarm is disabled! Please choose an activation method, then re-enable." as CharSequence), Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(requireView(), ("SARCALL Alarm is disabled! Please add a rule, then re-enable." as CharSequence), Snackbar.LENGTH_LONG).show()
                 }
             }
         }
@@ -73,7 +73,7 @@ class SettingsFragment : Fragment() {
             val sP: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             if (preference.key == "prefEnabled" && (newValue as Boolean)) {
                 if (sP.getString("rulesJSON", "")!!.isEmpty()) {
-                    Snackbar.make(requireView(), ("Error. Please choose an activation method first."), Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(requireView(), ("Error. Please add a rule first."), Snackbar.LENGTH_LONG).show()
                     return false
                 }
             }

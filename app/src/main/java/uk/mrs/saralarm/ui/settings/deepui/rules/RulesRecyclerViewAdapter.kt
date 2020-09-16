@@ -19,6 +19,7 @@ import android.view.animation.AccelerateInterpolator
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
@@ -260,33 +261,37 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
 
             addAlarmRulesButton.setOnClickListener {
-                if (addAlarmRulesButton.text == "Set Alarm Sound") {
-                    when (mData[adapterPosition].choice) {
-                        RulesChoice.PHRASE ->
-                            if (mData[adapterPosition].phrase == "") {
-                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
-                                return@setOnClickListener
-                            }
-                        RulesChoice.SMS_NUMBER ->
-                            if (mData[adapterPosition].smsNumber == "") {
-                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
-                                return@setOnClickListener
-                            }
-                        RulesChoice.ALL -> {
-                            if (mData[adapterPosition].smsNumber == "" && mData[adapterPosition].phrase == "") {
-                                Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
-                                return@setOnClickListener
+                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.RECEIVE_SMS") == 0) {
+                    if (addAlarmRulesButton.text == "Set Alarm Sound") {
+                        when (mData[adapterPosition].choice) {
+                            RulesChoice.PHRASE ->
+                                if (mData[adapterPosition].phrase == "") {
+                                    Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                    return@setOnClickListener
+                                }
+                            RulesChoice.SMS_NUMBER ->
+                                if (mData[adapterPosition].smsNumber == "") {
+                                    Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                    return@setOnClickListener
+                                }
+                            RulesChoice.ALL -> {
+                                if (mData[adapterPosition].smsNumber == "" && mData[adapterPosition].phrase == "") {
+                                    Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
+                                    return@setOnClickListener
+                                }
                             }
                         }
+                        val audioPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
+
+                        rulesFragment.position = adapterPosition
+
+                        rulesFragment.startActivityForResult(audioPickerIntent, 5)
+                    } else {
+                        checkAndRemoveFile(adapterPosition)
+                        notifyItemChanged(adapterPosition)
                     }
-                    val audioPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
-
-                    rulesFragment.position = adapterPosition
-
-                    rulesFragment.startActivityForResult(audioPickerIntent, 5)
                 } else {
-                    checkAndRemoveFile(adapterPosition)
-                    notifyItemChanged(adapterPosition)
+                    Snackbar.make(itemView, ("No read/write permission granted." as CharSequence), Snackbar.LENGTH_LONG).show()
                 }
             }
         }

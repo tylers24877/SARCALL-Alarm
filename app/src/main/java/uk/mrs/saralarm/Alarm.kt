@@ -13,7 +13,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
 import android.view.View
+import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import java.io.FileInputStream
 import java.io.IOException
@@ -45,7 +47,8 @@ class Alarm : Activity() {
             try {
                 mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
             } catch (e2: IOException) {
-                e2.printStackTrace()
+                FirebaseCrashlytics.getInstance().recordException(e)
+                Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show()
             }
         }
         mp!!.prepare()
