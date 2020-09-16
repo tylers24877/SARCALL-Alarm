@@ -8,8 +8,8 @@
     <string name="appwidget_text">SARCALL</string>
     <string name="notification_alarm_channel_id">Alarm Trigger Full Screen</string>
     <string name="placeholder_text">{PLACEHOLDER TEXT}</string>
-    <string name="pref_enabled_summary">Enable or disable the SMS alarm.\10This will NOT enable if none of the activation methods are chosen.</string>
-    <string name="pref_enabled_title">SARCALL Alarm Enabled</string>
+    <string name="pref_enabled_summary">Enable or disable the SMS alarm.\nThis will NOT enable no rules are configured.</string>
+    <string name="pref_enabled_title">SARCALL Alarm ON/OFF</string>
     <string name="respond_received_sarcall_sms_heading">Latest SARCALL SMS</string>
     <string name="response_attending_button">SAR A</string>
     <string name="response_date_received">Date Received</string>
@@ -32,8 +32,6 @@
     <string name="sar_l_seek_bar_low_time">N/A</string>
     <string name="sar_n_negitive">Take me back</string>
     <string name="sar_n_positive">I\'m sure</string>
-    <string name="setup_needed">No activation method selected in settings.</string>
-    <string name="setup_summery_text">Please allow the app to access incoming SMS messages.\10\10You\'ll be asked to disable battery optimisation for this app. This is to allow SMS messages to be detected at all times. Don\'t worry, this app is very lightweight and it will not drain your battery.</string>
-    <string name="trigger_pref_title">SAR Team</string>
-    <string name="triggers_sum">Select your SAR Team</string>
+    <string name="setup_needed">No rules configured in settings</string>
+    <string name="setup_summery_text">In order for the app to work correctly, please allow the app to access incoming SMS messages and access to device storage.\nYou\'ll may be asked to disable battery optimisation for this app. This is to allow SMS messages to be detected at all times. Don\'t worry, this app is very lightweight and it will not drain your battery.</string>
 </resources>

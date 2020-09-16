@@ -78,9 +78,10 @@ class MainActivity : AppCompatActivity() {
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE")
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V1")
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V2")
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V3")
             val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-                .addTag("SARCALL_CHECK_UPDATE_V3_TAG").build()
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V3", ExistingPeriodicWorkPolicy.KEEP, build)
+                .addTag("SARCALL_CHECK_UPDATE_V4_TAG").build()
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V4", ExistingPeriodicWorkPolicy.KEEP, build)
         }
         upgradePreferences(pref)
 
@@ -95,9 +96,23 @@ class MainActivity : AppCompatActivity() {
     private fun upgradePreferences(pref: SharedPreferences) {
         val edit = pref.edit()
         val rulesNewObjectArray: ArrayList<RulesObject>
+        val smsNumberNewObjectArray: ArrayList<String>
         val oldSMSNumber = pref.getString("prefSetPhoneNumber", "")
         val oldTrigger = pref.getString("prefUseCustomTrigger", "")
 
+        if (!oldSMSNumber.isNullOrBlank()) {
+            val jsonNumber = pref.getString("respondSMSNumbersJSON", "")
+            if (jsonNumber.isNullOrBlank()) {
+                smsNumberNewObjectArray = ArrayList()
+                smsNumberNewObjectArray.add(oldSMSNumber)
+            } else {
+                val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
+                val fromJson: ArrayList<String> = Gson().fromJson(jsonNumber, type)
+                fromJson.add(oldSMSNumber)
+                smsNumberNewObjectArray = fromJson
+            }
+            edit.putString("respondSMSNumbersJSON", Gson().toJson(smsNumberNewObjectArray))
+        }
         if (!oldSMSNumber.isNullOrBlank() && !oldTrigger.isNullOrBlank()) {
             val json = pref.getString("rulesJSON", "")
             if (json.isNullOrBlank()) {
@@ -109,7 +124,8 @@ class MainActivity : AppCompatActivity() {
                 fromJson.add(RulesObject(smsNumber = oldSMSNumber, phrase = oldTrigger))
                 rulesNewObjectArray = fromJson
             }
-            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
+            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray))
+                .remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
         } else if (!oldSMSNumber.isNullOrBlank()) {
             val json = pref.getString("rulesJSON", "")
             if (json.isNullOrBlank()) {

@@ -106,6 +106,7 @@ class SMSApp : BroadcastReceiver() {
             if (checkRulesSMSNumber.first) {
                 if (checkScreenState(context)) {
                     ActivationNotification.notifyPostAlarm(context)
+
                 } else {
                     notify(context, checkRulesBoth.second, strMessage, smsNumber)
                 }
@@ -114,6 +115,7 @@ class SMSApp : BroadcastReceiver() {
                 if (checkRulesPhrase.first) {
                     if (checkScreenState(context)) {
                         ActivationNotification.notifyPostAlarm(context)
+
                     } else {
                         notify(context, checkRulesBoth.second, strMessage, smsNumber)
                     }
@@ -121,7 +123,6 @@ class SMSApp : BroadcastReceiver() {
             }
         }
     }
-
 }
 
 private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Pair<Boolean, String> {

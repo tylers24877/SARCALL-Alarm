@@ -54,7 +54,7 @@ class Widget : AppWidgetProvider() {
                 pref.edit().putBoolean("prefEnabled", false).apply()
                 Toast.makeText(context, "SARCALL Alarm disabled", Toast.LENGTH_SHORT).show()
             } else
-                if (pref.getBoolean("prefUsePhoneNumber", false) || pref.getString("triggersJSON", "")!!.isNotEmpty()) {
+                if (pref.getString("rulesJSON", "")!!.isNotEmpty()) {
                     pref.edit().putBoolean("prefEnabled", true).apply()
                     Toast.makeText(context, "SARCALL Alarm enabled", Toast.LENGTH_SHORT).show()
                 } else {

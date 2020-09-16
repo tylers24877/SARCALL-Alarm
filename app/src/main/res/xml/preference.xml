@@ -8,7 +8,7 @@
         android:title="@string/pref_enabled_title"
         app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
-        android:summary="Configure multiple rules using a phrase, SMS number or both.\nYou're also able to customise the alarm, for each rule, by setting a custom alarm sound and change the colours."
+        android:summary="Configure as many rules as you like using a phrase, SMS number or both.\nIf the &quot;Both&quot; option is selected, a received SMS containing the phrase would've had to come from &quot;SMS Number&quot; to trigger the alarm.\n \nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)\n \nYou're also able to customise the alarm, for each rule, by setting a custom alarm sound (more customisation options coming soon)."
         android:title="Trigger Rules"
         app:iconSpaceReserved="false" />
 
@@ -17,12 +17,12 @@
         app:iconSpaceReserved="false" />
 
     <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference
-        android:summary="Set the SMS numbers to send the SAR A/L/N SMS to from the &quot;Respond&quot; Page.\nThis can be sent to multiple numbers at the same time."
+        android:summary="Set the SMS numbers to send the SAR A/L/N SMS to from the &quot;Respond&quot; Page.\nThe SAR A/L/N message can be sent to multiple numbers at the same time."
         android:title="SAR A/L/N Reply Number"
         app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesPreference
-        android:summary="Setup response messages for use when responding with SAR A/L\10For example...&quot;On my way to RV.&quot;"
-        android:title="Predefined Response Messages"
+        android:summary="Setup response messages to append to the SAR A/L messages. You don't need to enter the &quot;SAR A/L&quot; prefix, just the message itself\nFor example...&quot;On my way to RV from my home.&quot;"
+        android:title="SAR A/L Predefined Response Messages"
         app:iconSpaceReserved="false" />
     <PreferenceCategory
         app:iconSpaceReserved="false"
@@ -30,7 +30,7 @@
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="betaChannel"
-        android:summary="Subscribe to the beta version of this app"
+        android:summary="Subscribe to the beta version of this app. This is used when checking for updates in the background"
         android:title="Beta Channel"
         app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

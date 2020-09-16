@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Vibrator
 import android.view.View
+import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import java.io.FileInputStream
 import java.io.IOException
@@ -48,7 +49,7 @@ class Alarm : Activity() {
             }
         }
         mp!!.prepare()
-        // mp!!.start()
+        mp!!.start()
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         val maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
@@ -79,16 +80,18 @@ class Alarm : Activity() {
         drawable.isOneShot = false
         alarm_background.background = drawable
 
-        handler.postDelayed(Runnable { drawable.start() }, 100)
-        Handler().postDelayed(Runnable { finish() }, 90000)
+        handler.postDelayed({ drawable.start() }, 100)
+        Handler().postDelayed({ finish() }, 90000)
 
-        alarm_stop_button.setOnClickListener{finish()}
+        alarm_stop_button.setOnClickListener { finish() }
+
+        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
     /* access modifiers changed from: protected */
     public override fun onResume() {
         super.onResume()
-        //mp?.start()
+        mp?.start()
     }
 
     /* access modifiers changed from: protected */
