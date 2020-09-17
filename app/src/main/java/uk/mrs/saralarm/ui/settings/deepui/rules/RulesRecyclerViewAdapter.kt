@@ -7,7 +7,6 @@ import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
@@ -16,19 +15,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
-import android.widget.RadioGroup
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.textview.MaterialTextView
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
@@ -112,47 +105,49 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         when (mData[holder.layoutPosition].choice) {
             RulesChoice.ALL -> {
-                holder.rulesRadioGroup.check(R.id.rulesRadioBoth)
-                holder.smsNumberTextInputLayout.visibility = View.VISIBLE
-                holder.phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                holder.itemView.rulesRadioGroup.check(R.id.rulesRadioBoth)
+                holder.itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.VISIBLE
+                holder.itemView.phraseRulesRecyclerTextInput.visibility = View.VISIBLE
             }
             RulesChoice.SMS_NUMBER -> {
-                holder.rulesRadioGroup.check(R.id.rulesRadioSMSNumber)
-                holder.smsNumberTextInputLayout.visibility = View.VISIBLE
-                holder.phraseRulesRecyclerTextInputLayout.visibility = View.GONE
+                holder.itemView.rulesRadioGroup.check(R.id.rulesRadioSMSNumber)
+                holder.itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.VISIBLE
+                holder.itemView.phraseRulesRecyclerTextInput.visibility = View.GONE
             }
             RulesChoice.PHRASE -> {
-                holder.rulesRadioGroup.check(R.id.rulesRadioTrigger)
-                holder.smsNumberTextInputLayout.visibility = View.GONE
-                holder.phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                holder.itemView.rulesRadioGroup.check(R.id.rulesRadioTrigger)
+                holder.itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.GONE
+                holder.itemView.phraseRulesRecyclerTextInput.visibility = View.VISIBLE
             }
         }
 
         if (mData[holder.layoutPosition].smsNumber.isNotBlank()) {
             try {
                 if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.layoutPosition].smsNumber, "GB"))) {
-                    holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                    holder.itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
                 } else {
-                    holder.smsNumberTextInputLayout.error = ""
+                    holder.itemView.SMSNumbersRulesRecyclerTextInput.error = ""
                 }
             } catch (e: NumberParseException) {
-                holder.smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                holder.itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
             }
         }
 
-        holder.smsNumberEditText.setText(mData[holder.layoutPosition].smsNumber)
-        holder.phraseEditText.setText(mData[holder.layoutPosition].phrase)
+        holder.itemView.SMSNumbersRulesEditText.setText(mData[holder.layoutPosition].smsNumber)
+        holder.itemView.phraseRulesEditText.setText(mData[holder.layoutPosition].phrase)
+
+        holder.itemView.customiseAlarmLoopingCheckBox.isChecked = mData[holder.layoutPosition].customAlarmRulesObject.isLooping
 
         if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isEmpty()) {
-            holder.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
-            holder.addAlarmRulesButton.text = "Set Alarm Sound"
+            holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
+            holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
         } else {
             if (File(mData[holder.layoutPosition].customAlarmRulesObject.alarmFileLocation).exists()) {
-                holder.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
-                holder.addAlarmRulesButton.text = "Reset Alarm Sound"
+                holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
             } else {
-                holder.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
-                holder.addAlarmRulesButton.text = "Set Alarm Sound"
+                holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
+                holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
             }
         }
     }
@@ -168,24 +163,24 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
 
-        val rulesRadioGroup: RadioGroup = itemView.rulesRadioGroup
-        val smsNumberEditText: TextInputEditText = itemView.SMSNumbersRulesEditText
-        val smsNumberTextInputLayout: TextInputLayout = itemView.SMSNumbersRulesRecyclerTextInput
-        val phraseEditText: TextInputEditText = itemView.phraseRulesEditText
-        val phraseRulesRecyclerTextInputLayout: TextInputLayout = itemView.phraseRulesRecyclerTextInput
+        //val rulesRadioGroup: RadioGroup = itemView.rulesRadioGroup
+        //val smsNumberEditText: TextInputEditText = itemView.SMSNumbersRulesEditText
+        //val smsNumberTextInputLayout: TextInputLayout = itemView.SMSNumbersRulesRecyclerTextInput
+        //val phraseEditText: TextInputEditText = itemView.phraseRulesEditText
+        //val phraseRulesRecyclerTextInputLayout: TextInputLayout = itemView.phraseRulesRecyclerTextInput
 
-        val customiseAlarmRulesTextView: TextView = itemView.customiseAlarmRulesTextView
-        val customiseAlarmRulesConstraintLayout: ConstraintLayout = itemView.customiseAlarmRulesConstraintLayout
+        //val customiseAlarmRulesTextView: TextView = itemView.customiseAlarmRulesTextView
+        //val customiseAlarmRulesConstraintLayout: ConstraintLayout = itemView.customiseAlarmRulesConstraintLayout
 
-        val addAlarmRulesButton: MaterialButton = itemView.addAlarmRulesButton
-        val addAlarmRulesTextView: MaterialTextView = itemView.addAlarmRulesTextView
+        //val addAlarmRulesButton: MaterialButton = itemView.addAlarmRulesButton
+        //val addAlarmRulesTextView: MaterialTextView = itemView.addAlarmRulesTextView
 
         init {
-            smsNumberEditText.inputType = 3
-            smsNumberEditText.maxLines = 1
+            itemView.SMSNumbersRulesEditText.inputType = 3
+            itemView.SMSNumbersRulesEditText.maxLines = 1
 
 
-            smsNumberEditText.addTextChangedListener(object : TextWatcher {
+            itemView.SMSNumbersRulesEditText.addTextChangedListener(object : TextWatcher {
                 var smsNumberEditing = false
 
                 override fun afterTextChanged(s: Editable) {
@@ -194,21 +189,21 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                             try {
                                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
                                 if (!phoneUtil.isValidNumber(formattedNumber)) {
-                                    smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                                    itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
                                 } else {
                                     smsNumberEditing = true
-                                    val prevSelection: Int = smsNumberEditText.selectionStart
-                                    val prevLength: Int = smsNumberEditText.length()
-                                    smsNumberEditText.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
-                                    smsNumberEditText.setSelection(smsNumberEditText.length() - prevLength + prevSelection)
-                                    smsNumberTextInputLayout.error = ""
+                                    val prevSelection: Int = itemView.SMSNumbersRulesEditText.selectionStart
+                                    val prevLength: Int = itemView.SMSNumbersRulesEditText.length()
+                                    itemView.SMSNumbersRulesEditText.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
+                                    itemView.SMSNumbersRulesEditText.setSelection(itemView.SMSNumbersRulesEditText.length() - prevLength + prevSelection)
+                                    itemView.SMSNumbersRulesRecyclerTextInput.error = ""
                                 }
                             } catch (e: NumberParseException) {
-                                smsNumberTextInputLayout.error = "SMS Number is in the wrong format"
+                                itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
                             }
                             smsNumberEditing = false
                         }
-                    mData[adapterPosition].smsNumber = smsNumberEditText.text.toString()
+                    mData[adapterPosition].smsNumber = itemView.SMSNumbersRulesEditText.text.toString()
                 }
 
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -216,10 +211,10 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             })
 
-            phraseEditText.addTextChangedListener(object : TextWatcher {
+            itemView.phraseRulesEditText.addTextChangedListener(object : TextWatcher {
 
                 override fun afterTextChanged(s: Editable) {
-                    mData[adapterPosition].phrase = phraseEditText.text.toString()
+                    mData[adapterPosition].phrase = itemView.phraseRulesEditText.text.toString()
                 }
 
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -228,41 +223,49 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
             })
 
-            rulesRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+            itemView.rulesRadioGroup.setOnCheckedChangeListener { _, checkedId ->
                 when (checkedId) {
                     R.id.rulesRadioBoth -> {
                         mData[adapterPosition].choice = RulesChoice.ALL
-                        smsNumberTextInputLayout.visibility = View.VISIBLE
-                        phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                        itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.VISIBLE
+                        itemView.phraseRulesRecyclerTextInput.visibility = View.VISIBLE
                     }
                     R.id.rulesRadioTrigger -> {
                         mData[adapterPosition].choice = RulesChoice.PHRASE
-                        smsNumberTextInputLayout.visibility = View.GONE
-                        phraseRulesRecyclerTextInputLayout.visibility = View.VISIBLE
+                        itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.GONE
+                        itemView.phraseRulesRecyclerTextInput.visibility = View.VISIBLE
                     }
                     R.id.rulesRadioSMSNumber -> {
                         mData[adapterPosition].choice = RulesChoice.SMS_NUMBER
-                        smsNumberTextInputLayout.visibility = View.VISIBLE
-                        phraseRulesRecyclerTextInputLayout.visibility = View.GONE
+                        itemView.SMSNumbersRulesRecyclerTextInput.visibility = View.VISIBLE
+                        itemView.phraseRulesRecyclerTextInput.visibility = View.GONE
                     }
                 }
             }
 
-            customiseAlarmRulesTextView.setOnClickListener {
-                if (customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
-                    customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
-                    customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
+            itemView.customiseAlarmLoopingCheckBox.setOnCheckedChangeListener { _, isChecked ->
+                mData[adapterPosition].customAlarmRulesObject.isLooping = isChecked
+            }
+
+            itemView.customiseAlarmRulesTextView.setOnClickListener {
+                if (itemView.customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
+                    itemView.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
+                    itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
                 } else {
-                    customiseAlarmRulesConstraintLayout.visibility = View.GONE
-                    customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
+                    itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
+                    itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
 
                 }
 
             }
 
-            addAlarmRulesButton.setOnClickListener {
-                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.RECEIVE_SMS") == 0) {
-                    if (addAlarmRulesButton.text == "Set Alarm Sound") {
+            itemView.addAlarmRulesButton.setOnClickListener {
+                if (ActivityCompat.checkSelfPermission(
+                        mContext,
+                        "android.permission.WRITE_EXTERNAL_STORAGE"
+                    ) == 0 && ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0
+                ) {
+                    if (itemView.addAlarmRulesButton.text == "Set Alarm Sound") {
                         when (mData[adapterPosition].choice) {
                             RulesChoice.PHRASE ->
                                 if (mData[adapterPosition].phrase == "") {
@@ -281,11 +284,12 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                                 }
                             }
                         }
-                        val audioPickerIntent = Intent(Intent.ACTION_PICK, MediaStore.Audio.Media.EXTERNAL_CONTENT_URI)
-
                         rulesFragment.position = adapterPosition
+                        val intent = Intent()
+                        intent.action = Intent.ACTION_GET_CONTENT
+                        intent.type = "audio/*"
+                        rulesFragment.startActivityForResult(Intent.createChooser(intent, "Choose an Audio File"), 5)
 
-                        rulesFragment.startActivityForResult(audioPickerIntent, 5)
                     } else {
                         checkAndRemoveFile(adapterPosition)
                         notifyItemChanged(adapterPosition)

@@ -193,10 +193,10 @@ class RespondFragment : Fragment() {
                     val respondViewModel: RespondViewModel = getRespondViewModel()
                     respondViewModel.setEta(progressCal)
                     val sb = SpannableStringBuilder()
-                    sb.append("Estimated time to RV: ")
+                    sb.append("Estimated time to arrival: ")
                     sb.append(progressCal.toString())
                     sb.append(" minutes")
-                    sb.setSpan(StyleSpan(1), 22, progressCal.toString().length + 22, 18)
+                    sb.setSpan(StyleSpan(1), 27, progressCal.toString().length + 27, 18)
                     dialog.respond_dialog_sar_a_seek_eta_txtview.text = sb
 
                     seekBar.secondaryProgress = progress
@@ -295,14 +295,14 @@ class RespondFragment : Fragment() {
                     val respondViewModel: RespondViewModel = getRespondViewModel()
                     respondViewModel.setEta(progressCal)
                     val sb = SpannableStringBuilder()
-                    sb.append("Estimated time to RV: ")
+                    sb.append("Estimated time to arrival: ")
                     sb.append(progressCal.toString())
                     sb.append(" minutes")
-                    sb.setSpan(StyleSpan(1), 22, progressCal.toString().length + 22, 18)
+                    sb.setSpan(StyleSpan(1), 27, progressCal.toString().length + 27, 18)
                     if (progressCal != 0) {
                         dialog.respond_dialog_sar_l_seek_eta_txtview.text = sb
                     } else {
-                        dialog.respond_dialog_sar_l_seek_eta_txtview.text = "Estimated time to RV: N/A"
+                        dialog.respond_dialog_sar_l_seek_eta_txtview.text = "Estimated time to arrival: N/A"
                     }
                     seekBar.secondaryProgress = progress
                 }

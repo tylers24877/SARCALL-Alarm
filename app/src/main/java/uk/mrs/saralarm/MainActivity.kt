@@ -66,22 +66,23 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             if (pref.getBoolean("betaChannel", false)) {
                 AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update_beta.xml")
+                    .setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update_beta.xml")
                     .setCancelable(false).start()
             } else {
                 AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update.xml")
+                    .setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update.xml")
                     .setCancelable(false).start()
             }
         }
         if (savedInstanceState == null) {
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE")
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V1")
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V2")
             WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V3")
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4")
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5")
+
             val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-                .addTag("SARCALL_CHECK_UPDATE_V4_TAG").build()
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V4", ExistingPeriodicWorkPolicy.KEEP, build)
+                .addTag("SARCALL_CHECK_UPDATE_V6_TAG").build()
+            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V6", ExistingPeriodicWorkPolicy.KEEP, build)
         }
         upgradePreferences(pref)
 

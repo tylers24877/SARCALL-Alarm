@@ -11,20 +11,16 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.Handler
-import android.os.Vibrator
 import android.view.View
-import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import java.io.FileInputStream
-import java.io.IOException
 
 
 class Alarm : Activity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
-    private var vibrator: Vibrator? = null
     /* access modifiers changed from: protected */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,17 +34,19 @@ class Alarm : Activity() {
 
         mp = MediaPlayer()
         mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
-        mp!!.isLooping = true
+
+        mp!!.isLooping = intent.getBooleanExtra("isLooping", true)
+
         try {
             val fileInputStream = FileInputStream(intent.getStringExtra("soundFile"))
             mp!!.setDataSource(fileInputStream.fd)
             fileInputStream.close()
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             try {
+                FirebaseCrashlytics.getInstance().log(intent.getStringExtra("soundFile").toString())
                 mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
-            } catch (e2: IOException) {
+            } catch (e2: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
-                Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show()
             }
         }
         mp!!.prepare()
@@ -67,13 +65,6 @@ class Alarm : Activity() {
         // hide the navigation bar.
         val uiOptions = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN)
         window.decorView.systemUiVisibility = uiOptions
-
-
-        val pattern = longArrayOf(0, 200, 500)
-        // get the vibrator service for the device.
-        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-
-        vibrator!!.vibrate(pattern, 0)
 
         val drawable = AnimationDrawable()
         val handler = Handler()
@@ -107,7 +98,6 @@ class Alarm : Activity() {
     public override fun onDestroy() {
         super.onDestroy()
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
-        vibrator!!.cancel()
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(0)
         ActivationNotification.notifyPostAlarm(this)
     }

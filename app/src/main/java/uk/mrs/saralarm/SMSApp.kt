@@ -99,7 +99,7 @@ class SMSApp : BroadcastReceiver() {
             if (checkScreenState(context)) {
                 ActivationNotification.notifyPostAlarm(context)
             } else {
-                notify(context, checkRulesBoth.second, strMessage, smsNumber)
+                notify(context, checkRulesBoth.second, strMessage, smsNumber, checkRulesBoth.third)
             }
         } else {
             val checkRulesSMSNumber = checkRulesSMSNumber(rulesSMSSet, smsNumber, phoneUtil)
@@ -108,7 +108,7 @@ class SMSApp : BroadcastReceiver() {
                     ActivationNotification.notifyPostAlarm(context)
 
                 } else {
-                    notify(context, checkRulesBoth.second, strMessage, smsNumber)
+                    notify(context, checkRulesSMSNumber.second, strMessage, smsNumber, checkRulesSMSNumber.third)
                 }
             } else {
                 val checkRulesPhrase = checkRulesPhrase(rulesPhraseSet, strMessage)
@@ -117,7 +117,7 @@ class SMSApp : BroadcastReceiver() {
                         ActivationNotification.notifyPostAlarm(context)
 
                     } else {
-                        notify(context, checkRulesBoth.second, strMessage, smsNumber)
+                        notify(context, checkRulesPhrase.second, strMessage, smsNumber, checkRulesPhrase.third)
                     }
                 }
             }
@@ -125,41 +125,41 @@ class SMSApp : BroadcastReceiver() {
     }
 }
 
-private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Pair<Boolean, String> {
+private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Triple<Boolean, String, Boolean> {
     for (s in SS) {
         if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
-            return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+            return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
         }
     }
-    return Pair(false, "")
+    return Triple(false, "", true)
 }
 
-private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Pair<Boolean, String> {
+private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Triple<Boolean, String, Boolean> {
     for (s in rulesSMSSet) {
         try {
             val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
             if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
-                return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+                return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
             }
         } catch (e: NumberParseException) {
         }
     }
-    return Pair(false, "")
+    return Triple(false, "", true)
 }
 
-private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Pair<Boolean, String> {
+private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Triple<Boolean, String, Boolean> {
     for (s in SS) {
         try {
             if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                 if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
-                    return Pair(true, s.customAlarmRulesObject.alarmFileLocation)
+                    return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
                 }
             }
         } catch (e: NumberParseException) {
         }
     }
-    return Pair(false, "")
+    return Triple(false, "", true)
 }
 
 private fun checkScreenState(context: Context): Boolean {

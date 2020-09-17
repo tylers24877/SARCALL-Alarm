@@ -1,6 +1,6 @@
 package uk.mrs.saralarm.ui.settings.deepui.rules
 
-import android.content.ContentResolver
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -21,11 +21,10 @@ import kotlinx.coroutines.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.IOException
 import java.lang.reflect.Type
 import kotlin.coroutines.CoroutineContext
+import kotlin.random.Random
 
 
 class RulesFragment : Fragment(), CoroutineScope {
@@ -70,47 +69,32 @@ class RulesFragment : Fragment(), CoroutineScope {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (data != null && requestCode == 5 && resultCode == -1) {
-            val file = File(getRealPathFromURI(data.data)!!)
-            try {
-                copy(file, requireContext().filesDir)
-                adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + file.name
-                adapter!!.mData[position].customAlarmRulesObject.alarmFileName = file.name
-                adapter!!.saveData()
-                adapter!!.notifyItemChanged(position)
-            } catch (e: IOException) {
-                FirebaseCrashlytics.getInstance().recordException(e)
-                Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
+        if (requestCode == 5 && resultCode == Activity.RESULT_OK) {
+            if ((data != null) && (data.data != null)) {
+                try {
+                    val fileName = if (data.data!!.path != null) File(data.data!!.path!!).name else "Alarm_Sound" + Random.nextInt(1000000, 9999999).toString()
+                    inputStreamToFile(requireContext(), fileName, data.data!!, requireContext().filesDir)
+                    adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + fileName
+                    adapter!!.mData[position].customAlarmRulesObject.alarmFileName = fileName
+                    adapter!!.saveData()
+                    adapter!!.notifyDataSetChanged()
+                } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
+                }
             }
         }
     }
 
-    private fun getRealPathFromURI(contentURI: Uri?): String? {
-        val requireContext: Context = requireContext()
-        val contentResolver: ContentResolver = requireContext.contentResolver
-        val cursor = contentResolver.query(contentURI!!, null as Array<String?>?, null as String?, null as Array<String?>?, null as String?)
-            ?: return contentURI.path
-        cursor.moveToFirst()
-        val result = cursor.getString(cursor.getColumnIndex("_data"))
-        cursor.close()
-        return result
-    }
-
-    @Suppress("BlockingMethodInNonBlockingContext")
-    private fun copy(sourceFile: File, destFile: File) = this.launch {
+    private fun inputStreamToFile(context: Context, fileName: String, uri: Uri, destFile: File) = this.launch {
         withContext(Dispatchers.IO) {
-            if (!destFile.parentFile.exists()) destFile.parentFile.mkdirs()
-            if (!destFile.exists()) {
-                destFile.createNewFile()
-            }
-            val source = FileInputStream(sourceFile).channel
-            val destination = FileOutputStream(destFile.toString() + File.separator + sourceFile.name).channel
-            destination.transferFrom(source, 0, source.size())
-            source.close()
-            destination.close()
+            val inputStream = context.contentResolver.openInputStream(uri)
+            val output = FileOutputStream(destFile.toString() + File.separator + fileName)
+            inputStream?.copyTo(output, 4 * 1024)
+            inputStream?.close()
+            output.close()
         }
     }
-
     override val coroutineContext: CoroutineContext =
         Dispatchers.Main + SupervisorJob()
 

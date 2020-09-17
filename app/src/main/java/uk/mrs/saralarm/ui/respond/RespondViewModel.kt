@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -62,29 +63,37 @@ class RespondViewModel : ViewModel() {
                         rulesPhraseSet.add(r)
                     }
                 }
-
-                val c: Cursor? = context.contentResolver.query(Telephony.Sms.CONTENT_URI, null, null, null, null)
+                val projection = arrayOf(Telephony.Sms.Inbox.TYPE, Telephony.Sms.Inbox.DATE, Telephony.Sms.Inbox.BODY, Telephony.Sms.Inbox.ADDRESS) //specify columns you want to return
+                val c: Cursor? = context.contentResolver.query(Telephony.Sms.Inbox.CONTENT_URI, projection, null, null, Telephony.Sms.Inbox.DEFAULT_SORT_ORDER)
                 if (c != null) {
 
                     if (c.moveToFirst()) {
                         work@ do {
-                            if (c.getString(c.getColumnIndexOrThrow("type")).toInt() == 1) {
-                                val smsDate: String = c.getString(c.getColumnIndexOrThrow("date"))
-                                val body: String = c.getString(c.getColumnIndexOrThrow("body"))
-                                val phoneNumberC: String = c.getString(c.getColumnIndexOrThrow("address"))
-                                val date = Date(smsDate.toLong())
+                            if (c.getString(c.getColumnIndexOrThrow(Telephony.Sms.Inbox.TYPE)).toInt() == 1) {
 
+                                try {
+                                    val smsDate: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.DATE))
+                                    val body: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.BODY))
+                                    val phoneNumberC: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.ADDRESS))
+                                    val date = Date(smsDate.toLong())
 
-                                if (checkRulesBoth(rulesBothSet, body, phoneNumberC, phoneUtil)) {
-                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
-                                    break@work
-                                } else if (checkRulesSMSNumber(rulesSMSSet, phoneNumberC, phoneUtil)) {
-                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
-                                    break@work
-                                } else if (checkRulesPhrase(rulesPhraseSet, body)) {
-                                    setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                    if (checkRulesBoth(rulesBothSet, body, phoneNumberC, phoneUtil)) {
+                                        setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                        break@work
+                                    } else if (checkRulesSMSNumber(rulesSMSSet, phoneNumberC, phoneUtil)) {
+                                        setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                        break@work
+                                    } else if (checkRulesPhrase(rulesPhraseSet, body)) {
+                                        setBodyAndDate = Pair(body, DateFormat.getDateTimeInstance().format(date))
+                                        break@work
+                                    }
+                                } catch (e: Exception) {
+                                    FirebaseCrashlytics.getInstance().log(c.position.toString())
+                                    FirebaseCrashlytics.getInstance().recordException(e)
+                                    setBodyAndDate = Pair("An error occurred at: " + c.position, "")
                                     break@work
                                 }
+
                             }
 
                         } while (c.moveToNext())

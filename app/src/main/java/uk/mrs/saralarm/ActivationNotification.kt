@@ -12,11 +12,12 @@ import androidx.core.app.NotificationCompat
 
 object ActivationNotification {
 
-    fun notify(context: Context, soundFile: String, alarmPreviewSMSBody: String, alarmPreviewSMSNumber: String) {
+    fun notify(context: Context, soundFile: String, alarmPreviewSMSBody: String, alarmPreviewSMSNumber: String, isLooping: Boolean) {
         val title = context.resources.getString(R.string.activation_notification_title_template)
 
         val fullScreenIntent = Intent(context, Alarm::class.java)
         fullScreenIntent.putExtra("soundFile", soundFile).putExtra("alarmPreviewSMSBody", alarmPreviewSMSBody).putExtra("alarmPreviewSMSNumber", alarmPreviewSMSNumber)
+            .putExtra("isLooping", isLooping)
         fullScreenIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY).addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
         val fullScreenPendingIntent = PendingIntent.getActivity(context, 0, fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
@@ -37,7 +38,7 @@ object ActivationNotification {
         val title = context.resources.getString(R.string.activation_notification_title_template)
 
         val notificationBuilder = NotificationCompat.Builder(context, "Post Alarm Trigger").setSmallIcon(R.drawable.ic_baseline_notification_important_24).setContentTitle(title)
-            .setContentText("SARCALL activity_alarm triggered!").setStyle(NotificationCompat.BigTextStyle().bigText("SARCALL alarm triggered! Click to respond.")).setAutoCancel(true)
+            .setContentText("SARCALL Alarm activated recently!").setStyle(NotificationCompat.BigTextStyle().bigText("SARCALL alarm activated! Click to respond.")).setAutoCancel(true)
             .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT)).setPriority(2)
             .setCategory(NotificationCompat.CATEGORY_ALARM).setColor(Color.argb(255, 204, 51, 1))
 
