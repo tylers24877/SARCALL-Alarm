@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "212009916766",
+    "firebase_url": "https://sarcall-alarm.firebaseio.com",
+    "project_id": "sarcall-alarm",
+    "storage_bucket": "sarcall-alarm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:212009916766:android:4afc5616a275d16ce9d7cf",
+        "android_client_info": {
+          "package_name": "uk.mrs.saralarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "212009916766-ls527kks4ont0rqm9f23tj4394onplhl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3hRdyhh0KvF7BneUhu26HcT3r1mNuExk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "212009916766-ls527kks4ont0rqm9f23tj4394onplhl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
