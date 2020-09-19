@@ -19,9 +19,9 @@ class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(contex
             AppUpdater(applicationContext).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.NOTIFICATION).setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update.xml")
                 .setCancelable(false).start()
         }
-        val params = Bundle()
-        params.putString("beta", PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("betaChannel", false).toString())
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("background_update_check", params)
+        val param = Bundle()
+        param.putString("beta", PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("betaChannel", false).toString())
+        FirebaseAnalytics.getInstance(applicationContext).logEvent("background_update_check", param)
         return Result.success()
     }
 }

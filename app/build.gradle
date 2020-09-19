@@ -10,12 +10,12 @@ android {
             keyAlias 'tyler'
             keyPassword 'P@ssw0rd'
             storePassword 'P@ssw0rd'
-            storeFile file("C:\\Users\\tyler\\AndroidStudioProjects\\Keys\\new\\tyler.jks")
+            storeFile file("D:\\android\\AndroidStudioProjects\\Keys\\new\\tyler.jks")
 
         }
     }
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "uk.mrs.saralarm"
