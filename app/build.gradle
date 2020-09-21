@@ -10,7 +10,7 @@ android {
             keyAlias 'tyler'
             keyPassword 'P@ssw0rd'
             storePassword 'P@ssw0rd'
-            storeFile file("D:\\android\\AndroidStudioProjects\\Keys\\new\\tyler.jks")
+            storeFile file("C:\\Users\\tsimm\\AndroidStudioProjects\\new\\tyler.jks")
 
         }
     }
@@ -23,7 +23,7 @@ android {
         targetSdkVersion 30
 
         versionCode 25
-        versionName "1.5.2beta"
+        versionName "1.5.2build"
 
 
         multiDexEnabled true
@@ -36,9 +36,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             zipAlignEnabled true
             signingConfig signingConfigs.Main_Signer
+            manifestPlaceholders = [crashlyticsCollectionEnabled:"true"]
+
         }
         debug {
             signingConfig signingConfigs.Main_Signer
+            manifestPlaceholders = [crashlyticsCollectionEnabled:"false"]
         }
     }
 }
@@ -62,6 +65,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-crashlytics:17.2.1'
-
-
+    implementation 'com.github.QuadFlask:colorpicker:0.0.15'
 }

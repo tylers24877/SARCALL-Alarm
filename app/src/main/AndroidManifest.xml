@@ -11,6 +11,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="uk.mrs.saralarm">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.SEND_SMS" />
@@ -21,6 +22,8 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
 
     <uses-feature
         android:name="android.hardware.telephony"
@@ -36,6 +39,10 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup,android:supportsRtl"
         tools:targetApi="q">
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${crashlyticsCollectionEnabled}" />
+
         <activity
             android:name=".SetupActivity"
             android:label="@string/app_name" />

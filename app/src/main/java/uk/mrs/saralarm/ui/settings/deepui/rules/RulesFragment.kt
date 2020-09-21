@@ -13,6 +13,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -53,6 +54,8 @@ class RulesFragment : Fragment(), CoroutineScope {
         ItemTouchHelper(RulesDragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(root.rulesRecyclerView)
         root.rulesFab.setOnClickListener {
             adapter!!.addItem()
+            FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
+
         }
 
         return root

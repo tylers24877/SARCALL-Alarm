@@ -66,23 +66,22 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             if (pref.getBoolean("betaChannel", false)) {
                 AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update_beta.xml")
+                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update_beta.xml")
                     .setCancelable(false).start()
             } else {
                 AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update.xml")
+                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update.xml")
                     .setCancelable(false).start()
             }
         }
         if (savedInstanceState == null) {
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V2")
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V3")
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4")
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5")
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4") //version 1.5.2 beta
+            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5") //version 1.5.2 beta
 
             val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
                 .addTag("SARCALL_CHECK_UPDATE_V6_TAG").build()
-            WorkManager.getInstance(this).enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V6", ExistingPeriodicWorkPolicy.KEEP, build)
+            WorkManager.getInstance(this)
+                .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V6", ExistingPeriodicWorkPolicy.KEEP, build)
         }
         upgradePreferences(pref)
 
@@ -92,6 +91,8 @@ class MainActivity : AppCompatActivity() {
                 pref.edit().putBoolean("prefEnabled", false).apply()
             }
         }
+
+        nav_view.menu.findItem(R.id.navigation_teamleader).isVisible = pref.getBoolean("teamleaderMode", false)
     }
 
     private fun upgradePreferences(pref: SharedPreferences) {

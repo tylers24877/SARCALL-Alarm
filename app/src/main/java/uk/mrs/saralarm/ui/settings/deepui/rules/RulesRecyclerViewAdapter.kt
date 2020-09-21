@@ -1,6 +1,7 @@
 package uk.mrs.saralarm.ui.settings.deepui.rules
 
 import android.animation.ObjectAnimator
+import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,28 +12,30 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.animation.AccelerateInterpolator
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
+import kotlinx.android.synthetic.main.colour_dialog_fragment.*
 import kotlinx.android.synthetic.main.settings_rules_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
+import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourDragAdapter
+import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourRecyclerViewAdapter
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.io.File
-import java.util.*
 
 
 class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragment, data: ArrayList<RulesObject>) : RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
@@ -296,6 +299,37 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                     }
                 } else {
                     Snackbar.make(itemView, ("No read/write permission granted." as CharSequence), Snackbar.LENGTH_LONG).show()
+                }
+            }
+
+            itemView.addAlarmColoursRulesButton.setOnClickListener {
+                val dialog = Dialog(mContext)
+                dialog.setContentView(R.layout.colour_dialog_fragment)
+                val window: Window = dialog.window!!
+                window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                window.setGravity(Gravity.CENTER)
+                dialog.show()
+
+                dialog.ColoursRecyclerView.layoutManager = LinearLayoutManager(mContext)
+
+                val colourAdapter = ColourRecyclerViewAdapter(mContext, mData[adapterPosition].customAlarmRulesObject.colorArray)
+
+                dialog.ColoursRecyclerView.adapter = colourAdapter
+
+                ItemTouchHelper(ColourDragAdapter(colourAdapter, mContext, 3, 0)).attachToRecyclerView(dialog.ColoursRecyclerView)
+
+                dialog.ColoursRecyclerAddButton.setOnClickListener {
+                    colourAdapter.addItem(true)
+                }
+                dialog.ColoursRecyclerSaveButton.setOnClickListener {
+                    colourAdapter.saveData()
+                    dialog.dismiss()
+                }
+                dialog.ColoursRecyclerExitButton.setOnClickListener {
+                    dialog.dismiss()
+                }
+                colourAdapter.onSave = {
+                    mData[adapterPosition].customAlarmRulesObject.colorArray = it
                 }
             }
         }

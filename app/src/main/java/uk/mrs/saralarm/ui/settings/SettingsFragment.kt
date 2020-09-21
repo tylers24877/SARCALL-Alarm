@@ -16,6 +16,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.activity_main.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.Widget
 
@@ -33,8 +34,9 @@ class SettingsFragment : Fragment() {
 
             preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
-            val findPreference1: Preference? = findPreference("prefEnabled")
-            findPreference1!!.onPreferenceChangeListener = this
+            (findPreference("prefEnabled") as Preference?)!!.onPreferenceChangeListener = this
+            (findPreference("teamleaderMode") as Preference?)!!.onPreferenceChangeListener = this
+
 
         }
 
@@ -76,7 +78,10 @@ class SettingsFragment : Fragment() {
                     Snackbar.make(requireView(), ("Error. Please add a rule first."), Snackbar.LENGTH_LONG).show()
                     return false
                 }
-            }
+            } else
+                if (preference.key == "teamleaderMode") {
+                    requireView().rootView.nav_view.menu.findItem(R.id.navigation_teamleader).isVisible = newValue as Boolean
+                }
             return true
         }
 

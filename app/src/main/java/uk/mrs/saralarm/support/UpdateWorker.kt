@@ -14,9 +14,10 @@ class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(contex
     override fun doWork(): Result {
         if (PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("betaChannel", false)) {
             AppUpdater(applicationContext).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.NOTIFICATION)
-                .setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update_beta.xml").setCancelable(false).start()
+                .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update_beta.xml").setCancelable(false).start()
         } else {
-            AppUpdater(applicationContext).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.NOTIFICATION).setUpdateXML("http://sarcallapp.com/downloads/sarcall_alarm/update.xml")
+            AppUpdater(applicationContext).setUpdateFrom(UpdateFrom.XML)
+                .setDisplay(Display.NOTIFICATION).setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update.xml")
                 .setCancelable(false).start()
         }
         val param = Bundle()

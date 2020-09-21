@@ -28,6 +28,8 @@ class Alarm : Activity() {
         window.addFlags(6816896)
         setContentView(R.layout.activity_alarm)
 
+        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_started_locked", null)
+
         println(intent.getStringExtra("alarmPreviewSMSBody"))
         alarmPreviewSMSTextView.text = if (intent.getStringExtra("alarmPreviewSMSBody") != null) intent.getStringExtra("alarmPreviewSMSBody") else "Preview not available"
         alarmPreviewSMSNumberTextView.text = if (intent.getStringExtra("alarmPreviewSMSNumber") != null) "From: " + intent.getStringExtra("alarmPreviewSMSNumber") else ""
@@ -39,11 +41,12 @@ class Alarm : Activity() {
 
         try {
             val fileInputStream = FileInputStream(intent.getStringExtra("soundFile"))
+            FirebaseCrashlytics.getInstance().log(intent.getStringExtra("soundFile").toString())
+
             mp!!.setDataSource(fileInputStream.fd)
             fileInputStream.close()
         } catch (e: Exception) {
             try {
-                FirebaseCrashlytics.getInstance().log(intent.getStringExtra("soundFile").toString())
                 mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
             } catch (e2: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)

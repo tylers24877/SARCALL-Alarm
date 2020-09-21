@@ -34,4 +34,11 @@
         android:summary="Subscribe to the beta version of this app. This is used when checking for updates in the background"
         android:title="Beta Channel"
         app:iconSpaceReserved="false" />
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="teamleaderMode"
+        android:summaryOff="Mode Off"
+        android:summaryOn="Mode On"
+        android:title="Teamleader Mode"
+        app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

@@ -12,6 +12,7 @@ import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.view.Display
 import androidx.preference.PreferenceManager
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -98,6 +99,8 @@ class SMSApp : BroadcastReceiver() {
         if (checkRulesBoth.first) {
             if (checkScreenState(context)) {
                 ActivationNotification.notifyPostAlarm(context)
+                FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+
             } else {
                 notify(context, checkRulesBoth.second, strMessage, smsNumber, checkRulesBoth.third)
             }
@@ -106,6 +109,8 @@ class SMSApp : BroadcastReceiver() {
             if (checkRulesSMSNumber.first) {
                 if (checkScreenState(context)) {
                     ActivationNotification.notifyPostAlarm(context)
+                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+
 
                 } else {
                     notify(context, checkRulesSMSNumber.second, strMessage, smsNumber, checkRulesSMSNumber.third)
@@ -115,6 +120,7 @@ class SMSApp : BroadcastReceiver() {
                 if (checkRulesPhrase.first) {
                     if (checkScreenState(context)) {
                         ActivationNotification.notifyPostAlarm(context)
+                        FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
 
                     } else {
                         notify(context, checkRulesPhrase.second, strMessage, smsNumber, checkRulesPhrase.third)
