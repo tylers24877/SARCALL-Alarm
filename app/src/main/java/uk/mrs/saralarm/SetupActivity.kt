@@ -27,7 +27,7 @@ class SetupActivity : AppCompatActivity() {
                 ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 && ActivityCompat.checkSelfPermission(this,
                     "android.permission.WRITE_EXTERNAL_STORAGE") == 0 && ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0)
             {
-                checkBattery()
+                checkOverlay()
             } else {
                 requestPermissions(arrayOf("android.permission.RECEIVE_SMS","android.permission.READ_SMS","android.permission.SEND_SMS","android.permission.READ_EXTERNAL_STORAGE",
                         "android.permission.WRITE_EXTERNAL_STORAGE"), 1)
@@ -40,7 +40,7 @@ class SetupActivity : AppCompatActivity() {
         if (requestCode == 1) {
             for (permission in permissions) {
                 if (Intrinsics.areEqual(permission as Any, "android.permission.READ_SMS" as Any)) {
-                    checkBattery()
+                    checkOverlay()
                 }
             }
         }
@@ -64,11 +64,44 @@ class SetupActivity : AppCompatActivity() {
         startApp()
     }
 
+    private fun checkOverlay() {
+        /*if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                !Settings.canDrawOverlays(this)
+            } else false) {
+
+            val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { dialog, which ->
+                when (which) {
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                        startActivityForResult(intent, 44)
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        checkBattery()
+                    }
+                }
+            }
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setMessage("The 'Display on top' permission is needed to activate the alarm, when the screen is on." +
+                    "\nPlease enable the permission in settings")
+                .setPositiveButton("Okay, take me to settings", dialogClickListener)
+                .setNegativeButton("Maybe later", dialogClickListener)
+            builder.setOnCancelListener {
+                checkBattery()
+            }
+            builder.show()
+        }
+        else*/
+        checkBattery()
+    }
+
     /* access modifiers changed from: protected */
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 2) {
             startApp()
+        }
+        if (requestCode == 44) {
+            checkBattery()
         }
     }
 

@@ -22,9 +22,7 @@ import uk.mrs.saralarm.ActivationNotification.notify
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import java.lang.reflect.Type
-import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.HashSet
 
 
 class SMSApp : BroadcastReceiver() {
@@ -96,34 +94,37 @@ class SMSApp : BroadcastReceiver() {
     ) {
 
         val checkRulesBoth = checkRulesBoth(rulesBothSet, strMessage, smsNumber, phoneUtil)
-        if (checkRulesBoth.first) {
+        if (checkRulesBoth.choosen) {
             if (checkScreenState(context)) {
                 ActivationNotification.notifyPostAlarm(context)
+                //openAlarmVisible(context, checkRulesBoth, strMessage, smsNumber)
                 FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
-
             } else {
-                notify(context, checkRulesBoth.second, strMessage, smsNumber, checkRulesBoth.third)
+                notify(context, checkRulesBoth, strMessage, smsNumber)
             }
         } else {
             val checkRulesSMSNumber = checkRulesSMSNumber(rulesSMSSet, smsNumber, phoneUtil)
-            if (checkRulesSMSNumber.first) {
+            if (checkRulesSMSNumber.choosen) {
                 if (checkScreenState(context)) {
+                    //openAlarmVisible(context, checkRulesSMSNumber, strMessage, smsNumber)
+
                     ActivationNotification.notifyPostAlarm(context)
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
 
 
                 } else {
-                    notify(context, checkRulesSMSNumber.second, strMessage, smsNumber, checkRulesSMSNumber.third)
+                    notify(context, checkRulesSMSNumber, strMessage, smsNumber)
                 }
             } else {
                 val checkRulesPhrase = checkRulesPhrase(rulesPhraseSet, strMessage)
-                if (checkRulesPhrase.first) {
+                if (checkRulesPhrase.choosen) {
                     if (checkScreenState(context)) {
+                        //openAlarmVisible(context, checkRulesPhrase, strMessage, smsNumber)
                         ActivationNotification.notifyPostAlarm(context)
                         FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
 
                     } else {
-                        notify(context, checkRulesPhrase.second, strMessage, smsNumber, checkRulesPhrase.third)
+                        notify(context, checkRulesPhrase, strMessage, smsNumber)
                     }
                 }
             }
@@ -131,41 +132,50 @@ class SMSApp : BroadcastReceiver() {
     }
 }
 
-private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Triple<Boolean, String, Boolean> {
+private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): RuleAlarmData {
     for (s in SS) {
         if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
-            return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
+            return RuleAlarmData(
+                true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                s.customAlarmRulesObject.colorArray
+            )
         }
     }
-    return Triple(false, "", true)
+    return RuleAlarmData(false)
 }
 
-private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Triple<Boolean, String, Boolean> {
+private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): RuleAlarmData {
     for (s in rulesSMSSet) {
         try {
             val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
             if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
-                return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
+                return RuleAlarmData(
+                    true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                    s.customAlarmRulesObject.colorArray
+                )
             }
         } catch (e: NumberParseException) {
         }
     }
-    return Triple(false, "", true)
+    return RuleAlarmData(false)
 }
 
-private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Triple<Boolean, String, Boolean> {
+private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): RuleAlarmData {
     for (s in SS) {
         try {
             if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                 if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
-                    return Triple(true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping)
+                    return RuleAlarmData(
+                        true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                        s.customAlarmRulesObject.colorArray
+                    )
                 }
             }
         } catch (e: NumberParseException) {
         }
     }
-    return Triple(false, "", true)
+    return RuleAlarmData(false)
 }
 
 private fun checkScreenState(context: Context): Boolean {

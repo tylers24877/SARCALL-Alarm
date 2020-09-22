@@ -80,7 +80,6 @@ class RulesFragment : Fragment(), CoroutineScope {
                     adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + fileName
                     adapter!!.mData[position].customAlarmRulesObject.alarmFileName = fileName
                     adapter!!.saveData()
-                    adapter!!.notifyDataSetChanged()
                 } catch (e: Exception) {
                     FirebaseCrashlytics.getInstance().recordException(e)
                     Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()

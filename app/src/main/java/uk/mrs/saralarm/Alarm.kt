@@ -11,6 +11,7 @@ import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -21,6 +22,7 @@ import java.io.FileInputStream
 class Alarm : Activity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
+
     /* access modifiers changed from: protected */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,14 +54,19 @@ class Alarm : Activity() {
                 FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
-        mp!!.prepare()
-        mp!!.start()
+        try {
+            mp!!.prepare()
+            mp!!.start()
+        } catch (e2: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e2)
+        }
+
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
         val maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
         originalAudio = audio.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
         audio.setStreamVolume(AudioManager.STREAM_VOICE_CALL, maxVolume, 0)
-        audio.mode =  AudioManager.MODE_IN_CALL
+        audio.mode = AudioManager.MODE_IN_CALL
         audio.isSpeakerphoneOn = true
 
         // Hide both the navigation bar and the status bar.
@@ -70,10 +77,30 @@ class Alarm : Activity() {
         window.decorView.systemUiVisibility = uiOptions
 
         val drawable = AnimationDrawable()
-        val handler = Handler()
-        drawable.addFrame(ColorDrawable(Color.RED), 500)
-        drawable.addFrame(ColorDrawable(Color.GREEN), 500)
+        val handler = Handler(Looper.getMainLooper())
 
+        @Suppress("UNCHECKED_CAST") val colourArray = intent.getSerializableExtra("colourArrayList") as ArrayList<String>
+        if (!colourArray.isNullOrEmpty()) {
+            for (colour in colourArray) {
+                try {
+                    drawable.addFrame(ColorDrawable(Color.parseColor(colour)), 500)
+                } catch (e: Exception) {
+                    when (e) {
+                        is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                        }
+                        else -> throw e
+                    }
+                }
+            }
+            if (drawable.numberOfFrames == 0) {
+                drawable.addFrame(ColorDrawable(Color.RED), 500)
+                drawable.addFrame(ColorDrawable(Color.GREEN), 500)
+            }
+        } else {
+            drawable.addFrame(ColorDrawable(Color.RED), 500)
+            drawable.addFrame(ColorDrawable(Color.GREEN), 500)
+        }
         drawable.isOneShot = false
         alarm_background.background = drawable
 
@@ -82,7 +109,9 @@ class Alarm : Activity() {
 
         alarm_stop_button.setOnClickListener { finish() }
 
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
+        val param = Bundle()
+        param.putString("CustomColourAmount", colourArray.size.toString())
+        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", param)
     }
 
     /* access modifiers changed from: protected */

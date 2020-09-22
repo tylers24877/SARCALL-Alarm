@@ -87,7 +87,6 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         }
         if (list.isNotEmpty()) {
             mData.removeAll(list)
-            notifyDataSetChanged()
         }
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
@@ -98,6 +97,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             editor.putString("rulesJSON", Gson().toJson(mData))
 
         editor.apply()
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -323,9 +323,6 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                 }
                 dialog.ColoursRecyclerSaveButton.setOnClickListener {
                     colourAdapter.saveData()
-                    dialog.dismiss()
-                }
-                dialog.ColoursRecyclerExitButton.setOnClickListener {
                     dialog.dismiss()
                 }
                 colourAdapter.onSave = {
