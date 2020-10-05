@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +25,7 @@ import androidx.work.WorkManager
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
@@ -89,6 +91,7 @@ class MainActivity : AppCompatActivity() {
                 .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V7", ExistingPeriodicWorkPolicy.KEEP, build)
         }
         upgradePreferences(pref)
+        checkOverlay()
 
         if (pref.getBoolean("prefEnabled", false)) {
             val string = pref.getString("rulesJSON", "")
@@ -96,58 +99,32 @@ class MainActivity : AppCompatActivity() {
                 pref.edit().putBoolean("prefEnabled", false).apply()
             }
         }
+    }
 
-        /*if(!pref.getBoolean("ignoreOverlayWarning", false)) {
-            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    !Settings.canDrawOverlays(this)
-                } else false
-            ) {
-
-                val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { dialog, which ->
-                    when (which) {
-                        DialogInterface.BUTTON_POSITIVE -> {
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                            startActivityForResult(intent, 505)
-                            FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
-                        }
-                        DialogInterface.BUTTON_NEUTRAL -> {
-
-                        }
-                        DialogInterface.BUTTON_NEGATIVE -> {
-                            pref.edit().putBoolean("ignoreOverlayWarning",true).apply()
-                            FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_ignore", null)
-                        }
-                    }
-                }
-                val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-                builder.setMessage(
-                    "The 'Display on top' permission is needed to activate the alarm, when the screen is on." +
-                            "\n\nPlease enable the permission in settings"
-                )
-                    .setPositiveButton("Okay, take me to settings", dialogClickListener)
-                    .setNeutralButton("Maybe later",dialogClickListener)
-                    .setNegativeButton("No thanks", dialogClickListener).show()
-            }
-        }*/
-
-        if (pref.getBoolean("showScreenOnWarning", true)) {
-            val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { dialog, which ->
+    private fun checkOverlay() {
+        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                !Settings.canDrawOverlays(this)
+            } else false
+        ) {
+            val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     DialogInterface.BUTTON_POSITIVE -> {
-                        pref.edit().putBoolean("showScreenOnWarning", false).apply()
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                        startActivityForResult(intent, 505)
+                        FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
                     }
                 }
             }
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             builder.setMessage(
-                "Due to a limitation within the android system, the alarm will only display fullscreen (with audio) when the screen is OFF/Locked.\n\n" +
-                        "If the screen is ON/IN USE when you receive a trigger SMS, you'll see a notification instead (without an audio alarm)." +
-                        "\nI'm working on a solution for this restriction."
+                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
+                        "\nPlease enable the permission on the app settings page."
             )
-                .setPositiveButton("I Understand", dialogClickListener).show()
+                .setPositiveButton("Continue Setup", dialogClickListener)
+                .setCancelable(false)
+                .show()
         }
     }
-
     private fun upgradePreferences(pref: SharedPreferences) {
         val edit = pref.edit()
         val rulesNewObjectArray: ArrayList<RulesObject>
@@ -221,5 +198,18 @@ class MainActivity : AppCompatActivity() {
             onBackPressed()
         }
         return true
+    }
+
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 505) {
+            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    !Settings.canDrawOverlays(this)
+                } else false
+            ) {
+                checkOverlay()
+            }
+        }
     }
 }

@@ -1,11 +1,15 @@
 package uk.mrs.saralarm
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.provider.Settings
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
@@ -64,10 +68,12 @@ class SetupActivity : AppCompatActivity() {
         startApp()
     }
 
+    @SuppressLint("InlinedApi")
     private fun checkOverlay() {
-        /*if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 !Settings.canDrawOverlays(this)
-            } else false) {
+            } else false
+        ) {
 
             val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { dialog, which ->
                 when (which) {
@@ -81,17 +87,17 @@ class SetupActivity : AppCompatActivity() {
                 }
             }
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage("The 'Display on top' permission is needed to activate the alarm, when the screen is on." +
-                    "\nPlease enable the permission in settings")
-                .setPositiveButton("Okay, take me to settings", dialogClickListener)
-                .setNegativeButton("Maybe later", dialogClickListener)
+            builder.setMessage(
+                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
+                        "\nPlease enable the permission on the app settings page."
+            )
+                .setPositiveButton("Okay, take me to settings", dialogClickListener).setCancelable(false)
             builder.setOnCancelListener {
-                checkBattery()
+                checkOverlay()
             }
             builder.show()
-        }
-        else*/
-        checkBattery()
+        } else
+            checkBattery()
     }
 
     /* access modifiers changed from: protected */
@@ -101,7 +107,14 @@ class SetupActivity : AppCompatActivity() {
             startApp()
         }
         if (requestCode == 44) {
-            checkBattery()
+            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Settings.canDrawOverlays(this)
+                } else false
+            ) {
+                checkBattery()
+            } else {
+                checkOverlay()
+            }
         }
     }
 

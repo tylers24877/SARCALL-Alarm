@@ -56,9 +56,11 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     }
 
     fun removeItems(adapterPosition: Int) {
-        checkAndRemoveFile(adapterPosition)
-        mData.removeAt(adapterPosition)
-        notifyItemRemoved(adapterPosition)
+        if (adapterPosition >= 0 && adapterPosition < mData.size) {
+            checkAndRemoveFile(adapterPosition)
+            mData.removeAt(adapterPosition)
+            notifyItemRemoved(adapterPosition)
+        }
     }
 
     fun addItem() {

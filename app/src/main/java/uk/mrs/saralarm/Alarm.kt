@@ -1,6 +1,7 @@
 package uk.mrs.saralarm
 
 import android.app.Activity
+import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Color
@@ -9,13 +10,19 @@ import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
+import android.view.WindowInsets
+import android.view.WindowInsetsController
+import android.view.WindowManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
+import uk.mrs.saralarm.support.ActivationNotification
+import uk.mrs.saralarm.support.RuleAlarmData
 import java.io.FileInputStream
 
 
@@ -26,24 +33,38 @@ class Alarm : Activity() {
     /* access modifiers changed from: protected */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(1)
-        window.addFlags(6816896)
         setContentView(R.layout.activity_alarm)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            val keyguardManager = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            keyguardManager.requestDismissKeyguard(this, null)
+        } else {
+            this.window.addFlags(
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
+                        WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            )
+        }
 
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_started_locked", null)
 
-        println(intent.getStringExtra("alarmPreviewSMSBody"))
-        alarmPreviewSMSTextView.text = if (intent.getStringExtra("alarmPreviewSMSBody") != null) intent.getStringExtra("alarmPreviewSMSBody") else "Preview not available"
-        alarmPreviewSMSNumberTextView.text = if (intent.getStringExtra("alarmPreviewSMSNumber") != null) "From: " + intent.getStringExtra("alarmPreviewSMSNumber") else ""
+        val ruleAlarmData = intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
+
+
+        println(ruleAlarmData.alarmPreviewSMSBody)
+        alarmPreviewSMSTextView.text = ruleAlarmData.alarmPreviewSMSBody
+        alarmPreviewSMSNumberTextView.text = "From: " + ruleAlarmData.alarmPreviewSMSNumber
 
         mp = MediaPlayer()
         mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
 
-        mp!!.isLooping = intent.getBooleanExtra("isLooping", true)
+        mp!!.isLooping = ruleAlarmData.isLooping
 
         try {
-            val fileInputStream = FileInputStream(intent.getStringExtra("soundFile"))
-            FirebaseCrashlytics.getInstance().log(intent.getStringExtra("soundFile").toString())
+            val fileInputStream = FileInputStream(ruleAlarmData.soundFile)
+            FirebaseCrashlytics.getInstance().log(ruleAlarmData.soundFile)
 
             mp!!.setDataSource(fileInputStream.fd)
             fileInputStream.close()
@@ -69,17 +90,22 @@ class Alarm : Activity() {
         audio.mode = AudioManager.MODE_IN_CALL
         audio.isSpeakerphoneOn = true
 
-        // Hide both the navigation bar and the status bar.
-        // SYSTEM_UI_FLAG_FULLSCREEN is only available on Android 4.1 and higher, but as
-        // a general rule, you should design your app to hide the status bar whenever you
-        // hide the navigation bar.
-        val uiOptions = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN)
-        window.decorView.systemUiVisibility = uiOptions
 
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            val uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_FULLSCREEN
+            window.decorView.systemUiVisibility = uiOptions
+        } else {
+            window.setDecorFitsSystemWindows(false)
+            val controller = window.insetsController
+            if (controller != null) {
+                controller.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+                controller.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
         val drawable = AnimationDrawable()
         val handler = Handler(Looper.getMainLooper())
 
-        @Suppress("UNCHECKED_CAST") val colourArray = intent.getSerializableExtra("colourArrayList") as ArrayList<String>
+        val colourArray = ruleAlarmData.colorArrayList
         if (!colourArray.isNullOrEmpty()) {
             for (colour in colourArray) {
                 try {
@@ -110,7 +136,11 @@ class Alarm : Activity() {
         alarm_stop_button.setOnClickListener { finish() }
 
         val param = Bundle()
-        param.putString("CustomColourAmount", colourArray.size.toString())
+        if (colourArray.isNullOrEmpty())
+            param.putString("CustomColourAmount", "0")
+        else
+            param.putString("CustomColourAmount", colourArray.size.toString())
+
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", param)
     }
 

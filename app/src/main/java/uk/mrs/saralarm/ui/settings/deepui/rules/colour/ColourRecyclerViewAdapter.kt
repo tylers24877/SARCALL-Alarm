@@ -42,8 +42,11 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
     }
 
     fun removeItems(adapterPosition: Int) {
-        mData.removeAt(adapterPosition)
-        notifyItemRemoved(adapterPosition)
+
+        if (adapterPosition >= 0 && adapterPosition < mData.size) {
+            mData.removeAt(adapterPosition)
+            notifyItemRemoved(adapterPosition)
+        }
     }
 
     fun addItem(showPicker: Boolean) {
