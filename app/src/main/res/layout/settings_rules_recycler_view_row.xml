@@ -16,7 +16,7 @@
             android:id="@+id/rulesDragImageView"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_baseline_drag_indicator_24"
+            app:srcCompat="@drawable/ic_baseline_drag_indicator_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/rules_vertical_guideline"
             app:layout_constraintStart_toStartOf="parent"

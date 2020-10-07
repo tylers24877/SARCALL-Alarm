@@ -20,7 +20,6 @@ import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
-import kotlinx.android.synthetic.main.settings_rules_recycler_view_row.view.*
 import kotlinx.android.synthetic.main.settings_sms_numbers_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
@@ -119,7 +118,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
                                 val prevSelection: Int = myTextView.selectionStart
                                 val prevLength: Int = myTextView.length()
                                 myTextView.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
-                                myTextView.SMSNumbersRulesEditText.setSelection(
+                                myTextView.setSelection(
                                     if (myTextView.length() - prevLength + prevSelection > 0) {
                                         myTextView.length() - prevLength + prevSelection
                                     } else {
