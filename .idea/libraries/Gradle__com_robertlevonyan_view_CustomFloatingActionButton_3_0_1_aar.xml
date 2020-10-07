@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.robertlevonyan.view:CustomFloatingActionButton:3.0.1@aar">
     <CLASSES>
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/e95f3985754a8412d49c8c913b00a96a/jetified-CustomFloatingActionButton-3.0.1/AndroidManifest.xml" />
-      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/e95f3985754a8412d49c8c913b00a96a/jetified-CustomFloatingActionButton-3.0.1/jars/classes.jar!/" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/e95f3985754a8412d49c8c913b00a96a/jetified-CustomFloatingActionButton-3.0.1/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/b61d84a9435165f34ff050639dc88060/jetified-CustomFloatingActionButton-3.0.1/AndroidManifest.xml" />
+      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/b61d84a9435165f34ff050639dc88060/jetified-CustomFloatingActionButton-3.0.1/jars/classes.jar!/" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/b61d84a9435165f34ff050639dc88060/jetified-CustomFloatingActionButton-3.0.1/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://E:/android/.gradle/caches/modules-2/files-2.1/com.robertlevonyan.view/CustomFloatingActionButton/3.0.1/337df09b3465bb5d02260eec8b16f47c724c359c/CustomFloatingActionButton-3.0.1-javadoc.jar!/" />

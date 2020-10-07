@@ -8,7 +8,7 @@
     <string name="appwidget_text">SARCALL</string>
     <string name="notification_alarm_channel_id">Alarm Trigger Full Screen</string>
     <string name="placeholder_text">{PLACEHOLDER TEXT}</string>
-    <string name="pref_enabled_summary">Enable or disable the SMS alarm.\nThis will NOT enable no rules are configured.</string>
+    <string name="pref_enabled_summary">Enable or disable the SMS alarm.</string>
     <string name="pref_enabled_title">SARCALL Alarm ON/OFF</string>
     <string name="respond_received_sarcall_sms_heading">Latest SARCALL SMS</string>
     <string name="response_attending_button">SAR A</string>

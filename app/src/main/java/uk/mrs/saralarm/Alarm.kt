@@ -48,9 +48,13 @@ class Alarm : Activity() {
             )
         }
 
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_started_locked", null)
 
-        val ruleAlarmData = intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
+        val ruleAlarmData =
+            if (intent.getSerializableExtra("ruleAlarmData") != null) {
+                intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
+            } else {
+                RuleAlarmData(alarmPreviewSMSBody = "Error Occurred with reading SMS. Error Code = 1")
+            }
 
 
         println(ruleAlarmData.alarmPreviewSMSBody)

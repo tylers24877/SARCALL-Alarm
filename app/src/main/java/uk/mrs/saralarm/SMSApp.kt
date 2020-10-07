@@ -101,6 +101,7 @@ class SMSApp : BroadcastReceiver() {
                 startService(context, checkRulesBoth)
                 FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
             } else {
+                FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                 startService(context, checkRulesBoth)
             }
         } else {
@@ -110,6 +111,7 @@ class SMSApp : BroadcastReceiver() {
                     startService(context, checkRulesSMSNumber)
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                 } else {
+                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                     startService(context, checkRulesSMSNumber)
                 }
             } else {
@@ -119,6 +121,7 @@ class SMSApp : BroadcastReceiver() {
                         startService(context, checkRulesPhrase)
                         FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                     } else {
+                        FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                         startService(context, checkRulesPhrase)
                     }
                 }
@@ -126,7 +129,7 @@ class SMSApp : BroadcastReceiver() {
         }
     }
 
-    fun startService(context: Context, ruleAlarmData: RuleAlarmData) {
+    private fun startService(context: Context, ruleAlarmData: RuleAlarmData) {
         val serviceIntent = Intent(context, NotificationForeground::class.java)
         serviceIntent.putExtra("ruleAlarmData", ruleAlarmData)
         ContextCompat.startForegroundService(context, serviceIntent)

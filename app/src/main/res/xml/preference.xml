@@ -31,7 +31,7 @@
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="betaChannel"
-        android:summary="Subscribe to the beta version of this app. This is used when checking for updates in the background"
+        android:summary="Subscribe to the beta version of this app. Be aware, this channel may be unstable."
         android:title="Beta Channel"
         app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

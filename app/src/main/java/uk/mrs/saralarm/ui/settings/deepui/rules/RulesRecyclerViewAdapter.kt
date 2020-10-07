@@ -167,19 +167,6 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-
-        //val rulesRadioGroup: RadioGroup = itemView.rulesRadioGroup
-        //val smsNumberEditText: TextInputEditText = itemView.SMSNumbersRulesEditText
-        //val smsNumberTextInputLayout: TextInputLayout = itemView.SMSNumbersRulesRecyclerTextInput
-        //val phraseEditText: TextInputEditText = itemView.phraseRulesEditText
-        //val phraseRulesRecyclerTextInputLayout: TextInputLayout = itemView.phraseRulesRecyclerTextInput
-
-        //val customiseAlarmRulesTextView: TextView = itemView.customiseAlarmRulesTextView
-        //val customiseAlarmRulesConstraintLayout: ConstraintLayout = itemView.customiseAlarmRulesConstraintLayout
-
-        //val addAlarmRulesButton: MaterialButton = itemView.addAlarmRulesButton
-        //val addAlarmRulesTextView: MaterialTextView = itemView.addAlarmRulesTextView
-
         init {
             itemView.SMSNumbersRulesEditText.inputType = 3
             itemView.SMSNumbersRulesEditText.maxLines = 1
@@ -200,15 +187,24 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                                     val prevSelection: Int = itemView.SMSNumbersRulesEditText.selectionStart
                                     val prevLength: Int = itemView.SMSNumbersRulesEditText.length()
                                     itemView.SMSNumbersRulesEditText.setText(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
-                                    itemView.SMSNumbersRulesEditText.setSelection(itemView.SMSNumbersRulesEditText.length() - prevLength + prevSelection)
+                                    itemView.SMSNumbersRulesEditText.setSelection(
+                                        if (itemView.SMSNumbersRulesEditText.length() - prevLength + prevSelection > 0) {
+                                            itemView.SMSNumbersRulesEditText.length() - prevLength + prevSelection
+                                        } else {
+                                            0
+                                        }
+                                    )
                                     itemView.SMSNumbersRulesRecyclerTextInput.error = ""
+
                                 }
                             } catch (e: NumberParseException) {
                                 itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
                             }
                             smsNumberEditing = false
                         }
-                    mData[adapterPosition].smsNumber = itemView.SMSNumbersRulesEditText.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
+                        mData[adapterPosition].smsNumber = itemView.SMSNumbersRulesEditText.text.toString()
+                    }
                 }
 
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -219,7 +215,9 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             itemView.phraseRulesEditText.addTextChangedListener(object : TextWatcher {
 
                 override fun afterTextChanged(s: Editable) {
-                    mData[adapterPosition].phrase = itemView.phraseRulesEditText.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
+                        mData[adapterPosition].phrase = itemView.phraseRulesEditText.text.toString()
+                    }
                 }
 
                 override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
