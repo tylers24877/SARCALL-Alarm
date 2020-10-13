@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -93,7 +94,7 @@ class RespondFragment : Fragment() {
             val phoneNumberJSON: String? = pref.getString("rulesJSON", "")
             if (phoneNumberJSON.isNullOrBlank()) {
                 requireView().InfoView.visibility = View.VISIBLE
-                requireView().InfoView_txtview.text = "Rules are not configured correctly, please click to check."
+                requireView().InfoView_txtview.text = "Rules are not configured correctly! Please click to check."
                 requireView().InfoView.setOnClickListener{
                     findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
                 }
@@ -420,22 +421,29 @@ class RespondFragment : Fragment() {
     private fun updateLatestSMS() {
         if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0) {
             GlobalScope.launch(Dispatchers.Main) {
-                requireView().respond_sms_loading_bar.visibility = View.VISIBLE
-                requireView().respond_sms_preview_txtview.visibility = View.GONE
-                requireView().respond_preview_date_txtview.visibility = View.GONE
+                try {
+                    requireView().respond_sms_loading_bar.visibility = View.VISIBLE
+                    requireView().respond_sms_preview_txtview.visibility = View.GONE
+                    requireView().respond_preview_date_txtview.visibility = View.GONE
 
-                val (resultBody,resultDate) = respondViewModel!!.setPreviewAsync(requireContext()).await()
-                requireView().respond_sms_preview_txtview.text = resultBody
-                requireView().respond_preview_date_txtview.text = resultDate
+                    val (resultBody, resultDate) = respondViewModel!!.setPreviewAsync(requireContext()).await()
+                    requireView().respond_sms_preview_txtview.text = resultBody
+                    requireView().respond_preview_date_txtview.text = resultDate
 
-                requireView().respond_sms_loading_bar.visibility = View.GONE
-                requireView().respond_sms_preview_txtview.visibility = View.VISIBLE
-                requireView().respond_preview_date_txtview.visibility = View.VISIBLE
-
+                    requireView().respond_sms_loading_bar.visibility = View.GONE
+                    requireView().respond_sms_preview_txtview.visibility = View.VISIBLE
+                    requireView().respond_preview_date_txtview.visibility = View.VISIBLE
+                } catch (e: IllegalStateException) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                }
             }
         } else {
-            requireView().respond_preview_date_txtview.text = ""
-            requireView().respond_sms_preview_txtview.setText(R.string.response_permission_placeholder)
+            try {
+                requireView().respond_preview_date_txtview.text = ""
+                requireView().respond_sms_preview_txtview.setText(R.string.response_permission_placeholder)
+            } catch (e: IllegalStateException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
+            }
         }
     }
 }
