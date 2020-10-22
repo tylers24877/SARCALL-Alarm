@@ -16,7 +16,11 @@ data class CustomAlarmRulesObject(
 
 enum class RulesChoice {
     @SerializedName("sms_number")
-    SMS_NUMBER, @SerializedName("phrase")
-    PHRASE, @SerializedName("all")
+    SMS_NUMBER,
+
+    @SerializedName("phrase")
+    PHRASE,
+
+    @SerializedName("all")
     ALL
 }

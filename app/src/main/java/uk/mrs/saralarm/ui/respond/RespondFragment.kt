@@ -1,5 +1,6 @@
 package uk.mrs.saralarm.ui.respond
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -32,6 +34,8 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat
 import kotlinx.android.synthetic.main.dialog_respond_sar_a.*
 import kotlinx.android.synthetic.main.dialog_respond_sar_l.*
+import kotlinx.android.synthetic.main.dialog_sign_off.*
+import kotlinx.android.synthetic.main.fragment_respond.*
 import kotlinx.android.synthetic.main.fragment_respond.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -40,7 +44,9 @@ import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
 import java.lang.reflect.Type
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
+import kotlin.math.abs
 
 
 class RespondFragment : Fragment() {
@@ -68,18 +74,25 @@ class RespondFragment : Fragment() {
         root.respond_sar_a_button.setOnClickListener{
             dialogSARAOpen(context)
         }
-        root.respond_sar_l_button.setOnClickListener{
+        root.respond_sar_l_button.setOnClickListener {
             dialogSARLOpen(context)
         }
-        root.respond_sar_n_button.setOnClickListener{
+        root.respond_sar_n_button.setOnClickListener {
             dialogSARNOpen()
         }
         root.pullToRefresh.setOnRefreshListener {
             updateLatestSMS()
             root.pullToRefresh.isRefreshing = false
         }
+        root.respond_sign_on.setOnClickListener {
+            displaySignOnDialog()
+        }
+        root.respond_sign_off.setOnClickListener {
+            displaySignOffDialog()
+        }
         return root
     }
+
     override fun onResume() {
        updateLatestSMS()
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -131,13 +144,13 @@ class RespondFragment : Fragment() {
         }
         customMessageArray.removeAll(Collections.singleton(""))
         customMessageArray.add(0, "Enter Custom Message...")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, customMessageArray)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_expandable_list_item_1, customMessageArray)
+        adapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1)
 
         dialog.sar_a_spinner.adapter = adapter
 
 
-        dialog.sar_a_spinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener{
+        dialog.sar_a_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (dialog.sar_a_spinner.selectedItem.toString() == "Enter Custom Message...") {
                     dialog.respond_dialog_sar_a_message_editview.isEnabled = true
@@ -191,16 +204,12 @@ class RespondFragment : Fragment() {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (progress >= 0 && progress <= seekBar.max) {
                     val progressCal = progress * 5
-                    val respondViewModel: RespondViewModel = getRespondViewModel()
-                    respondViewModel.setEta(progressCal)
                     val sb = SpannableStringBuilder()
                     sb.append("Estimated time to arrival: ")
                     sb.append(progressCal.toString())
                     sb.append(" minutes")
                     sb.setSpan(StyleSpan(1), 27, progressCal.toString().length + 27, 18)
                     dialog.respond_dialog_sar_a_seek_eta_txtview.text = sb
-
-                    seekBar.secondaryProgress = progress
                 }
             }
         })
@@ -208,9 +217,9 @@ class RespondFragment : Fragment() {
         dialog.respond_dialog_sar_a_submit_button.setOnClickListener {
             val progressCal = dialog.respond_dialog_sar_a_seek.progress * 5
             if(dialog.sar_a_spinner.selectedItem=="Enter Custom Message...") {
-                sendSMSResponse(requireContext(), dialog, SARResponseCode.SAR_A, progressCal, dialog.respond_dialog_sar_a_message_editview.text.toString())
+                sendSMSResponse(requireContext(), SARResponseCode.SAR_A, dialog, progressCal, dialog.respond_dialog_sar_a_message_editview.text.toString())
             }else{
-                sendSMSResponse(requireContext(), dialog, SARResponseCode.SAR_A, progressCal, dialog.sar_a_spinner.selectedItem.toString())
+                sendSMSResponse(requireContext(), SARResponseCode.SAR_A, dialog, progressCal, dialog.sar_a_spinner.selectedItem.toString())
             }
         }
     }
@@ -232,8 +241,8 @@ class RespondFragment : Fragment() {
         }
         customMessageArray.removeAll(Collections.singleton(""))
         customMessageArray.add(0, "Enter Custom Message...")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, customMessageArray)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_expandable_list_item_1, customMessageArray)
+        adapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1)
 
 
         dialog.sar_l_spinner.adapter = adapter
@@ -293,8 +302,6 @@ class RespondFragment : Fragment() {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (progress >= 0 && progress <= seekBar.max) {
                     val progressCal = progress * 5
-                    val respondViewModel: RespondViewModel = getRespondViewModel()
-                    respondViewModel.setEta(progressCal)
                     val sb = SpannableStringBuilder()
                     sb.append("Estimated time to arrival: ")
                     sb.append(progressCal.toString())
@@ -305,7 +312,6 @@ class RespondFragment : Fragment() {
                     } else {
                         dialog.respond_dialog_sar_l_seek_eta_txtview.text = "Estimated time to arrival: N/A"
                     }
-                    seekBar.secondaryProgress = progress
                 }
             }
         })
@@ -313,9 +319,9 @@ class RespondFragment : Fragment() {
         dialog.respond_dialog_sar_l_submit_button.setOnClickListener {
             val progressCal = dialog.respond_dialog_sar_l_seek.progress * 5
             if(dialog.sar_l_spinner.selectedItem=="Enter Custom Message...") {
-                sendSMSResponse(requireContext(), dialog, SARResponseCode.SAR_L, progressCal, dialog.respond_dialog_sar_l_message_editview.text.toString())
+                sendSMSResponse(requireContext(), SARResponseCode.SAR_L, dialog, progressCal, dialog.respond_dialog_sar_l_message_editview.text.toString())
             }else{
-                sendSMSResponse(requireContext(), dialog, SARResponseCode.SAR_L, progressCal, dialog.sar_l_spinner.selectedItem.toString())
+                sendSMSResponse(requireContext(), SARResponseCode.SAR_L, dialog, progressCal, dialog.sar_l_spinner.selectedItem.toString())
             }
         }
 
@@ -324,7 +330,7 @@ class RespondFragment : Fragment() {
     private fun dialogSARNOpen() {
         val dialogClickListener  =  DialogInterface.OnClickListener{ dialog, which ->
             if (which == BUTTON_POSITIVE) {
-                sendSMSResponse(requireContext(), dialog, SARResponseCode.SAR_N, 0, null)
+                sendSMSResponse(requireContext(), SARResponseCode.SAR_N, dialog, 0, null)
             }
         }
         AlertDialog.Builder(requireContext()).setMessage(R.string.SAR_N_dialog_title).setPositiveButton(R.string.sar_n_positive, dialogClickListener)
@@ -332,7 +338,7 @@ class RespondFragment : Fragment() {
     }
 
 
-    private fun sendSMSResponse(context: Context, dialog: DialogInterface, sarResponseCode: SARResponseCode, eta: Int, message: String?) {
+    private fun sendSMSResponse(context: Context, sarResponseCode: SARResponseCode, dialog: DialogInterface?, value: Int, message: String?) {
         val sb: StringBuilder
         val smsManager: SmsManager = SmsManager.getDefault()
         val pref = PreferenceManager.getDefaultSharedPreferences(context)
@@ -341,16 +347,15 @@ class RespondFragment : Fragment() {
             val type: Type = object : TypeToken<java.util.ArrayList<String>?>() {}.type
             val phoneNumberSet: java.util.ArrayList<String>? = Gson().fromJson(pref.getString("respondSMSNumbersJSON", ""), type)
             if (phoneNumberSet.isNullOrEmpty()) {
-                Toast.makeText(context, "Failed! No SARCALL number chosen. Please check/add number in settings.", Toast.LENGTH_LONG).show()
+                Snackbar.make(respond_constraintLayout, "Failed! No SARCALL number chosen. Please check/add number in settings.", Snackbar.LENGTH_LONG).show()
                 return
             }
-
             when (sarResponseCode) {
                 SARResponseCode.SAR_A -> {
-                    if (eta != 0) {
+                    if (value != 0) {
                         sb = StringBuilder()
                         sb.append("SAR A")
-                        sb.append(eta)
+                        sb.append(value)
                         sb.append(' ')
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
@@ -365,13 +370,13 @@ class RespondFragment : Fragment() {
                         }
                     }
                     Toast.makeText(context, "SAR A sent to SARCALL", Toast.LENGTH_LONG).show()
-                    dialog.cancel()
+                    dialog?.cancel()
                 }
                 SARResponseCode.SAR_L -> {
-                    if (eta != 0) {
+                    if (value != 0) {
                         sb = StringBuilder()
                         sb.append("SAR L")
-                        sb.append(eta)
+                        sb.append(value)
                         sb.append(' ')
                         sb.append(message)
                         for (phoneNumber in phoneNumberSet) {
@@ -388,18 +393,45 @@ class RespondFragment : Fragment() {
                     }
 
                     Toast.makeText(context, "SAR L sent to SARCALL", Toast.LENGTH_LONG).show()
-                    dialog.cancel()
+                    dialog?.cancel()
                 }
                 SARResponseCode.SAR_N -> {
                     for (phoneNumber in phoneNumberSet) {
                         smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, "SAR N", null, null)
                     }
                     Toast.makeText(context, "SAR N sent to SARCALL", Toast.LENGTH_LONG).show()
-                    dialog.cancel()
+                    dialog?.cancel()
+                }
+                SARResponseCode.SIGN_ON -> {
+                    for (phoneNumber in phoneNumberSet) {
+                        smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, "ON $message", null, null)
+                    }
+                    Toast.makeText(context, "Sign on SMS sent to SARCALL. Lookout for a confirmation SMS.", Toast.LENGTH_LONG).show()
+                    dialog?.cancel()
+                }
+                SARResponseCode.SIGN_OFF -> {
+                    for (phoneNumber in phoneNumberSet) {
+                        if (value != 0) {
+                            smsManager.sendTextMessage(
+                                phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, "OFF $message $value" + "d",
+                                null, null
+                            )
+                        } else {
+                            smsManager.sendTextMessage(
+                                phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberFormat.INTERNATIONAL), null, "OFF $message",
+                                null, null
+                            )
+                        }
+                    }
+                    Toast.makeText(context, "Sign off SMS sent to SARCALL. Lookout for a confirmation SMS.", Toast.LENGTH_LONG).show()
+                    dialog?.cancel()
                 }
             }
         } catch (e7: NumberParseException) {
             Toast.makeText(context, "Failed! SARCALL SMS number is formatted wrong. Please check number in settings.", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Unknown error. Please try again or report issue.", Toast.LENGTH_LONG).show()
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 
@@ -413,9 +445,6 @@ class RespondFragment : Fragment() {
                 }
             }
         }
-    }
-    fun getRespondViewModel(): RespondViewModel {
-        return respondViewModel!!
     }
 
     private fun updateLatestSMS() {
@@ -445,6 +474,85 @@ class RespondFragment : Fragment() {
                 FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
+    }
+
+    private fun displaySignOnDialog() {
+        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
+            if (which == BUTTON_POSITIVE) {
+                val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                val teamPrefix = pref.getString("prefTeamPrefix", "")
+                if (teamPrefix.isNullOrBlank()) {
+                    Snackbar.make(respond_constraintLayout, "Cannot sign on. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
+                    return@OnClickListener
+                }
+                sendSMSResponse(requireContext(), SARResponseCode.SIGN_ON, null, 0, teamPrefix)
+            }
+        }
+        AlertDialog.Builder(requireContext()).setTitle("Sign On").setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
+            .setNegativeButton("No", dialogClickListener).show()
+    }
+
+    private fun displaySignOffDialog() {
+        var daysBetween = 0
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.dialog_sign_off)
+        val window: Window = dialog.window!!
+        window.setLayout(MATCH_PARENT, WRAP_CONTENT)
+        window.setGravity(Gravity.CENTER)
+        dialog.show()
+
+        dialog.respond_dialog_sign_off_cancel_button.setOnClickListener {
+            dialog.cancel()
+        }
+
+        dialog.respond_dialog_sign_off_set_date_button.setOnClickListener {
+            val c = Calendar.getInstance()
+            val datePickerDialog = DatePickerDialog(
+                requireContext(), { _, year, month, dayOfMonth ->
+                    val cal = Calendar.getInstance()
+                    cal[Calendar.MONTH] = month
+                    cal[Calendar.DAY_OF_MONTH] = dayOfMonth
+                    cal[Calendar.YEAR] = year
+                    if (cal.before(c)) {
+                        Toast.makeText(requireContext(), "Please choose a day past present day.", Toast.LENGTH_LONG).show()
+                        return@DatePickerDialog
+                    }
+
+                    daysBetween = safeLongToInt(TimeUnit.MILLISECONDS.toDays(abs(cal.timeInMillis - c.timeInMillis)))
+
+                    val sb = SpannableStringBuilder()
+                    sb.append("Duration: ")
+                    if (daysBetween == 0) {
+                        sb.append("∞")
+                    } else {
+                        sb.append("$daysBetween day" + if (daysBetween != 1) "s" else "")
+                    }
+                    sb.setSpan(StyleSpan(1), 10, daysBetween.toString().length + 10, SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE)
+                    dialog.respond_dialog_sign_off_seek_dur_txtview.text = sb
+                },
+                c[Calendar.YEAR], c[Calendar.MONTH], c[Calendar.DAY_OF_MONTH]
+            )
+            datePickerDialog.datePicker.minDate = c.timeInMillis
+            datePickerDialog.show()
+        }
+
+
+        dialog.respond_dialog_sign_off_submit_button.setOnClickListener {
+            val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            val teamPrefix = pref.getString("prefTeamPrefix", "")
+            if (teamPrefix.isNullOrBlank()) {
+                Snackbar.make(respond_constraintLayout, "Cannot sign off. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
+                dialog.cancel()
+                return@setOnClickListener
+            }
+            sendSMSResponse(requireContext(), SARResponseCode.SIGN_OFF, dialog, daysBetween, teamPrefix)
+        }
+    }
+
+    private fun safeLongToInt(l: Long): Int {
+        require(!(l < Int.MIN_VALUE || l > Int.MAX_VALUE)) { "$l cannot be cast to int without changing its value." }
+        return l.toInt()
     }
 }
 

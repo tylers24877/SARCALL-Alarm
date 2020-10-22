@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/respond_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:id="@+id/respond_constraintLayout"
         android:layout_height="match_parent">
 
         <GridLayout
@@ -26,7 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/error"
-                app:cornerRadius="4.0dip">
+                app:cornerRadius="4.0dip"
+                tools:ignore="UselessParent">
 
                 <TextView
                     android:id="@+id/InfoView_txtview"
@@ -173,21 +176,50 @@
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"
             android:layout_marginStart="30.0dip"
-            android:layout_marginLeft="30.0dip"
-            android:layout_marginTop="35.0dip"
+            android:layout_marginTop="16.0dip"
             android:layout_marginEnd="15.0dip"
-            android:layout_marginRight="15.0dip"
             android:paddingTop="15.0dip"
             android:paddingBottom="15.0dip"
             android:text="@string/response_late_button"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
-            app:layout_constraintEnd_toStartOf="@id/guideline"
+            app:layout_constraintEnd_toStartOf="@id/guideline_V"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/respond_sar_a_button" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/respond_sign_on"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30.0dip"
+            android:layout_marginTop="36dp"
+            android:layout_marginEnd="15.0dip"
+            android:paddingTop="5dip"
+            android:paddingBottom="5dip"
+            android:text="Sign On"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            app:backgroundTint="@color/primary_dark"
+            app:layout_constraintEnd_toStartOf="@id/guideline_V"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/respond_sar_l_button" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/respond_sign_off"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15.0dip"
+            android:paddingTop="5dip"
+            android:paddingBottom="5dip"
+            android:text="Sign Off"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
+            app:backgroundTint="@color/primary_dark"
+            app:layout_constraintEnd_toEndOf="@+id/respond_sar_n_button"
+            app:layout_constraintStart_toStartOf="@id/guideline_V"
+            app:layout_constraintTop_toTopOf="@+id/respond_sign_on" />
+
+
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline"
+            android:id="@+id/guideline_V"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
             android:orientation="vertical"
@@ -198,17 +230,15 @@
             android:layout_width="0.0dip"
             android:layout_height="wrap_content"
             android:layout_marginStart="15.0dip"
-            android:layout_marginLeft="15.0dip"
-            android:layout_marginTop="35.0dip"
             android:layout_marginEnd="30.0dip"
-            android:layout_marginRight="30.0dip"
             android:paddingTop="15.0dip"
             android:paddingBottom="15.0dip"
             android:text="@string/response_unavailable_button"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/guideline"
-            app:layout_constraintTop_toBottomOf="@id/respond_sar_a_button" />
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@id/guideline_V"
+            app:layout_constraintTop_toTopOf="@+id/respond_sar_l_button" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

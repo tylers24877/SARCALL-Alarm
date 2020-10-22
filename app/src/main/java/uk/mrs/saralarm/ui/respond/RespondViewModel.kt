@@ -4,8 +4,6 @@ import android.content.Context
 import android.database.Cursor
 import android.provider.Telephony
 import android.telephony.PhoneNumberUtils
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
@@ -27,13 +25,6 @@ import java.util.regex.Pattern
 import kotlin.collections.HashSet
 
 class RespondViewModel : ViewModel() {
-    private val mEta = MutableLiveData<Int>()
-    val eta: LiveData<Int>
-        get() = mEta
-
-    fun setEta(eta: Int) {
-        mEta.value = Integer.valueOf(eta)
-    }
 
     fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {

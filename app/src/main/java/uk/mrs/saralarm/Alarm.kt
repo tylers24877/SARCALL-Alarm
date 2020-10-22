@@ -57,8 +57,6 @@ class Alarm : Activity() {
                 RuleAlarmData(alarmPreviewSMSBody = "Error Occurred with reading SMS. Error Code = 1")
             }
 
-
-        println(ruleAlarmData.alarmPreviewSMSBody)
         alarmPreviewSMSTextView.text = ruleAlarmData.alarmPreviewSMSBody
         alarmPreviewSMSNumberTextView.text = "From: " + ruleAlarmData.alarmPreviewSMSNumber
 
@@ -140,13 +138,7 @@ class Alarm : Activity() {
 
         alarm_stop_button.setOnClickListener { finish() }
 
-        val param = Bundle()
-        if (colourArray.isNullOrEmpty())
-            param.putString("CustomColourAmount", "0")
-        else
-            param.putString("CustomColourAmount", colourArray.size.toString())
-
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", param)
+        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
     /* access modifiers changed from: protected */

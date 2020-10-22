@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SARCALL_Alarm.iml" filepath="$PROJECT_DIR$/.idea/modules/SARCALL_Alarm.iml" group="SARCALL_Alarm" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="SARCALL Alarm/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SARCALL_Alarm.iml" filepath="$PROJECT_DIR$/.idea/modules/SARCALL_Alarm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SARCALL_Alarm.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SARCALL_Alarm.app.iml" />
     </modules>
   </component>
 </project>

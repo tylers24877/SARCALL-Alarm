@@ -5,16 +5,16 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment.findNavController
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreferenceCompat
+import androidx.preference.*
 import com.google.android.material.snackbar.Snackbar
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.Widget
@@ -26,7 +26,8 @@ class SettingsFragment : Fragment() {
         parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
         return inflater.inflate(R.layout.fragment_settings, container, false)
     }
-    class PrefsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener, OnSharedPreferenceChangeListener,Preference.OnPreferenceClickListener {
+
+    class PrefsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener, OnSharedPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.preference, rootKey)
@@ -34,10 +35,32 @@ class SettingsFragment : Fragment() {
             preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
             (findPreference("prefEnabled") as Preference?)!!.onPreferenceChangeListener = this
+
+
+            val editTextPreference = preferenceManager.findPreference<EditTextPreference>("prefTeamPrefix")
+            editTextPreference!!.setOnBindEditTextListener { editText ->
+                val filter =
+                    InputFilter { source, start, end, _, _, _ ->
+                        for (i in start until end) {
+                            if (Character.isWhitespace(source[i])) {
+                                return@InputFilter ""
+                            }
+                        }
+                        null
+                    }
+                editText.filters = arrayOf(filter)
+            }
+
+
+            try {
+                preferenceManager.findPreference<PreferenceScreen>("appVersion")?.summary = appVersion()
+            } catch (e: PackageManager.NameNotFoundException) {
+                e.printStackTrace()
+            }
         }
 
         override fun onSharedPreferenceChanged(sP: SharedPreferences, key: String) {
-            if (key =="prefEnabled" && context != null) {
+            if (key == "prefEnabled" && context != null) {
                 val intent = Intent(context, Widget::class.java)
                 intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
                 val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(requireContext(), Widget::class.java))
@@ -78,10 +101,16 @@ class SettingsFragment : Fragment() {
             return true
         }
 
-    override fun onPreferenceClick(it: Preference?): Boolean {
-        findNavController(this).navigate(R.id.action_navigation_settings_to_customiseAlarmFragment)
-        return true
-    }
+        override fun onPreferenceClick(it: Preference?): Boolean {
+            findNavController(this).navigate(R.id.action_navigation_settings_to_customiseAlarmFragment)
+            return true
+        }
 
-}
+        @Throws(PackageManager.NameNotFoundException::class)
+        fun appVersion(): String? {
+            val pInfo: PackageInfo =
+                requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            return pInfo.versionName
+        }
+    }
 }
