@@ -23,7 +23,7 @@ class Widget : AppWidgetProvider() {
             val remoteViews = RemoteViews(context.packageName, R.layout.widget_app)
             remoteViews.setOnClickPendingIntent(
                 R.id.appwidget_sarcall_button,
-                getPendingSelfIntent(context, WIDGET_CLICK)
+                getPendingSelfIntent(context)
             )
             updateAppWidget(context, appWidgetManager, appWidgetID, remoteViews)
         }
@@ -62,7 +62,7 @@ class Widget : AppWidgetProvider() {
                 else -> {
                     Toast.makeText(
                         context,
-                        "Unable to activate SARCALL Alarm. No activation method chosen in app settings.",
+                        "Unable to activate SARCALL Alarm, as the rules are not configured in app settings.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -71,9 +71,9 @@ class Widget : AppWidgetProvider() {
         }
     }
 
-    private fun getPendingSelfIntent(context: Context, action: String): PendingIntent {
+    private fun getPendingSelfIntent(context: Context): PendingIntent {
         val intent = Intent(context, javaClass)
-        intent.action = action
+        intent.action = WIDGET_CLICK
         return PendingIntent.getBroadcast(context, 0, intent, 0)
     }
 

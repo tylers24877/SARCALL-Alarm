@@ -33,6 +33,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/respond_dialog_sign_off_set_date_button" />
 
         <com.google.android.material.button.MaterialButton
@@ -43,6 +44,7 @@
             android:text="Set Return Date"
             app:layout_constraintEnd_toEndOf="@+id/respond_dialog_sign_off_submit_button"
             app:layout_constraintStart_toStartOf="@+id/respond_dialog_sign_off_cancel_button"
+            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@+id/dialog_sign_off_title" />
 
         <com.google.android.material.button.MaterialButton

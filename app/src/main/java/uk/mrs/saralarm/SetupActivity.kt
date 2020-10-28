@@ -44,8 +44,12 @@ class SetupActivity : AppCompatActivity() {
                 checkOverlayAndMoveOn()
             } else {
                 //if permissions not granted, request them with request code of 1.
-                requestPermissions(arrayOf("android.permission.RECEIVE_SMS","android.permission.READ_SMS","android.permission.SEND_SMS","android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.WRITE_EXTERNAL_STORAGE"), 1)
+                requestPermissions(
+                    arrayOf(
+                        "android.permission.RECEIVE_SMS", "android.permission.READ_SMS", "android.permission.SEND_SMS", "android.permission.READ_EXTERNAL_STORAGE",
+                        "android.permission.WRITE_EXTERNAL_STORAGE"
+                    ), 1
+                )
             }
         }
     }

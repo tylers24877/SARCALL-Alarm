@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             if (systemService == null) {
                 //Throw an error if it doesn't
                 throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
-                //If the service does exist, check if the app is NOT ignoring battery optimizations.
+            //If the service does exist, check if the app is NOT ignoring battery optimizations.
             } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
                 //Create a new intent.
                 val i = Intent()

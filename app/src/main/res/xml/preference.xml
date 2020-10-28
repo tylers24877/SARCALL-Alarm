@@ -44,7 +44,8 @@
             android:key="prefDateWorkaround"
             android:summary="Enable fix for sign off date calculation on SARCALL"
             android:title="Date Workaround"
-            app:iconSpaceReserved="false" />
+            app:iconSpaceReserved="false"
+            app:isPreferenceVisible="false" />
     </PreferenceCategory>
 
     <PreferenceCategory

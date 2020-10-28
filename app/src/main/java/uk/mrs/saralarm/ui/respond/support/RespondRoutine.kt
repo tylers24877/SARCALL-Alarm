@@ -1,10 +1,9 @@
-package uk.mrs.saralarm.ui.respond
+package uk.mrs.saralarm.ui.respond.support
 
 import android.content.Context
 import android.database.Cursor
 import android.provider.Telephony
 import android.telephony.PhoneNumberUtils
-import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
@@ -24,7 +23,7 @@ import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.HashSet
 
-class RespondViewModel : ViewModel() {
+object RespondRoutine {
 
     fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {
