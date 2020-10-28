@@ -124,23 +124,12 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="48dp" />
 
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/customiseAlarmLoopingCheckBox"
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/customiseAlarmSetAlarmSoundTextView"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Loop Sound"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/addAlarmRulesButton"
-                app:layout_constraintTop_toTopOf="@+id/addAlarmRulesButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/addAlarmRulesButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Set Alarm Sound"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
+                android:text="Alarm Sound:"
                 app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -148,11 +137,39 @@
                 android:id="@+id/addAlarmRulesTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="No Alarm Sound Set. Using Default."
-                android:layout_marginTop="8dp"
                 android:paddingBottom="8dp"
+                android:text="No Alarm Sound Set. Using Default."
                 app:layout_constraintStart_toStartOf="@+id/addAlarmRulesButton"
-                app:layout_constraintTop_toBottomOf="@id/addAlarmRulesButton" />
+                app:layout_constraintTop_toBottomOf="@+id/customiseAlarmSetAlarmSoundTextView" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addAlarmRulesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set Alarm Sound"
+                app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/addAlarmRulesTextView" />
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/customiseAlarmLoopingCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="Loop Sound"
+                app:layout_constraintBottom_toBottomOf="@+id/addAlarmRulesButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/addAlarmRulesButton"
+                app:layout_constraintTop_toTopOf="@+id/addAlarmRulesButton" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/customiseAlarm_Visuals_TextView"
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Visuals:"
+                app:layout_constraintStart_toStartOf="@+id/customise_rules_vertical_guideline"
+                app:layout_constraintTop_toBottomOf="@+id/addAlarmRulesButton" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addAlarmColoursRulesButton"
@@ -160,7 +177,7 @@
                 android:layout_height="wrap_content"
                 android:text="Set Colours"
                 app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/addAlarmRulesTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/customiseAlarm_Visuals_TextView" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

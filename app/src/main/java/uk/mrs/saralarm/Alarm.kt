@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -18,11 +19,13 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.Toast
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import uk.mrs.saralarm.support.ActivationNotification
 import uk.mrs.saralarm.support.RuleAlarmData
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
 import java.io.FileInputStream
 
 
@@ -30,7 +33,6 @@ class Alarm : Activity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
 
-    /* access modifiers changed from: protected */
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_alarm)
@@ -65,19 +67,44 @@ class Alarm : Activity() {
 
         mp!!.isLooping = ruleAlarmData.isLooping
 
-        try {
-            val fileInputStream = FileInputStream(ruleAlarmData.soundFile)
-            FirebaseCrashlytics.getInstance().log(ruleAlarmData.soundFile)
+        when (ruleAlarmData.soundType) {
+            SoundType.NONE -> {
+                try {
+                    mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                }
+            }
+            SoundType.SYSTEM -> {
+                try {
+                    FirebaseCrashlytics.getInstance().log(Uri.parse(ruleAlarmData.soundFile).toString())
+                    mp!!.setDataSource(applicationContext, Uri.parse(ruleAlarmData.soundFile))
+                } catch (e: Exception) {
+                    try {
+                        Toast.makeText(applicationContext, "Failed to load system sound. Resorting to default.", Toast.LENGTH_LONG).show()
+                        mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                    } catch (e2: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e2)
+                    }
+                }
+            }
+            SoundType.CUSTOM -> {
+                try {
+                    val fileInputStream = FileInputStream(ruleAlarmData.soundFile)
+                    FirebaseCrashlytics.getInstance().log(ruleAlarmData.soundFile)
 
-            mp!!.setDataSource(fileInputStream.fd)
-            fileInputStream.close()
-        } catch (e: Exception) {
-            try {
-                mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
-            } catch (e2: Exception) {
-                FirebaseCrashlytics.getInstance().recordException(e)
+                    mp!!.setDataSource(fileInputStream.fd)
+                    fileInputStream.close()
+                } catch (e: Exception) {
+                    try {
+                        mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                    } catch (e2: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e2)
+                    }
+                }
             }
         }
+
         try {
             mp!!.prepare()
             mp!!.start()
@@ -106,7 +133,6 @@ class Alarm : Activity() {
             }
         }
         val drawable = AnimationDrawable()
-        val handler = Handler(Looper.getMainLooper())
 
         val colourArray = ruleAlarmData.colorArrayList
         if (!colourArray.isNullOrEmpty()) {
@@ -133,28 +159,27 @@ class Alarm : Activity() {
         drawable.isOneShot = false
         alarm_background.background = drawable
 
+        val handler = Handler(Looper.getMainLooper())
+
         handler.postDelayed({ drawable.start() }, 100)
-        Handler().postDelayed({ finish() }, 90000)
+        handler.postDelayed({ finish() }, 300000)
 
         alarm_stop_button.setOnClickListener { finish() }
 
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
-    /* access modifiers changed from: protected */
-    public override fun onResume() {
+    override fun onResume() {
         super.onResume()
         mp?.start()
     }
 
-    /* access modifiers changed from: protected */
-    public override fun onPause() {
+    override fun onPause() {
         super.onPause()
         mp?.pause()
     }
 
-    /* access modifiers changed from: protected */
-    public override fun onDestroy() {
+    override fun onDestroy() {
         super.onDestroy()
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(0)

@@ -47,8 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="200.0dip"
             android:layout_marginStart="8.0dip"
-            android:layout_marginLeft="8.0dip"
-            android:layout_marginTop="8.0dip"
+            android:layout_marginTop="16dp"
             android:layout_marginRight="8.0dip"
             android:clickable="true"
             android:focusable="true"
@@ -56,12 +55,15 @@
             app:cardCornerRadius="8.0dip"
             app:cardElevation="10.0dip"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/InfoView">
+
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/pullToRefresh"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -80,6 +82,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <View
+                        android:id="@+id/view"
                         android:layout_width="match_parent"
                         android:layout_height="1.0dip"
                         android:layout_marginStart="15.0dip"
@@ -95,10 +98,10 @@
                         android:layout_height="match_parent"
                         android:layout_marginLeft="5.0dip"
                         android:layout_marginTop="45.0dip"
-                        android:layout_marginRight="5.0dip"
-                        android:layout_marginBottom="30.0dip"
+                        android:layout_marginBottom="30dp"
                         android:fadeScrollbars="false"
                         android:scrollbars="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="@id/respond_sms_preview_heading_txtview"
                         app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_heading_txtview">
 
@@ -128,26 +131,23 @@
                         android:layout_width="fill_parent"
                         android:layout_height="1.0dip"
                         android:layout_marginStart="15.0sp"
-                        android:layout_marginLeft="15.0sp"
-                        android:layout_marginTop="5.0dip"
                         android:layout_marginEnd="15.0dip"
-                        android:layout_marginRight="15.0dip"
+                        android:layout_marginBottom="24dp"
                         android:background="@color/divider"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@id/respond_sms_preview_scrollview"
-                        app:layout_constraintStart_toStartOf="@id/respond_sms_preview_scrollview"
-                        app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_scrollview" />
+                        app:layout_constraintStart_toStartOf="@id/respond_sms_preview_scrollview" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/respond_preview_date_txtview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="5.0dip"
-                        android:layout_marginLeft="5.0dip"
-                        android:layout_marginTop="8.0dip"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginBottom="3dp"
                         android:text="@string/response_date_received"
                         android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                        app:layout_constraintStart_toStartOf="@id/respond_sms_preview_scrollview"
-                        app:layout_constraintTop_toBottomOf="@id/respond_sms_preview_scrollview" />
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="@id/respond_sms_preview_scrollview" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </androidx.cardview.widget.CardView>

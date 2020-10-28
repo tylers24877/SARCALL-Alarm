@@ -16,10 +16,8 @@ import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import kotlinx.android.synthetic.main.colour_recycler_view_row.view.*
-import kotlinx.android.synthetic.main.settings_sms_numbers_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
-import kotlin.jvm.internal.Intrinsics
 
 
 class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<ColourRecyclerViewAdapter.ViewHolder?>() {
@@ -94,7 +92,7 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
 
         val colorPickerDialogBuilder = ColorPickerDialogBuilder
             .with(mContext)
-            .setTitle("Choose color")
+            .setTitle("Choose Colour")
             .wheelType(ColorPickerView.WHEEL_TYPE.CIRCLE)
             .density(24)
             .lightnessSliderOnly()
@@ -137,14 +135,13 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
         }
 
         override fun onItemSelected() {
-            val animator = ObjectAnimator.ofFloat(itemView.sms_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
+            val animator = ObjectAnimator.ofFloat(itemView.colour_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }
 
         override fun onItemClear() {
-            Intrinsics.checkNotNullExpressionValue(itemView, "itemView")
-            val animator = ObjectAnimator.ofFloat(itemView.sms_recycler_cardview, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
+            val animator = ObjectAnimator.ofFloat(itemView.colour_recycler_cardview, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }

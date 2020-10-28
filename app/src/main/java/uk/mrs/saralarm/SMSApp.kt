@@ -139,7 +139,7 @@ class SMSApp : BroadcastReceiver() {
         for (s in SS) {
             if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
                 return RuleAlarmData(
-                    true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                    true, s.customAlarmRulesObject.alarmSoundType, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
                     s.customAlarmRulesObject.colorArray, m, num
                 )
             }
@@ -153,7 +153,7 @@ class SMSApp : BroadcastReceiver() {
                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                 if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
                     return RuleAlarmData(
-                        true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                        true, s.customAlarmRulesObject.alarmSoundType, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
                         s.customAlarmRulesObject.colorArray, m, phoneNumberC
                     )
                 }
@@ -170,7 +170,7 @@ class SMSApp : BroadcastReceiver() {
                     val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                     if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
                         return RuleAlarmData(
-                            true, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
+                            true, s.customAlarmRulesObject.alarmSoundType, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
                             s.customAlarmRulesObject.colorArray, body, receivedNumber
                         )
                     }

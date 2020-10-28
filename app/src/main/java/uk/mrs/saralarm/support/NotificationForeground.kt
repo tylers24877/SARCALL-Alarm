@@ -26,7 +26,7 @@ class NotificationForeground : Service() {
         val notificationBuilder = NotificationCompat.Builder(this, "Alarm Trigger Foreground")
             .setSmallIcon(uk.mrs.saralarm.R.drawable.ic_baseline_notification_important_24)
             .setContentTitle(title)
-            .setContentText("SARCALL Alarm Actviated").setAutoCancel(true)
+            .setContentText("SARCALL Alarm Activated").setAutoCancel(true)
             .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)

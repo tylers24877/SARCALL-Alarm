@@ -21,38 +21,95 @@ class SetupActivity : AppCompatActivity() {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Loads the layout XML for this Activity and sets the layout as the current view.
         setContentView(R.layout.activity_setup)
+
+        //Sets the SetupToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
         setSupportActionBar(SetupToolbar)
 
-
+        //Setup OnClick Listener for the setup button. When clicked...
         setup_permission_button.setOnClickListener {
-            if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0 && ActivityCompat.checkSelfPermission(this,
-                    "android.permission.SEND_SMS") == 0 &&
-                ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 && ActivityCompat.checkSelfPermission(this,
-                    "android.permission.WRITE_EXTERNAL_STORAGE") == 0 && ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0)
-            {
-                checkOverlay()
+            //Check if the user has the necessary permissions
+            if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0 && ActivityCompat.checkSelfPermission(
+                    this,
+                    "android.permission.SEND_SMS"
+                ) == 0 &&
+                ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 && ActivityCompat.checkSelfPermission(
+                    this,
+                    "android.permission.WRITE_EXTERNAL_STORAGE"
+                ) == 0 && ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0
+            ) {
+                //if permissions already granted, go straight to checking overlay.
+                checkOverlayAndMoveOn()
             } else {
+                //if permissions not granted, request them with request code of 1.
                 requestPermissions(arrayOf("android.permission.RECEIVE_SMS","android.permission.READ_SMS","android.permission.SEND_SMS","android.permission.READ_EXTERNAL_STORAGE",
-                        "android.permission.WRITE_EXTERNAL_STORAGE"), 1)
+                    "android.permission.WRITE_EXTERNAL_STORAGE"), 1)
             }
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        //if request code of 1 is received
         if (requestCode == 1) {
             for (permission in permissions) {
                 if (Intrinsics.areEqual(permission as Any, "android.permission.READ_SMS" as Any)) {
-                    checkOverlay()
+                    //Check overlay
+                    checkOverlayAndMoveOn()
                 }
             }
         }
     }
 
-    /* access modifiers changed from: private */
+    /**
+     * Check if app is allowed to draw on top of other apps. If it cannot, permission from the user will be requested.
+     * Once granted, Move onto checking battery optimisation.
+     */
+    @SuppressLint("InlinedApi")
+    private fun checkOverlayAndMoveOn() {
+        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                !Settings.canDrawOverlays(this)
+            } else false
+        ) {
+
+            val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
+                when (which) {
+                    //If Positive button pressed.
+                    DialogInterface.BUTTON_POSITIVE -> {
+                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                        //Start an activity to display the permission settings to enable to draw on top.
+                        startActivityForResult(intent, 44)
+                    }
+                    DialogInterface.BUTTON_NEGATIVE -> {
+                        //Move onto checking battery.
+                        checkBattery()
+                    }
+                }
+            }
+            //Build and display the dialog.
+            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+            builder.setMessage(
+                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
+                        "\nPlease enable the permission on the app settings page."
+            )
+                .setPositiveButton("Okay, take me to settings", dialogClickListener).setCancelable(false)
+            builder.setOnCancelListener {
+                checkOverlayAndMoveOn()
+            }
+            builder.show()
+        } else
+            checkBattery() //Move onto checking battery, as overlay granted.
+    }
+
+    /**
+     * Check if battery optimisation is ignored, if not request it. Request code "2"
+     * Once accepted, continue to startApp().
+     */
     private fun checkBattery() {
-        if (Build.VERSION.SDK_INT >= 23) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val intent = Intent()
             val packageName = packageName
             val systemService = getSystemService(Context.POWER_SERVICE)
@@ -65,47 +122,19 @@ class SetupActivity : AppCompatActivity() {
                 return
             }
         }
+        //Start app if already granted.
         startApp()
     }
 
-    @SuppressLint("InlinedApi")
-    private fun checkOverlay() {
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                !Settings.canDrawOverlays(this)
-            } else false
-        ) {
-
-            val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { dialog, which ->
-                when (which) {
-                    DialogInterface.BUTTON_POSITIVE -> {
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, 44)
-                    }
-                    DialogInterface.BUTTON_NEGATIVE -> {
-                        checkBattery()
-                    }
-                }
-            }
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage(
-                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
-                        "\nPlease enable the permission on the app settings page."
-            )
-                .setPositiveButton("Okay, take me to settings", dialogClickListener).setCancelable(false)
-            builder.setOnCancelListener {
-                checkOverlay()
-            }
-            builder.show()
-        } else
-            checkBattery()
-    }
-
-    /* access modifiers changed from: protected */
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+
+        //If request code of 2 (from checkBattery())
         if (requestCode == 2) {
+            //Start the app
             startApp()
         }
+        //If request code of 44 (from checkOverlayAndMoveOn())
         if (requestCode == 44) {
             if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     Settings.canDrawOverlays(this)
@@ -113,11 +142,14 @@ class SetupActivity : AppCompatActivity() {
             ) {
                 checkBattery()
             } else {
-                checkOverlay()
+                checkOverlayAndMoveOn()
             }
         }
     }
 
+    /**
+     * Set startedBefore Preference to true, start the MainActivity and close current activity.
+     */
     private fun startApp() {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("startedBefore", true).apply()
         startActivity(Intent(this, MainActivity::class.java))

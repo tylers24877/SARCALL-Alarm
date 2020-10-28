@@ -26,95 +26,149 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import uk.mrs.saralarm.support.UpdateWorker
-import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
-import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
-import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 import kotlin.jvm.internal.Intrinsics
 
 
 class MainActivity : AppCompatActivity() {
 
-
     @SuppressLint("InlinedApi")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        //Load preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
+
+        //Check if application has NOT been used before.
+        //If true, starts the SetupActivity for user to configure permissions on. It will also kill this activity.
+        //If false, continue.
         if (!pref.getBoolean("startedBefore", false)) {
             startActivity(Intent(this, SetupActivity::class.java))
             finish()
             return
         }
+
+        //Loads the layout XML for this Activity and sets the layout as the current view.
         setContentView(R.layout.activity_main)
+
+        //Sets the ResponseToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
         setSupportActionBar(ResponseToolbar)
+
+        //Build the app bar for the activity. The IDs set here are the top level fragments.
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(R.id.navigation_respond, R.id.navigation_settings).build()
-
+        //Load the navigation controller for the fragments from the layout XML.
         val navController: NavController = Navigation.findNavController(this, R.id.nav_host_fragment)
-
+        //Configures the ActionBar set up earlier to work with the Nav Controller. EG changing actionbar titles to match the current page.
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
+        //Set the BottomNavigationView to the Nav Controller.
         NavigationUI.setupWithNavController(nav_view, navController)
-        if (Build.VERSION.SDK_INT >= 23) {
-            val intent = Intent()
+
+        //Check if what SDK the app is running on. If Version M(23) or higher...
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //Load Package Name.
             val packageName = packageName
+            //Load the Power Service from the system.
             val systemService = getSystemService(Context.POWER_SERVICE)
+            //Checks it does not exist.
             if (systemService == null) {
+                //Throw an error if it doesn't
                 throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
+                //If the service does exist, check if the app is NOT ignoring battery optimizations.
             } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
-                intent.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
-                intent.data = Uri.parse("package:$packageName")
-                startActivity(intent)
+                //Create a new intent.
+                val i = Intent()
+                //Set the action of the intent to request to ignore battery optimizations
+                i.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+                i.data = Uri.parse("package:$packageName")
+                //Starts request to ask user.
+                startActivity(i)
             }
         }
-        if (savedInstanceState == null) {
-            if (pref.getBoolean("betaChannel", false)) {
-                AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update_beta.xml")
-                    .setCancelable(false).start()
-            } else {
-                AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
-                    .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update.xml")
-                    .setCancelable(false).start()
-            }
-        }
-        if (savedInstanceState == null) {
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4") //version 1.5.2 beta
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5") //version 1.5.2 beta
-            WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V6") //version 1.5.2 beta
 
-            val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-                .addTag("SARCALL_CHECK_UPDATE_V7_TAG").build()
-            WorkManager.getInstance(this)
-                .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V7", ExistingPeriodicWorkPolicy.KEEP, build)
-        }
-        upgradePreferences(pref)
-        checkOverlay()
-
+        //Check if alarm is enabled. If true,
         if (pref.getBoolean("prefEnabled", false)) {
+            //Check if the Rules are configured. If empty...
             val string = pref.getString("rulesJSON", "")
             if (string!!.isEmpty()) {
+                //Set the alarm to disabled.
                 pref.edit().putBoolean("prefEnabled", false).apply()
             }
         }
+
+        //Check if app is newly open rather then a OnCreate refresh.
+        if (savedInstanceState == null) {
+            checkForUpdate(pref)
+            createBackgroundJobs()
+        }
+        checkOverlay()
     }
 
+    /**
+     * Create/update background jobs for app updater.
+     * Checks 12 hourly-ish
+     */
+    private fun createBackgroundJobs() {
+
+        //Delete old versions of the update checker.
+        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4") //version 1.5.2 beta
+        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5") //version 1.5.2 beta
+        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V6") //version 1.5.2 beta
+
+        val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
+            .addTag("SARCALL_CHECK_UPDATE_V7_TAG").build()
+        //Enqueue a task using Work Manager for 12 hourly-ish checks
+        WorkManager.getInstance(this)
+            .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V7", ExistingPeriodicWorkPolicy.KEEP, build)
+    }
+
+    /**
+     * Checks for app updates and actions accordingly.
+     * @param pref SharedPreferences for the application.
+     */
+    private fun checkForUpdate(pref: SharedPreferences) {
+        //Check if app is set to use beta channel. If true...
+        if (pref.getBoolean("betaChannel", false)) {
+            //Check for updates on the beta URL @Github
+            AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
+                .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update_beta.xml")
+                .setCancelable(false).start()
+        } else {
+            //Check for updates on the stable URL @Github
+            AppUpdater(this).setUpdateFrom(UpdateFrom.XML).setDisplay(Display.DIALOG)
+                .setUpdateXML("https://raw.githubusercontent.com/tylers24877/MRT-SAR-Alarm/master/update.xml")
+                .setCancelable(false).start()
+        }
+    }
+
+    /**
+     * Check if app is allowed to draw on top of other apps. If it cannot, permission from the user will be requested.
+     */
+    @SuppressLint("InlinedApi")
     private fun checkOverlay() {
+        //Check if cannot draw on top. If true...
         if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 !Settings.canDrawOverlays(this)
             } else false
         ) {
+            //Create a dialog informing the user.
             val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
+                //When button is clicked...
                 when (which) {
+                    //Positive
                     DialogInterface.BUTTON_POSITIVE -> {
+                        //Start an activity to display the permission settings to enable to draw on top.
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
                         startActivityForResult(intent, 505)
+
+                        //Log to firebase that the user is accepting.
                         FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
                     }
                 }
             }
+
+            //Build and display the dialog.
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
             builder.setMessage(
                 "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
@@ -124,66 +178,6 @@ class MainActivity : AppCompatActivity() {
                 .setCancelable(false)
                 .show()
         }
-    }
-    private fun upgradePreferences(pref: SharedPreferences) {
-        val edit = pref.edit()
-        val rulesNewObjectArray: ArrayList<RulesObject>
-        val smsNumberNewObjectArray: ArrayList<String>
-        val oldSMSNumber = pref.getString("prefSetPhoneNumber", "")
-        val oldTrigger = pref.getString("prefUseCustomTrigger", "")
-
-        if (!oldSMSNumber.isNullOrBlank()) {
-            val jsonNumber = pref.getString("respondSMSNumbersJSON", "")
-            if (jsonNumber.isNullOrBlank()) {
-                smsNumberNewObjectArray = ArrayList()
-                smsNumberNewObjectArray.add(oldSMSNumber)
-            } else {
-                val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
-                val fromJson: ArrayList<String> = Gson().fromJson(jsonNumber, type)
-                fromJson.add(oldSMSNumber)
-                smsNumberNewObjectArray = fromJson
-            }
-            edit.putString("respondSMSNumbersJSON", Gson().toJson(smsNumberNewObjectArray))
-        }
-        if (!oldSMSNumber.isNullOrBlank() && !oldTrigger.isNullOrBlank()) {
-            val json = pref.getString("rulesJSON", "")
-            if (json.isNullOrBlank()) {
-                rulesNewObjectArray = ArrayList()
-                rulesNewObjectArray.add(RulesObject(smsNumber = oldSMSNumber, phrase = oldTrigger))
-            } else {
-                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
-                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
-                fromJson.add(RulesObject(smsNumber = oldSMSNumber, phrase = oldTrigger))
-                rulesNewObjectArray = fromJson
-            }
-            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray))
-                .remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
-        } else if (!oldSMSNumber.isNullOrBlank()) {
-            val json = pref.getString("rulesJSON", "")
-            if (json.isNullOrBlank()) {
-                rulesNewObjectArray = ArrayList()
-                rulesNewObjectArray.add(RulesObject(choice = RulesChoice.SMS_NUMBER, smsNumber = oldSMSNumber))
-            } else {
-                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
-                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
-                fromJson.add(RulesObject(choice = RulesChoice.SMS_NUMBER, smsNumber = oldSMSNumber))
-                rulesNewObjectArray = fromJson
-            }
-            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
-        } else if (!oldTrigger.isNullOrBlank()) {
-            val json = pref.getString("rulesJSON", "")
-            if (json.isNullOrBlank()) {
-                rulesNewObjectArray = ArrayList()
-                rulesNewObjectArray.add(RulesObject(choice = RulesChoice.PHRASE, phrase = oldTrigger))
-            } else {
-                val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
-                val fromJson: ArrayList<RulesObject> = Gson().fromJson(json, type)
-                fromJson.add(RulesObject(choice = RulesChoice.PHRASE, phrase = oldTrigger))
-                rulesNewObjectArray = fromJson
-            }
-            edit.putString("rulesJSON", Gson().toJson(rulesNewObjectArray)).remove("prefSetPhoneNumber").remove("prefUseCustomTrigger")
-        }
-        edit.apply()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -203,7 +197,9 @@ class MainActivity : AppCompatActivity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        //Check if the request code matches the request from the CheckOverlay function
         if (requestCode == 505) {
+            //Check if the user accepted the permission. If not start the process again.
             if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     !Settings.canDrawOverlays(this)
                 } else false

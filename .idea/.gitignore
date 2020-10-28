@@ -1,2 +1,19 @@
 # Default ignored files
 /workspace.xml
+/caches/
+/codeStyles/
+/dictionaries/
+/libraries/
+/modules/
+/.gitignore
+/.name
+/assetWizardSettings.xml
+/compiler.xml
+/gradle.xml
+/jarRepositories.xml
+/misc.xml
+/modules.xml
+/navEditor.xml
+/render.experimental.xml
+/runConfigurations.xml
+/vcs.xml

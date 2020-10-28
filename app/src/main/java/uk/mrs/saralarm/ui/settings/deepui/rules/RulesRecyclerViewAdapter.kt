@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
@@ -29,16 +31,19 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.android.synthetic.main.colour_dialog_fragment.*
 import kotlinx.android.synthetic.main.settings_rules_recycler_view_row.view.*
+import kotlinx.android.synthetic.main.settings_rules_sound_dialog.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.ItemTouchViewHolder
 import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourDragAdapter
 import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourRecyclerViewAdapter
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
+import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
 import java.io.File
 
 
-class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragment, data: ArrayList<RulesObject>) : RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
+class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragment, data: ArrayList<RulesObject>, private val root: View) :
+    RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
     val mData: ArrayList<RulesObject> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -99,7 +104,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             editor.putString("rulesJSON", Gson().toJson(mData))
 
         editor.apply()
-        notifyDataSetChanged()
+        root.post { notifyDataSetChanged() }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -143,14 +148,27 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
         holder.itemView.customiseAlarmLoopingCheckBox.isChecked = mData[holder.layoutPosition].customAlarmRulesObject.isLooping
 
-        if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isEmpty()) {
-            holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
-            holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
-        } else {
-            if (File(mData[holder.layoutPosition].customAlarmRulesObject.alarmFileLocation).exists()) {
-                holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
-                holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
-            } else {
+        when (mData[holder.layoutPosition].customAlarmRulesObject.alarmSoundType) {
+            SoundType.NONE -> {
+                checkAndRemoveFile(holder.layoutPosition)
+                holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
+                holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
+            }
+            SoundType.SYSTEM -> {
+                if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
+                    holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                    holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
+                }
+            }
+            SoundType.CUSTOM -> {
+                if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
+                    if (File(mData[holder.layoutPosition].customAlarmRulesObject.alarmFileLocation).exists()) {
+                        holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                        holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
+                        return
+                    }
+                }
+                checkAndRemoveFile(holder.layoutPosition)
                 holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
                 holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
             }
@@ -263,11 +281,10 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
 
             itemView.addAlarmRulesButton.setOnClickListener {
-                if (ActivityCompat.checkSelfPermission(
-                        mContext,
-                        "android.permission.WRITE_EXTERNAL_STORAGE"
-                    ) == 0 && ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0
+                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.WRITE_EXTERNAL_STORAGE") == 0
+                    && ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0
                 ) {
+
                     if (itemView.addAlarmRulesButton.text == "Set Alarm Sound") {
                         when (mData[adapterPosition].choice) {
                             RulesChoice.PHRASE ->
@@ -287,12 +304,35 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                                 }
                             }
                         }
-                        rulesFragment.position = adapterPosition
-                        val intent = Intent()
-                        intent.action = Intent.ACTION_GET_CONTENT
-                        intent.type = "audio/*"
-                        rulesFragment.startActivityForResult(Intent.createChooser(intent, "Choose an Audio File"), 5)
 
+                        val dialog = Dialog(mContext)
+                        dialog.setContentView(R.layout.settings_rules_sound_dialog)
+                        val window: Window = dialog.window!!
+                        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                        window.setGravity(Gravity.CENTER)
+                        dialog.show()
+
+                        dialog.dialogSoundPickerCustomButton.setOnClickListener CustomSoundPickerButton@{
+                            dialog.cancel()
+
+                            rulesFragment.position = adapterPosition
+                            val intent = Intent()
+                            intent.action = Intent.ACTION_GET_CONTENT
+                            intent.type = "audio/*"
+                            rulesFragment.startActivityForResult(Intent.createChooser(intent, "Choose an Audio File"), 5)
+
+
+                        }
+
+                        dialog.dialogSoundPickerSystemButton.setOnClickListener {
+                            dialog.cancel()
+                            val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER)
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Sound")
+                            intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, null as Uri?)
+                            rulesFragment.position = adapterPosition
+                            rulesFragment.startActivityForResult(intent, 6)
+                        }
                     } else {
                         checkAndRemoveFile(adapterPosition)
                         notifyItemChanged(adapterPosition)
@@ -301,6 +341,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                     Snackbar.make(itemView, ("No read/write permission granted." as CharSequence), Snackbar.LENGTH_LONG).show()
                 }
             }
+
 
             itemView.addAlarmColoursRulesButton.setOnClickListener {
                 val dialog = Dialog(mContext)
@@ -367,8 +408,10 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                     deleteFile.delete()
                 }
             }
+            mData[adapterPosition].customAlarmRulesObject.alarmSoundType = SoundType.NONE
             mData[adapterPosition].customAlarmRulesObject.alarmFileLocation = ""
             mData[adapterPosition].customAlarmRulesObject.alarmFileName = ""
+            saveData()
         }
     }
 

@@ -457,7 +457,7 @@ class RespondFragment : Fragment() {
 
                     val (resultBody, resultDate) = respondViewModel!!.setPreviewAsync(requireContext()).await()
                     requireView().respond_sms_preview_txtview.text = resultBody
-                    requireView().respond_preview_date_txtview.text = resultDate
+                    requireView().respond_preview_date_txtview.text = "Received: $resultDate"
 
                     requireView().respond_sms_loading_bar.visibility = View.GONE
                     requireView().respond_sms_preview_txtview.visibility = View.VISIBLE
@@ -502,6 +502,8 @@ class RespondFragment : Fragment() {
         window.setGravity(Gravity.CENTER)
         dialog.show()
 
+        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
         dialog.respond_dialog_sign_off_cancel_button.setOnClickListener {
             dialog.cancel()
         }
@@ -509,7 +511,8 @@ class RespondFragment : Fragment() {
         dialog.respond_dialog_sign_off_set_date_button.setOnClickListener {
             val c = Calendar.getInstance()
             val datePickerDialog = DatePickerDialog(
-                requireContext(), { _, year, month, dayOfMonth ->
+                requireContext(),
+                { _, year, month, dayOfMonth ->
                     val cal = Calendar.getInstance()
                     cal[Calendar.MONTH] = month
                     cal[Calendar.DAY_OF_MONTH] = dayOfMonth
@@ -520,6 +523,10 @@ class RespondFragment : Fragment() {
                     }
 
                     daysBetween = safeLongToInt(TimeUnit.MILLISECONDS.toDays(abs(cal.timeInMillis - c.timeInMillis)))
+
+                    if (pref.getBoolean("prefDateWorkaround", true)) {
+                        if (daysBetween >= 3) daysBetween++
+                    }
 
                     val sb = SpannableStringBuilder()
                     sb.append("Duration: ")
@@ -539,7 +546,6 @@ class RespondFragment : Fragment() {
 
 
         dialog.respond_dialog_sign_off_submit_button.setOnClickListener {
-            val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             val teamPrefix = pref.getString("prefTeamPrefix", "")
             if (teamPrefix.isNullOrBlank()) {
                 Snackbar.make(respond_constraintLayout, "Cannot sign off. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
