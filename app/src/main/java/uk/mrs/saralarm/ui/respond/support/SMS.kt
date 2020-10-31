@@ -82,6 +82,13 @@ object SMS {
                     Toast.makeText(context, "SAR N sent to SARCALL", Toast.LENGTH_LONG).show()
                     dialog?.cancel()
                 }
+                SARResponseCode.SAR_H -> {
+                    for (phoneNumber in phoneNumberSet) {
+                        smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), null, "SAR H", null, null)
+                    }
+                    Toast.makeText(context, "SAR H sent to SARCALL", Toast.LENGTH_LONG).show()
+                    dialog?.cancel()
+                }
                 SARResponseCode.SIGN_ON -> {
                     for (phoneNumber in phoneNumberSet) {
                         smsManager.sendTextMessage(phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), null, "ON $message", null, null)

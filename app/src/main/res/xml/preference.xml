@@ -13,7 +13,7 @@
         app:iconSpaceReserved="false" />
     <EditTextPreference
         android:key="prefTeamPrefix"
-        android:summary="Used for the Sign On/Off functionality. The format will be like 'LEEMINGMRT', for example"
+        android:summary="Used for the Sign On/Off functionality. The format should be like 'LEEMINGMRT', for example"
         android:title="Team Prefix"
         app:iconSpaceReserved="false" />
 

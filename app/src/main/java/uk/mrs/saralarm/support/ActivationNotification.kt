@@ -17,10 +17,16 @@ object ActivationNotification {
     fun notifyPostAlarm(context: Context) {
         val title = context.resources.getString(R.string.activation_notification_title_template)
 
-        val notificationBuilder = NotificationCompat.Builder(context, "Post Alarm Trigger").setSmallIcon(R.drawable.ic_baseline_notification_important_24).setContentTitle(title)
-            .setContentText("SARCALL Alarm activated recently!").setAutoCancel(true)
-            .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT)).setPriority(2)
-            .setCategory(NotificationCompat.CATEGORY_ALARM).setColor(Color.argb(255, 204, 51, 1))
+        val notificationBuilder = NotificationCompat.Builder(context, "Post Alarm Trigger")
+            .setSmallIcon(R.drawable.ic_baseline_notification_important_24)
+            .setContentTitle(title)
+            .setContentText("SARCALL Alarm activated recently! Tap to respond.")
+            .setStyle(NotificationCompat.BigTextStyle().bigText(("SARCALL Alarm activated recently! Tap to respond.")))
+            .setAutoCancel(true)
+            .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
+            .setPriority(2)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setColor(Color.argb(255, 204, 51, 1))
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

@@ -181,6 +181,8 @@ class Alarm : Activity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        mp?.stop()
+        mp = null
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(0)
         ActivationNotification.notifyPostAlarm(this)

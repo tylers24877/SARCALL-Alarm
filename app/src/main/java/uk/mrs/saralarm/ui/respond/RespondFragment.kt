@@ -21,9 +21,10 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
-import uk.mrs.saralarm.ui.respond.dialogs.SARA
-import uk.mrs.saralarm.ui.respond.dialogs.SARL
-import uk.mrs.saralarm.ui.respond.dialogs.SARN
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSARA
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSARH
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSARL
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSARN
 import uk.mrs.saralarm.ui.respond.support.RespondRoutine
 import uk.mrs.saralarm.ui.respond.support.SMS.sendSMSResponse
 
@@ -48,14 +49,17 @@ class RespondFragment : Fragment() {
                 ), 0
             )
         }
-        root.respond_sar_a_button.setOnClickListener{
-            SARA.dialogSARAOpen(requireContext(), root)
+        root.respond_sar_a_button.setOnClickListener {
+            DialogSARA.open(requireContext(), root)
         }
         root.respond_sar_l_button.setOnClickListener {
-            SARL.dialogSARLOpen(requireContext(), root)
+            DialogSARL.open(requireContext(), root)
         }
         root.respond_sar_n_button.setOnClickListener {
-            SARN.dialogSARNOpen(requireContext(), root)
+            DialogSARN.open(requireContext(), root)
+        }
+        root.respond_sar_h_button.setOnClickListener {
+            DialogSARH.open(requireContext(), root)
         }
         root.pullToRefresh.setOnRefreshListener {
             updateLatestSMS()

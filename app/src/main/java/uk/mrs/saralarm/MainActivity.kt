@@ -29,7 +29,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import uk.mrs.saralarm.support.UpdateWorker
 import java.util.concurrent.TimeUnit
-import kotlin.jvm.internal.Intrinsics
 
 
 class MainActivity : AppCompatActivity() {
@@ -145,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Check if app is allowed to draw on top of other apps. If it cannot, permission from the user will be requested.
      */
-    @SuppressLint("InlinedApi")
+    @SuppressLint("InlinedApi", "MissingPermission")
     private fun checkOverlay() {
         //Check if cannot draw on top. If true...
         if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -182,18 +181,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        Intrinsics.checkNotNullExpressionValue(inflater, "menuInflater")
         inflater.inflate(R.menu.main_activity_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            onBackPressed()
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+            }
+            R.id.ActionBar_Help -> {
+                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_global_helpFragment)
+            }
         }
         return true
     }
-
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

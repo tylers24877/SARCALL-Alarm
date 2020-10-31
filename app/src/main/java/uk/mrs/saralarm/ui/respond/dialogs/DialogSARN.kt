@@ -8,8 +8,8 @@ import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
 import uk.mrs.saralarm.ui.respond.support.SMS.sendSMSResponse
 
-object SARN {
-    fun dialogSARNOpen(context: Context, view: View) {
+object DialogSARN {
+    fun open(context: Context, view: View) {
         val dialogClickListener = DialogInterface.OnClickListener { dialog, which ->
             if (which == DialogInterface.BUTTON_POSITIVE) {
                 sendSMSResponse(context, view, SARResponseCode.SAR_N, dialog, 0, null)

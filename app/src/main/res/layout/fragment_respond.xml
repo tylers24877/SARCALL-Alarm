@@ -9,7 +9,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:id="@+id/respond_constraintLayout"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="20dp">
 
         <GridLayout
             android:id="@+id/InfoView"
@@ -162,8 +163,8 @@
             android:layout_marginTop="32.0dip"
             android:layout_marginEnd="30.0dip"
             android:layout_marginRight="30.0dip"
-            android:paddingTop="15.0dip"
-            android:paddingBottom="15.0dip"
+            android:paddingTop="10.0dip"
+            android:paddingBottom="10.0dip"
             android:text="@string/response_attending_button"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
@@ -178,8 +179,8 @@
             android:layout_marginStart="30.0dip"
             android:layout_marginTop="16.0dip"
             android:layout_marginEnd="15.0dip"
-            android:paddingTop="15.0dip"
-            android:paddingBottom="15.0dip"
+            android:paddingTop="10.0dip"
+            android:paddingBottom="10.0dip"
             android:text="@string/response_late_button"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textStyle="bold"
@@ -188,20 +189,64 @@
             app:layout_constraintTop_toBottomOf="@id/respond_sar_a_button" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/respond_sar_h_button"
+            style="@style/Widget.AppCompat.Button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="16.0dip"
+            android:layout_marginEnd="15dp"
+            android:paddingTop="10.0dip"
+            android:paddingBottom="10.0dip"
+            android:text="@string/response_home_button"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/guideline_V_75"
+            app:layout_constraintStart_toStartOf="@+id/guideline_V_25"
+            app:layout_constraintTop_toBottomOf="@+id/respond_sar_n_button" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/respond_sar_n_button"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="15.0dip"
+            android:layout_marginEnd="30.0dip"
+            android:paddingTop="10.0dip"
+            android:paddingBottom="10.0dip"
+            android:text="@string/response_unavailable_button"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@id/guideline_V"
+            app:layout_constraintTop_toTopOf="@+id/respond_sar_l_button" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1.0dip"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            android:background="@color/divider"
+            app:layout_constraintBottom_toTopOf="@+id/respond_sign_on"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/respond_sar_h_button" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_sign_on"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="30.0dip"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="30dp"
             android:layout_marginEnd="15.0dip"
             android:paddingTop="5dip"
             android:paddingBottom="5dip"
-            android:text="Sign On"
+            android:text="@string/respond_sign_on"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             app:backgroundTint="@color/primary_dark"
             app:layout_constraintEnd_toStartOf="@id/guideline_V"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/respond_sar_l_button" />
+            app:layout_constraintTop_toBottomOf="@+id/respond_sar_h_button" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/respond_sign_off"
@@ -210,7 +255,7 @@
             android:layout_marginStart="15.0dip"
             android:paddingTop="5dip"
             android:paddingBottom="5dip"
-            android:text="Sign Off"
+            android:text="@string/respond_sign_off"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
             app:backgroundTint="@color/primary_dark"
             app:layout_constraintEnd_toEndOf="@+id/respond_sar_n_button"
@@ -225,20 +270,18 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/respond_sar_n_button"
-            android:layout_width="0.0dip"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15.0dip"
-            android:layout_marginEnd="30.0dip"
-            android:paddingTop="15.0dip"
-            android:paddingBottom="15.0dip"
-            android:text="@string/response_unavailable_button"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@id/guideline_V"
-            app:layout_constraintTop_toTopOf="@+id/respond_sar_l_button" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_V_25"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_V_75"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

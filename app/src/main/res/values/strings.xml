@@ -36,4 +36,7 @@
     <string name="setup_summery_text">In order for the app to work correctly, please allow the app to access incoming SMS messages and access to device storage.\n
         You also may be asked to disable battery optimisation for the app. This is to allow SMS messages to be detected at all times.
         Don\'t worry, this app is very lightweight and it will not drain your battery.</string>
+    <string name="response_home_button">SAR H</string>
+    <string name="respond_sign_on">Sign On</string>
+    <string name="respond_sign_off">Sign Off</string>
 </resources>
