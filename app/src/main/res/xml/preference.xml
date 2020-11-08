@@ -8,7 +8,7 @@
         android:title="@string/pref_enabled_title"
         app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
-        android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the phrase would've had to come from &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
+        android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the &quot;phrase&quot; would've had to come from the &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
         android:title="Trigger Rules"
         app:iconSpaceReserved="false" />
     <EditTextPreference
@@ -17,7 +17,7 @@
         android:title="Team Prefix"
         app:iconSpaceReserved="false" />
 
-    <PreferenceCategory
+    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
         android:title="Respond"
         app:iconSpaceReserved="false">
         <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference
@@ -28,9 +28,23 @@
             android:summary="Setup response messages to append to the SAR A/L messages. You don't need to enter the &quot;SAR A/L&quot; prefix, just the message itself\nFor example...&quot;On my way to RV from my home.&quot;"
             android:title="SAR A/L Predefined Response Messages"
             app:iconSpaceReserved="false" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
+    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
+    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
+        android:summary="Modify which buttons are displayed on the respond page."
+        android:title="Visuals"
+        app:iconSpaceReserved="false">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="visualShowSARH"
+            android:title="Display SAR H Button"
+            app:iconSpaceReserved="false" />
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="visualShowSignOnOff"
+            android:title="Display Sign On/Off Buttons"
+            app:iconSpaceReserved="false" />
+    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
+    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
         app:iconSpaceReserved="false"
         app:title="Advanced">
         <SwitchPreferenceCompat
@@ -46,9 +60,9 @@
             android:title="Date Workaround"
             app:iconSpaceReserved="false"
             app:isPreferenceVisible="false" />
-    </PreferenceCategory>
+    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
 
-    <PreferenceCategory
+    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
         android:title="About"
         app:iconSpaceReserved="false">
         <PreferenceScreen
@@ -56,6 +70,6 @@
             android:summary="1.0"
             android:title="Build Version"
             app:iconSpaceReserved="false" />
-    </PreferenceCategory>
+    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

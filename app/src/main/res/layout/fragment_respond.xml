@@ -222,6 +222,7 @@
             app:layout_constraintTop_toTopOf="@+id/respond_sar_l_button" />
 
         <View
+            android:id="@+id/respond_sign_on_off_split_view"
             android:layout_width="fill_parent"
             android:layout_height="1.0dip"
             android:layout_marginStart="30dp"

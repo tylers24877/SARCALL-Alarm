@@ -71,13 +71,13 @@ class RespondFragment : Fragment() {
         root.respond_sign_off.setOnClickListener {
             displaySignOffDialog()
         }
+
         return root
     }
 
     override fun onResume() {
        updateLatestSMS()
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
         if (!pref.getBoolean("prefEnabled", false)) {
             requireView().InfoView.visibility = View.VISIBLE
             requireView().InfoView_txtview.text = "SARCALL Alarm not enabled. Tap to go to settings."
@@ -105,6 +105,24 @@ class RespondFragment : Fragment() {
                 }
             }
         }
+
+        //Hide or show the optional features
+        if (pref.getBoolean("visualShowSARH", true)) {
+            requireView().respond_sar_h_button.visibility = View.VISIBLE
+        } else {
+            requireView().respond_sar_h_button.visibility = View.GONE
+        }
+        if (pref.getBoolean("visualShowSignOnOff", true)) {
+            requireView().respond_sign_on_off_split_view.visibility = View.VISIBLE
+            requireView().respond_sign_on.visibility = View.VISIBLE
+            requireView().respond_sign_off.visibility = View.VISIBLE
+        } else {
+            requireView().respond_sign_on_off_split_view.visibility = View.GONE
+            requireView().respond_sign_on.visibility = View.GONE
+            requireView().respond_sign_off.visibility = View.GONE
+        }
+
+
         super.onResume()
     }
 
@@ -246,9 +264,9 @@ class RespondFragment : Fragment() {
          */
     }
 
-    private fun safeLongToInt(l: Long): Int {
-        require(!(l < Int.MIN_VALUE || l > Int.MAX_VALUE)) { "$l cannot be cast to int without changing its value." }
-        return l.toInt()
-    }
+    /* private fun safeLongToInt(l: Long): Int {
+         require(!(l < Int.MIN_VALUE || l > Int.MAX_VALUE)) { "$l cannot be cast to int without changing its value." }
+         return l.toInt()
+     }*/
 }
 
