@@ -1,5 +1,5 @@
 <resources>
-    <string name="SAR_A_attending_txtview">SAR A</string>
+    <string name="SAR_A">SAR A</string>
     <string name="SAR_N_dialog_title">Are you sure you\'re unavailable?</string>
     <string name="activation_notification_title_template">SARCALL Activated</string>
     <string name="alarm_button_stop">Stop Alarm</string>
@@ -39,4 +39,7 @@
     <string name="response_home_button">SAR H</string>
     <string name="respond_sign_on">Sign On</string>
     <string name="respond_sign_off">Sign Off</string>
+
+    <string name="SMS_Number_Invalid">"SMS Number looks to be in the wrong format\nIf this is number is definitely correct, please click overwrite below"</string>
+    <string name="trigger_sms_number">Trigger SMS Number</string>
 </resources>

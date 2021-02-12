@@ -134,12 +134,12 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         if (mData[holder.layoutPosition].smsNumber.isNotBlank()) {
             try {
                 if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.layoutPosition].smsNumber, "GB"))) {
-                    holder.itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
+                    holder.itemView.SMSNumbersRulesRecyclerTextInput.error = holder.itemView.context.getString(R.string.SMS_Number_Invalid)
                 } else {
                     holder.itemView.SMSNumbersRulesRecyclerTextInput.error = ""
                 }
             } catch (e: NumberParseException) {
-                holder.itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
+                holder.itemView.SMSNumbersRulesRecyclerTextInput.error = holder.itemView.context.getString(R.string.SMS_Number_Invalid)
             }
         }
 
@@ -199,7 +199,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                             try {
                                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
                                 if (!phoneUtil.isValidNumber(formattedNumber)) {
-                                    itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
+                                    itemView.SMSNumbersRulesRecyclerTextInput.error = itemView.context.getString(R.string.SMS_Number_Invalid)
                                 } else {
                                     smsNumberEditing = true
                                     val prevSelection: Int = itemView.SMSNumbersRulesEditText.selectionStart
@@ -216,7 +216,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
                                 }
                             } catch (e: NumberParseException) {
-                                itemView.SMSNumbersRulesRecyclerTextInput.error = "SMS Number is in the wrong format"
+                                itemView.SMSNumbersRulesRecyclerTextInput.error = itemView.context.getString(R.string.SMS_Number_Invalid)
                             }
                             smsNumberEditing = false
                         }
