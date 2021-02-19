@@ -70,6 +70,16 @@
             android:summary="1.0"
             android:title="Build Version"
             app:iconSpaceReserved="false" />
+        <PreferenceScreen
+            android:key="backgroundWorkerCount"
+            android:summary="1.0"
+            android:title="Background Worker Count"
+            app:iconSpaceReserved="false" />
+        <PreferenceScreen
+            android:key="backgroundWorkerTime"
+            android:summary="1.0"
+            android:title="Last Background Worker Used"
+            app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

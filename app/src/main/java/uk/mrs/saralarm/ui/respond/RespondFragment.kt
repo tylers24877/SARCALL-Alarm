@@ -35,10 +35,10 @@ class RespondFragment : Fragment() {
         val root: View = inflater.inflate(R.layout.fragment_respond, container, false)
         if (!(ActivityCompat.checkSelfPermission(requireContext(), "android.permission.RECEIVE_SMS") == 0
                     && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.WRITE_EXTERNAL_STORAGE") == 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_EXTERNAL_STORAGE")== 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.SEND_SMS")== 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0))
-        {
+                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_EXTERNAL_STORAGE") == 0
+                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.SEND_SMS") == 0
+                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0)
+        ) {
             requestPermissions(
                 arrayOf(
                     "android.permission.RECEIVE_SMS",
@@ -76,20 +76,20 @@ class RespondFragment : Fragment() {
     }
 
     override fun onResume() {
-       updateLatestSMS()
+        updateLatestSMS()
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         if (!pref.getBoolean("prefEnabled", false)) {
             requireView().InfoView.visibility = View.VISIBLE
             requireView().InfoView_txtview.text = "SARCALL Alarm not enabled. Tap to go to settings."
-           requireView().InfoView.setOnClickListener{
-               findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
-           }
+            requireView().InfoView.setOnClickListener {
+                findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
+            }
         } else {
             val phoneNumberJSON: String? = pref.getString("rulesJSON", "")
             if (phoneNumberJSON.isNullOrBlank()) {
                 requireView().InfoView.visibility = View.VISIBLE
                 requireView().InfoView_txtview.text = "Rules are not configured correctly! Please click to check."
-                requireView().InfoView.setOnClickListener{
+                requireView().InfoView.setOnClickListener {
                     findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
                 }
             } else {
@@ -198,75 +198,5 @@ class RespondFragment : Fragment() {
         }
         AlertDialog.Builder(requireContext()).setTitle("Sign Off").setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
             .setNegativeButton("No", dialogClickListener).show()
-
-        /*
-        var daysBetween = 0
-
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_sign_off)
-        val window: Window = dialog.window!!
-        window.setLayout(MATCH_PARENT, WRAP_CONTENT)
-        window.setGravity(Gravity.CENTER)
-        dialog.show()
-
-        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-
-        dialog.respond_dialog_sign_off_cancel_button.setOnClickListener {
-            dialog.cancel()
-        }
-
-        dialog.respond_dialog_sign_off_set_date_button.setOnClickListener {
-            val c = Calendar.getInstance()
-            val datePickerDialog = DatePickerDialog(
-                requireContext(),
-                { _, year, month, dayOfMonth ->
-                    val cal = Calendar.getInstance()
-                    cal[Calendar.MONTH] = month
-                    cal[Calendar.DAY_OF_MONTH] = dayOfMonth
-                    cal[Calendar.YEAR] = year
-                    if (cal.before(c)) {
-                        Toast.makeText(requireContext(), "Please choose a day past present day.", Toast.LENGTH_LONG).show()
-                        return@DatePickerDialog
-                    }
-
-                    daysBetween = safeLongToInt(TimeUnit.MILLISECONDS.toDays(abs(cal.timeInMillis - c.timeInMillis)))
-
-                    if(pref.getBoolean("prefDateWorkaround",true)) {
-                        if(daysBetween>=3) daysBetween++
-                    }
-
-                    val sb = SpannableStringBuilder()
-                    sb.append("Duration: ")
-                    if (daysBetween == 0) {
-                        sb.append("∞")
-                    } else {
-                        sb.append("$daysBetween day" + if (daysBetween != 1) "s" else "")
-                    }
-                    sb.setSpan(StyleSpan(1), 10, daysBetween.toString().length + 10, SpannableStringBuilder.SPAN_INCLUSIVE_INCLUSIVE)
-                    dialog.respond_dialog_sign_off_seek_dur_txtview.text = sb
-                },
-                c[Calendar.YEAR], c[Calendar.MONTH], c[Calendar.DAY_OF_MONTH]
-            )
-            datePickerDialog.datePicker.minDate = c.timeInMillis
-            datePickerDialog.show()
-        }
-
-
-        dialog.respond_dialog_sign_off_submit_button.setOnClickListener {
-            val teamPrefix = pref.getString("prefTeamPrefix", "")
-            if (teamPrefix.isNullOrBlank()) {
-                Snackbar.make(respond_constraintLayout, "Cannot sign off. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
-                dialog.cancel()
-                return@setOnClickListener
-            }
-            sendSMSResponse(requireContext(), SARResponseCode.SIGN_OFF, dialog, daysBetween, teamPrefix)
-        }
-         */
     }
-
-    /* private fun safeLongToInt(l: Long): Int {
-         require(!(l < Int.MIN_VALUE || l > Int.MAX_VALUE)) { "$l cannot be cast to int without changing its value." }
-         return l.toInt()
-     }*/
 }
-

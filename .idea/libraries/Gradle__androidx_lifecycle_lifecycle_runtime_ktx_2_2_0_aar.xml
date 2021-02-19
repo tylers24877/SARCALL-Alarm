@@ -3,9 +3,12 @@
     <CLASSES>
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/f87573e880531695d1b8becb3841134e/jetified-lifecycle-runtime-ktx-2.2.0/res" />
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/081719fd0c5181e28ba86c8b79464e3c/jetified-lifecycle-runtime-ktx-2.2.0/res" />
-      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/2d7b0fd7b33a0b9af207fce54083353a/jetified-lifecycle-runtime-ktx-2.2.0/jars/classes.jar!/" />
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/2d7b0fd7b33a0b9af207fce54083353a/jetified-lifecycle-runtime-ktx-2.2.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/2d7b0fd7b33a0b9af207fce54083353a/jetified-lifecycle-runtime-ktx-2.2.0/AndroidManifest.xml" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/eaf6527550e4072ab0f0a5fd2a98bc9a/jetified-lifecycle-runtime-ktx-2.2.0/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/aefbc47b3fae4d3ed1f9e9d458f35820/jetified-lifecycle-runtime-ktx-2.2.0/res" />
+      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/a4f15cd9cc8c2ee12a778ed6f5fc7ea0/jetified-lifecycle-runtime-ktx-2.2.0/jars/classes.jar!/" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/a4f15cd9cc8c2ee12a778ed6f5fc7ea0/jetified-lifecycle-runtime-ktx-2.2.0/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/a4f15cd9cc8c2ee12a778ed6f5fc7ea0/jetified-lifecycle-runtime-ktx-2.2.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

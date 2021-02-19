@@ -51,6 +51,11 @@ class SettingsFragment : Fragment() {
                 editText.filters = arrayOf(filter)
             }
 
+            preferenceManager.findPreference<PreferenceScreen>("backgroundWorkerCount")?.summary =
+                preferenceManager.sharedPreferences.getInt("WorkerCount", 0).toString()
+            preferenceManager.findPreference<PreferenceScreen>("backgroundWorkerTime")?.summary =
+                preferenceManager.sharedPreferences.getString("WorkerTime", "None yet...")
+
 
             try {
                 preferenceManager.findPreference<PreferenceScreen>("appVersion")?.summary = appVersion()

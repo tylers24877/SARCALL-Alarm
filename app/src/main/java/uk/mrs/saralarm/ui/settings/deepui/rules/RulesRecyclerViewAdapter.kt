@@ -24,6 +24,8 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
@@ -46,8 +48,15 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
     val mData: ArrayList<RulesObject> = data
+    val optionsOpen: ArrayList<Boolean> = ArrayList()
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
+
+    init {
+        mData.forEachIndexed { index, _ ->
+            optionsOpen.add(index, false)
+        }
+    }
 
     override fun getItemCount(): Int {
         return mData.size
@@ -57,6 +66,11 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         val original = mData[fromPosition]
         mData.removeAt(fromPosition)
         mData.add(toPosition, original)
+
+        val originalOpenOptions = optionsOpen[fromPosition]
+        optionsOpen.removeAt(fromPosition)
+        optionsOpen.add(toPosition, originalOpenOptions)
+
         notifyItemMoved(fromPosition, toPosition)
     }
 
@@ -64,12 +78,14 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         if (adapterPosition >= 0 && adapterPosition < mData.size) {
             checkAndRemoveFile(adapterPosition)
             mData.removeAt(adapterPosition)
+            optionsOpen.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
         mData.add(RulesObject())
+        optionsOpen.add(mData.size, false)
         notifyDataSetChanged()
     }
 
@@ -162,16 +178,18 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
             SoundType.CUSTOM -> {
                 if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
-                    if (File(mData[holder.layoutPosition].customAlarmRulesObject.alarmFileLocation).exists()) {
-                        holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
-                        holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
-                        return
-                    }
+                    holder.itemView.addAlarmRulesTextView.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                    holder.itemView.addAlarmRulesButton.text = "Reset Alarm Sound"
                 }
-                checkAndRemoveFile(holder.layoutPosition)
-                holder.itemView.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
-                holder.itemView.addAlarmRulesButton.text = "Set Alarm Sound"
             }
+        }
+
+        if (optionsOpen[holder.layoutPosition]) {
+            holder.itemView.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
+            holder.itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
+        } else {
+            holder.itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
+            holder.itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
         }
     }
 
@@ -269,11 +287,14 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
 
             itemView.customiseAlarmRulesTextView.setOnClickListener {
+                TransitionManager.beginDelayedTransition(itemView.customiseAlarmRulesConstraintLayout, AutoTransition())
                 if (itemView.customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
                     itemView.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
+                    optionsOpen.add(adapterPosition, true)
                     itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
                 } else {
                     itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
+                    optionsOpen.add(adapterPosition, false)
                     itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
 
                 }
@@ -414,8 +435,6 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             saveData()
         }
     }
-
-
 }
 
 

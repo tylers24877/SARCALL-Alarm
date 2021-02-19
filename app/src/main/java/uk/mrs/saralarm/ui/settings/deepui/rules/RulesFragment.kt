@@ -3,9 +3,11 @@ package uk.mrs.saralarm.ui.settings.deepui.rules
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,13 +80,22 @@ class RulesFragment : Fragment(), CoroutineScope {
         if (requestCode == 5 && resultCode == Activity.RESULT_OK) {
             if ((data != null) && (data.data != null)) {
                 try {
-                    val fileName = if (data.data!!.path != null) File(data.data!!.path!!).name else "alarm_custom_sound" + Random.nextInt(1000000, 1999999).toString()
-                    inputStreamToFile(requireContext(), fileName, data.data!!, requireContext().filesDir)
+                    val fileName = if (data.data!!.path != null) getFileName(requireContext(), data.data!!) else "alarm_custom_sound" + Random.nextInt(1000000, 1999999).toString()
+
                     adapter!!.mData[position].customAlarmRulesObject.alarmSoundType = SoundType.CUSTOM
                     adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + fileName
                     adapter!!.mData[position].customAlarmRulesObject.alarmFileName = fileName
                     adapter!!.saveData()
+                    inputStreamToFile(requireContext(), fileName, data.data!!, requireContext().filesDir)
                 } catch (e: Exception) {
+                    try {
+                        adapter!!.mData[position].customAlarmRulesObject.alarmSoundType = SoundType.NONE
+                        adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = ""
+                        adapter!!.mData[position].customAlarmRulesObject.alarmFileName = ""
+                        adapter!!.saveData()
+                    } catch (e: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e)
+                    }
                     FirebaseCrashlytics.getInstance().recordException(e)
                     Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
                 }
@@ -112,12 +123,36 @@ class RulesFragment : Fragment(), CoroutineScope {
         }
     }
 
+    fun getFileName(mCon: Context, uri: Uri): String {
+        var result: String? = null
+        if (uri.scheme == "content") {
+            val cursor: Cursor? = mCon.contentResolver.query(uri, null, null, null, null)
+            cursor.use { cursored ->
+                if (cursored != null && cursored.moveToFirst()) {
+                    result = cursored.getString(cursored.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                }
+            }
+        }
+        if (result == null) {
+            result = uri.path
+            val cut = result!!.lastIndexOf('/')
+            if (cut != -1) {
+                result = result!!.substring(cut + 1)
+            }
+        }
+        return result as String
+    }
+
     private fun inputStreamToFile(context: Context, fileName: String, uri: Uri, destFile: File) = this.launch {
         withContext(Dispatchers.IO) {
             val inputStream = context.contentResolver.openInputStream(uri)
             val output = FileOutputStream(destFile.toString() + File.separator + fileName)
-            inputStream?.copyTo(output, 4 * 1024)
-            inputStream?.close()
+            if (inputStream != null) {
+                inputStream.copyTo(output, 4 * 1024)
+                inputStream.close()
+            } else {
+                Snackbar.make(requireView(), "Something went wrong. Error code:xInputStream", Snackbar.LENGTH_LONG).show()
+            }
             output.close()
         }
     }

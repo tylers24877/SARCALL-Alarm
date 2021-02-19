@@ -114,12 +114,13 @@ class MainActivity : AppCompatActivity() {
         WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4") //version 1.5.2 beta
         WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5") //version 1.5.2 beta
         WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V6") //version 1.5.2 beta
+        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V7") //version 1.5.2 beta
 
         val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-            .addTag("SARCALL_CHECK_UPDATE_V7_TAG").build()
+            .addTag("SARCALL_CHECK_UPDATE_V8_TAG").build()
         //Enqueue a task using Work Manager for 12 hourly-ish checks
         WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V7", ExistingPeriodicWorkPolicy.KEEP, build)
+            .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V8", ExistingPeriodicWorkPolicy.KEEP, build)
     }
 
     /**

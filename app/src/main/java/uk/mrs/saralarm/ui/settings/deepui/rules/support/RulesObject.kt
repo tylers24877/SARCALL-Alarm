@@ -15,7 +15,7 @@ data class CustomAlarmRulesObject(
     var alarmFileLocation: String = "",
     var isLooping: Boolean = true,
     var colorArray: ArrayList<String> = ArrayList(),
-    var alarmSoundType: SoundType = SoundType.CUSTOM
+    var alarmSoundType: SoundType = SoundType.NONE
 
 )
 enum class SoundType : Serializable {

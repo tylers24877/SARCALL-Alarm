@@ -1,6 +1,7 @@
 package uk.mrs.saralarm.support
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.preference.PreferenceManager
 import androidx.work.Worker
@@ -9,6 +10,8 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.google.firebase.analytics.FirebaseAnalytics
+import java.text.DateFormat.getDateTimeInstance
+import java.util.*
 
 class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(context!!, params!!) {
     override fun doWork(): Result {
@@ -23,6 +26,13 @@ class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(contex
         val param = Bundle()
         param.putString("beta", PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("betaChannel", false).toString())
         FirebaseAnalytics.getInstance(applicationContext).logEvent("background_update_check", param)
+
+        val sdf = getDateTimeInstance()
+        val currentDate = sdf.format(Date())
+        val editor: SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+        editor.putInt("WorkerCount", PreferenceManager.getDefaultSharedPreferences(applicationContext).getInt("WorkerCount", 0) + 1)
+        editor.putString("WorkerTime", currentDate).apply()
+
         return Result.success()
     }
 }
