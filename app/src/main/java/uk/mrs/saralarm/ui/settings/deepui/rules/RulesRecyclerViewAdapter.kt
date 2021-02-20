@@ -48,15 +48,8 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
     val mData: ArrayList<RulesObject> = data
-    val optionsOpen: ArrayList<Boolean> = ArrayList()
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
-
-    init {
-        mData.forEachIndexed { index, _ ->
-            optionsOpen.add(index, false)
-        }
-    }
 
     override fun getItemCount(): Int {
         return mData.size
@@ -67,10 +60,6 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         mData.removeAt(fromPosition)
         mData.add(toPosition, original)
 
-        val originalOpenOptions = optionsOpen[fromPosition]
-        optionsOpen.removeAt(fromPosition)
-        optionsOpen.add(toPosition, originalOpenOptions)
-
         notifyItemMoved(fromPosition, toPosition)
     }
 
@@ -78,27 +67,31 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         if (adapterPosition >= 0 && adapterPosition < mData.size) {
             checkAndRemoveFile(adapterPosition)
             mData.removeAt(adapterPosition)
-            optionsOpen.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
         mData.add(RulesObject())
-        optionsOpen.add(mData.size, false)
         notifyDataSetChanged()
     }
 
     fun saveData() {
         val list = ArrayList<RulesObject>()
+
         val it: Iterator<RulesObject> = mData.iterator()
+
         while (it.hasNext()) {
             val t = it.next()
             when (t.choice) {
                 RulesChoice.PHRASE ->
-                    if (t.phrase == "") list.add(t)
+                    if (t.phrase == "") {
+                        list.add(t)
+                    }
                 RulesChoice.SMS_NUMBER ->
-                    if (t.smsNumber == "") list.add(t)
+                    if (t.smsNumber == "") {
+                        list.add(t)
+                    }
                 RulesChoice.ALL -> {
                     if (t.smsNumber == "" && t.phrase == "") {
                         list.add(t)
@@ -183,14 +176,8 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                 }
             }
         }
-
-        if (optionsOpen[holder.layoutPosition]) {
-            holder.itemView.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
-            holder.itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
-        } else {
-            holder.itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
-            holder.itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
-        }
+        holder.itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
+        holder.itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
     }
 
     private fun getDrawable(context: Context, id: Int): Drawable? {
@@ -290,11 +277,9 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                 TransitionManager.beginDelayedTransition(itemView.customiseAlarmRulesConstraintLayout, AutoTransition())
                 if (itemView.customiseAlarmRulesConstraintLayout.visibility == View.GONE) {
                     itemView.customiseAlarmRulesConstraintLayout.visibility = View.VISIBLE
-                    optionsOpen.add(adapterPosition, true)
                     itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
                 } else {
                     itemView.customiseAlarmRulesConstraintLayout.visibility = View.GONE
-                    optionsOpen.add(adapterPosition, false)
                     itemView.customiseAlarmRulesTextView.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
 
                 }
