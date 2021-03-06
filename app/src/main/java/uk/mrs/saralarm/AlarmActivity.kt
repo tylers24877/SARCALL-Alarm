@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
@@ -20,16 +21,18 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
-import uk.mrs.saralarm.support.ActivationNotification
 import uk.mrs.saralarm.support.RuleAlarmData
+import uk.mrs.saralarm.support.notification.PostAlarmNotification
+import uk.mrs.saralarm.support.notification.SilencedForeground
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
 import java.io.FileInputStream
 
 
-class Alarm : Activity() {
+class AlarmActivity : Activity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
 
@@ -166,6 +169,14 @@ class Alarm : Activity() {
 
         alarm_stop_button.setOnClickListener { finish() }
 
+        alarm_silence_button.setOnClickListener {
+            val serviceIntent = Intent(this, SilencedForeground::class.java)
+            serviceIntent.putExtra("startMills", 3600000L)
+            ContextCompat.startForegroundService(this, serviceIntent)
+            Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
+
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
@@ -185,7 +196,7 @@ class Alarm : Activity() {
         mp = null
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(0)
-        ActivationNotification.notifyPostAlarm(this)
+        PostAlarmNotification.create(this)
     }
 
     override fun onBackPressed() {}

@@ -35,12 +35,12 @@ import kotlinx.android.synthetic.main.colour_dialog_fragment.*
 import kotlinx.android.synthetic.main.settings_rules_recycler_view_row.view.*
 import kotlinx.android.synthetic.main.settings_rules_sound_dialog.*
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.support.ItemTouchViewHolder
 import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourDragAdapter
 import uk.mrs.saralarm.ui.settings.deepui.rules.colour.ColourRecyclerViewAdapter
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
+import uk.mrs.saralarm.ui.settings.deepui.support.ItemTouchViewHolder
 import java.io.File
 
 

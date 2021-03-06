@@ -22,7 +22,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.android.synthetic.main.settings_sms_numbers_recycler_view_row.view.*
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.support.ItemTouchViewHolder
+import uk.mrs.saralarm.ui.settings.deepui.support.ItemTouchViewHolder
 import kotlin.jvm.internal.Intrinsics
 
 
@@ -77,7 +77,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view: View = mInflater.inflate(R.layout.settings_sms_numbers_recycler_view_row, parent, false)
-        return ViewHolder(this, view)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -98,7 +98,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     }
 
 
-    inner class ViewHolder(v: SMSNumbersRecyclerViewAdapter, itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
         var myTextView: TextInputEditText = itemView.SMSNumbersCustomMessageEditText
         var textInput: TextInputLayout = itemView.SMSNumbersRecyclerTextInput
 

@@ -3,7 +3,7 @@ package uk.mrs.saralarm.ui.settings.deepui.phone_numbers
 import android.content.Context
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import uk.mrs.saralarm.support.ItemTouchViewHolder
+import uk.mrs.saralarm.ui.settings.deepui.support.ItemTouchViewHolder
 
 
 class SMSNumbersDragAdapter(adapterCustomMessages: SMSNumbersRecyclerViewAdapter, context: Context?, dragDirs: Int, swipeDirs: Int) :

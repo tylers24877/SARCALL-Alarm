@@ -12,7 +12,7 @@ import androidx.core.internal.view.SupportMenu
 import androidx.preference.PreferenceManager
 
 
-class Widget : AppWidgetProvider() {
+class WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,

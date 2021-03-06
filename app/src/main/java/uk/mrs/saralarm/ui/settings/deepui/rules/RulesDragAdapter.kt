@@ -1,12 +1,11 @@
 package uk.mrs.saralarm.ui.settings.deepui.rules
 
-import android.content.Context
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import uk.mrs.saralarm.support.ItemTouchViewHolder
+import uk.mrs.saralarm.ui.settings.deepui.support.ItemTouchViewHolder
 
 
-class RulesDragAdapter(adapterCustomMessages: RulesRecyclerViewAdapter, context: Context?, dragDirs: Int, swipeDirs: Int) :
+class RulesDragAdapter(adapterCustomMessages: RulesRecyclerViewAdapter, dragDirs: Int, swipeDirs: Int) :
     ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
 
     private val mAdapter: RulesRecyclerViewAdapter = adapterCustomMessages

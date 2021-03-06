@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.support
+package uk.mrs.saralarm.ui.settings.deepui.support
 
 interface ItemTouchViewHolder {
     fun onItemClear()

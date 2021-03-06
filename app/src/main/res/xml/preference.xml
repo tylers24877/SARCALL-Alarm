@@ -1,37 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <uk.mrs.saralarm.support.preferences.RedSummaryPreferenceCategory
+        android:summary="* = Required for the app to function correctly!"
+        app:iconSpaceReserved="false">
+
+    </uk.mrs.saralarm.support.preferences.RedSummaryPreferenceCategory>
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="prefEnabled"
         android:summary="@string/pref_enabled_summary"
         android:title="@string/pref_enabled_title"
         app:iconSpaceReserved="false" />
-    <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
-        android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the &quot;phrase&quot; would've had to come from the &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
-        android:title="Trigger Rules"
-        app:iconSpaceReserved="false" />
-    <EditTextPreference
-        android:key="prefTeamPrefix"
-        android:summary="Used for the Sign On/Off functionality. The format should be like 'LEEMINGMRT', for example"
-        android:title="Team Prefix"
-        app:iconSpaceReserved="false" />
-
-    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
-        android:title="Respond"
+    <uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory
+        android:summary="Settings related to alarm activation"
+        android:title="Activation"
         app:iconSpaceReserved="false">
+        <uk.mrs.saralarm.ui.settings.deepui.rules.RulesPreference
+            android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the &quot;phrase&quot; would've had to come from the &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
+            android:title="Trigger Rules *"
+            app:iconSpaceReserved="false" />
+    </uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory>
+
+    <uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory
+        android:summary="Settings for use on the 'Respond' page of the app"
+        android:title="Respond Page"
+        app:iconSpaceReserved="false">
+        <EditTextPreference
+            android:key="prefTeamPrefix"
+            android:summary="Used for the Sign On/Off functionality. The format should be like 'LEEMINGMRT', for example"
+            android:title="Team Prefix *"
+            app:iconSpaceReserved="false" />
         <uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersPreference
             android:summary="Set the SMS numbers to send the SAR A/L/N SMS to from the &quot;Respond&quot; Page.\nThe SAR A/L/N message can be sent to multiple numbers at the same time."
-            android:title="SAR A/L/N Reply Number"
+            android:title="SAR A/L/N Reply Number *"
             app:iconSpaceReserved="false" />
         <uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesPreference
             android:summary="Setup response messages to append to the SAR A/L messages. You don't need to enter the &quot;SAR A/L&quot; prefix, just the message itself\nFor example...&quot;On my way to RV from my home.&quot;"
             android:title="SAR A/L Predefined Response Messages"
             app:iconSpaceReserved="false" />
-    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
-    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
+    </uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory>
+    <uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory
         android:summary="Modify which buttons are displayed on the respond page."
-        android:title="Visuals"
+        android:title="Respond Page Visuals"
         app:iconSpaceReserved="false">
         <SwitchPreferenceCompat
             android:defaultValue="true"
@@ -43,8 +54,8 @@
             android:key="visualShowSignOnOff"
             android:title="Display Sign On/Off Buttons"
             app:iconSpaceReserved="false" />
-    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
-    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
+    </uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory>
+    <uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory
         app:iconSpaceReserved="false"
         app:title="Advanced">
         <SwitchPreferenceCompat
@@ -60,9 +71,9 @@
             android:title="Date Workaround"
             app:iconSpaceReserved="false"
             app:isPreferenceVisible="false" />
-    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
+    </uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory>
 
-    <uk.mrs.saralarm.support.LongSummaryPreferenceCategory
+    <uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory
         android:title="About"
         app:iconSpaceReserved="false">
         <PreferenceScreen
@@ -73,13 +84,13 @@
         <PreferenceScreen
             android:key="backgroundWorkerCount"
             android:summary="1.0"
-            android:title="Background Worker Count"
+            android:title="Background Update Check"
             app:iconSpaceReserved="false" />
         <PreferenceScreen
             android:key="backgroundWorkerTime"
             android:summary="1.0"
-            android:title="Last Background Worker Used"
+            android:title="Last Background Update Check"
             app:iconSpaceReserved="false" />
-    </uk.mrs.saralarm.support.LongSummaryPreferenceCategory>
+    </uk.mrs.saralarm.support.preferences.LongSummaryPreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

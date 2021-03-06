@@ -19,31 +19,31 @@ import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
-import uk.mrs.saralarm.support.NotificationForeground
 import uk.mrs.saralarm.support.RuleAlarmData
+import uk.mrs.saralarm.support.notification.AlarmForeground
+import uk.mrs.saralarm.support.notification.SilencedForeground
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.deepui.rules.support.RulesObject
-import java.lang.reflect.Type
 import java.util.regex.Pattern
 
 
-class SMSApp : BroadcastReceiver() {
+class SMSBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         if (pref.getBoolean("prefEnabled", true)) {
             val phoneUtil = PhoneNumberUtil.getInstance()
 
-            val typeRuleObject: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
-            val rulesFromJson: ArrayList<RulesObject>? = Gson().fromJson(pref.getString("rulesJSON", ""), typeRuleObject)
+            val rulesFromJson: ArrayList<RulesObject>? = Gson().fromJson(
+                pref.getString("rulesJSON", ""),
+                object : TypeToken<ArrayList<RulesObject>?>() {}.type
+            )
 
-            val rulesBothSet: HashSet<RulesObject> = HashSet()
-            val rulesSMSSet: HashSet<RulesObject> = HashSet()
-            val rulesPhraseSet: HashSet<RulesObject> = HashSet()
+            val rulesBothSet = HashSet<RulesObject>()
+            val rulesSMSSet = HashSet<RulesObject>()
+            val rulesPhraseSet = HashSet<RulesObject>()
 
-            if (rulesFromJson.isNullOrEmpty()) {
-                return
-            } else {
+            if (rulesFromJson.isNullOrEmpty()) return else {
                 for (r in rulesFromJson) {
                     if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
                         try {
@@ -60,7 +60,7 @@ class SMSApp : BroadcastReceiver() {
 
             if (intent.action.equals("android.provider.Telephony.SMS_RECEIVED")) {
                 val bundle = intent.extras
-                val msgs: Array<SmsMessage?>
+                val messages: Array<SmsMessage?>
                 var strMessage = ""
                 var smsNumber = ""
                 val format = bundle!!.getString("format")
@@ -68,17 +68,17 @@ class SMSApp : BroadcastReceiver() {
                 val pdus = bundle["pdus"] as Array<*>?
                 if (pdus != null) { // Check the Android version.
                     // Fill the msgs array.
-                    msgs = arrayOfNulls(pdus.size)
-                    for (i in msgs.indices) {
+                    messages = arrayOfNulls(pdus.size)
+                    for (i in messages.indices) {
                         if (VERSION.SDK_INT >= Build.VERSION_CODES.M) { // If Android version M or newer:
-                            msgs[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray, format)
+                            messages[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray, format)
                         } else { // If Android version L or older:
-                            msgs[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray)
+                            messages[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray)
                         }
                         // Build the message to show.
-                        strMessage += msgs[i]?.messageBody
+                        strMessage += messages[i]?.messageBody
                     }
-                    smsNumber = msgs[0]!!.displayOriginatingAddress
+                    smsNumber = messages[0]!!.displayOriginatingAddress
                     checkMessages(strMessage, smsNumber, rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
                 }
             }
@@ -98,43 +98,36 @@ class SMSApp : BroadcastReceiver() {
         val checkRulesBoth = checkRulesBoth(rulesBothSet, strMessage, smsNumber, phoneUtil)
         if (checkRulesBoth.chosen) {
             if (checkScreenState(context)) {
-                startService(context, checkRulesBoth)
+                startAlarmForegroundService(context, checkRulesBoth)
                 FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
             } else {
                 FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
-                startService(context, checkRulesBoth)
+                startAlarmForegroundService(context, checkRulesBoth)
             }
         } else {
             val checkRulesSMSNumber = checkRulesSMSNumber(rulesSMSSet, smsNumber, phoneUtil, strMessage)
             if (checkRulesSMSNumber.chosen) {
                 if (checkScreenState(context)) {
-                    startService(context, checkRulesSMSNumber)
+                    startAlarmForegroundService(context, checkRulesSMSNumber)
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                 } else {
                     FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
-                    startService(context, checkRulesSMSNumber)
+                    startAlarmForegroundService(context, checkRulesSMSNumber)
                 }
             } else {
                 val checkRulesPhrase = checkRulesPhrase(rulesPhraseSet, strMessage, smsNumber)
                 if (checkRulesPhrase.chosen) {
                     if (checkScreenState(context)) {
-                        startService(context, checkRulesPhrase)
+                        startAlarmForegroundService(context, checkRulesPhrase)
                         FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                     } else {
                         FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
-                        startService(context, checkRulesPhrase)
+                        startAlarmForegroundService(context, checkRulesPhrase)
                     }
                 }
             }
         }
     }
-
-    private fun startService(context: Context, ruleAlarmData: RuleAlarmData) {
-        val serviceIntent = Intent(context, NotificationForeground::class.java)
-        serviceIntent.putExtra("ruleAlarmData", ruleAlarmData)
-        ContextCompat.startForegroundService(context, serviceIntent)
-    }
-
     private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String, num: String): RuleAlarmData {
         for (s in SS) {
             if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
@@ -193,6 +186,15 @@ class SMSApp : BroadcastReceiver() {
         } else {
             val pm = context.getSystemService(Context.POWER_SERVICE) as PowerManager
             pm.isScreenOn
+        }
+    }
+
+    private fun startAlarmForegroundService(context: Context, ruleAlarmData: RuleAlarmData) {
+        //check if the silence foreground service is active.
+        if (!SilencedForeground.isRunning) {
+            val serviceIntent = Intent(context, AlarmForeground::class.java)
+            serviceIntent.putExtra("ruleAlarmData", ruleAlarmData)
+            ContextCompat.startForegroundService(context, serviceIntent)
         }
     }
 }

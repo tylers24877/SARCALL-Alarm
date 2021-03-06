@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.support
+package uk.mrs.saralarm.support.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,11 +11,12 @@ import android.os.IBinder
 import android.provider.Settings
 import androidx.annotation.Nullable
 import androidx.core.app.NotificationCompat
-import uk.mrs.saralarm.Alarm
+import uk.mrs.saralarm.AlarmActivity
 import uk.mrs.saralarm.MainActivity
+import uk.mrs.saralarm.support.RuleAlarmData
 
 
-class NotificationForeground : Service() {
+class AlarmForeground : Service() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val ruleAlarmData = intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
@@ -34,7 +35,7 @@ class NotificationForeground : Service() {
 
         startForeground(10, notificationBuilder.build())
 
-        val fullScreenIntent = Intent(this, Alarm::class.java)
+        val fullScreenIntent = Intent(this, AlarmActivity::class.java)
         fullScreenIntent.putExtra("ruleAlarmData", ruleAlarmData)
         fullScreenIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or Intent.FLAG_ACTIVITY_NEW_TASK)
 
@@ -44,7 +45,7 @@ class NotificationForeground : Service() {
         ) {
             startActivity(fullScreenIntent)
         } else {
-            ActivationNotification.notifyPostAlarm(this)
+            PostAlarmNotification.create(this)
         }
 
         stopSelf()

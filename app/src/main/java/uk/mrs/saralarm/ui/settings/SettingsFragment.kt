@@ -17,7 +17,7 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.preference.*
 import com.google.android.material.snackbar.Snackbar
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.Widget
+import uk.mrs.saralarm.WidgetProvider
 
 
 class SettingsFragment : Fragment() {
@@ -66,9 +66,9 @@ class SettingsFragment : Fragment() {
 
         override fun onSharedPreferenceChanged(sP: SharedPreferences, key: String) {
             if (key == "prefEnabled" && context != null) {
-                val intent = Intent(context, Widget::class.java)
+                val intent = Intent(context, WidgetProvider::class.java)
                 intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
-                val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(requireContext(), Widget::class.java))
+                val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(ComponentName(requireContext(), WidgetProvider::class.java))
                 if (ids != null) {
                     if (ids.isNotEmpty()) {
                         intent.putExtra("appWidgetIds", ids)

@@ -2,10 +2,13 @@
   <dictionary name="tyler">
     <words>
       <w>leemingmrt</w>
+      <w>msgs</w>
+      <w>pdus</w>
       <w>saralarm</w>
       <w>sarcall</w>
       <w>sarl</w>
       <w>sarn</w>
+      <w>stopforeground</w>
       <w>widgetclick</w>
     </words>
   </dictionary>

@@ -56,7 +56,7 @@ class RulesFragment : Fragment(), CoroutineScope {
 
         root.rulesRecyclerView.adapter = adapter
 
-        ItemTouchHelper(RulesDragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(root.rulesRecyclerView)
+        ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.rulesRecyclerView)
         root.rulesFab.setOnClickListener {
             adapter!!.addItem()
             FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)

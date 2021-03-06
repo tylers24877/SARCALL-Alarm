@@ -17,6 +17,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 object SMS {
+
     fun sendSMSResponse(context: Context, view: View, sarResponseCode: SARResponseCode, dialog: DialogInterface?, value: Int, message: String?) {
         val sb: StringBuilder
         val smsManager: SmsManager = SmsManager.getDefault()

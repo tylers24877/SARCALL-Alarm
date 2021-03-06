@@ -17,7 +17,7 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import kotlinx.android.synthetic.main.colour_recycler_view_row.view.*
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.support.ItemTouchViewHolder
+import uk.mrs.saralarm.ui.settings.deepui.support.ItemTouchViewHolder
 
 
 class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<ColourRecyclerViewAdapter.ViewHolder?>() {

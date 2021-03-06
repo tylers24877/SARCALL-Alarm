@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.support
+package uk.mrs.saralarm.support.preferences
 
 import android.content.Context
 import android.util.AttributeSet
@@ -17,7 +17,7 @@ class LongSummaryPreferenceCategory @JvmOverloads constructor(
         summary?.let {
             // Enable multiple line support
             summary.isSingleLine = false
-            summary.maxLines = 10 // Just need to be high enough I guess
+            summary.maxLines = 10// Just need to be high enough I guess
         }
     }
 }

@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.support
+package uk.mrs.saralarm.support.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -12,9 +12,9 @@ import uk.mrs.saralarm.MainActivity
 import uk.mrs.saralarm.R
 
 
-object ActivationNotification {
+object PostAlarmNotification {
 
-    fun notifyPostAlarm(context: Context) {
+    fun create(context: Context) {
         val title = context.resources.getString(R.string.activation_notification_title_template)
 
         val notificationBuilder = NotificationCompat.Builder(context, "Post Alarm Trigger")
@@ -38,5 +38,4 @@ object ActivationNotification {
         }
         notificationManager.notify(1, notificationBuilder.build())
     }
-
 }
