@@ -13,7 +13,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.fragment_help.view.*
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.ui.settings.deepui.rules.drawableEnd
+import uk.mrs.saralarm.ui.settings.extra_ui.rules.drawableEnd
 
 
 class HelpFragment : Fragment() {

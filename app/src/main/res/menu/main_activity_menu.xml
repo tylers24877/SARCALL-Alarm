@@ -5,6 +5,5 @@
         android:id="@+id/ActionBar_Help"
         android:icon="@drawable/ic_baseline_help_outline_24"
         android:title="Help"
-        android:visible="false"
         app:showAsAction="ifRoom" />
 </menu>

@@ -16,7 +16,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.dialog_respond_sar_a.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
-import uk.mrs.saralarm.ui.respond.support.SMS.sendSMSResponse
+import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 import java.lang.reflect.Type
 import java.util.*
 import kotlin.collections.ArrayList

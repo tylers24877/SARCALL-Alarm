@@ -6,7 +6,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
-import uk.mrs.saralarm.ui.respond.support.SMS.sendSMSResponse
+import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 
 object DialogSARH {
     fun open(context: Context, view: View) {

@@ -36,11 +36,11 @@
         tools:replace="android:allowBackup,android:supportsRtl"
         tools:targetApi="q">
         <service
-            android:name=".support.notification.AlarmForeground"
+            android:name=".support.notification.AlarmForegroundNotification"
             android:enabled="true"
             android:exported="false" />
         <service
-            android:name=".support.notification.SilencedForeground"
+            android:name=".support.notification.SilencedForegroundNotification"
             android:enabled="true"
             android:exported="false" />
 
@@ -69,10 +69,11 @@
             android:name=".AlarmActivity"
             android:excludeFromRecents="true"
             android:showOnLockScreen="true"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <receiver
-            android:name=".SMSBroadcastReceiver"
+            android:name=".support.SMSBroadcastReceiver"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BROADCAST_SMS">
@@ -81,10 +82,10 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".support.notification.SilencedForeground$SilenceBroadcastReceiver" />
+        <receiver android:name=".support.notification.SilencedForegroundNotification$SilenceBroadcastReceiver" />
 
 
-        <receiver android:name=".WidgetProvider">
+        <receiver android:name=".support.WidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="uk.mrs.saralarm.Widget.widgetclick" />

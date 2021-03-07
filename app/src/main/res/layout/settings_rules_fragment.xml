@@ -16,11 +16,10 @@
         android:id="@+id/rulesFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|center_vertical|center_horizontal|center|end"
+        android:layout_gravity="bottom|center_vertical|center_horizontal|center|end"
         android:layout_margin="@dimen/fab_margin"
         android:contentDescription="Add"
         android:src="@drawable/ic_baseline_add_24"
-        app:fabColor="@color/accent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

@@ -1,8 +1,7 @@
 package uk.mrs.saralarm.ui.respond
 
-import android.content.DialogInterface
+import android.content.*
 import android.content.DialogInterface.BUTTON_POSITIVE
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,15 +20,21 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
+import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARA
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARH
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARL
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARN
-import uk.mrs.saralarm.ui.respond.support.RespondRoutine
-import uk.mrs.saralarm.ui.respond.support.SMS.sendSMSResponse
+import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver
+import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver.Companion.RESPOND_SMS_BROADCAST_RECEIVER_SENT
+import uk.mrs.saralarm.ui.respond.support.RespondUtil
+import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 
 
-class RespondFragment : Fragment() {
+class RespondFragment : Fragment(), RespondBroadcastListener {
+
+    private val respondBroadcastReceiver: RespondBroadcastReceiver = RespondBroadcastReceiver(this)
+    private val respondSMSBroadcastReceiver: RespondSMSBroadcastReceiver = RespondSMSBroadcastReceiver()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root: View = inflater.inflate(R.layout.fragment_respond, container, false)
@@ -72,6 +77,11 @@ class RespondFragment : Fragment() {
             displaySignOffDialog()
         }
 
+        context?.registerReceiver(
+            respondBroadcastReceiver,
+            IntentFilter("uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed")
+        )
+        context?.registerReceiver(respondSMSBroadcastReceiver, IntentFilter(RESPOND_SMS_BROADCAST_RECEIVER_SENT))
         return root
     }
 
@@ -80,32 +90,34 @@ class RespondFragment : Fragment() {
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         if (!pref.getBoolean("prefEnabled", false)) {
             requireView().InfoView.visibility = View.VISIBLE
-            requireView().InfoView_txtview.text = "SARCALL Alarm not enabled. Tap to go to settings."
+            requireView().InfoView_txtview.text = "SARCALL Alarm not enabled.\nTap to go to settings."
             requireView().InfoView.setOnClickListener {
                 findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
             }
-        } else {
-            val phoneNumberJSON: String? = pref.getString("rulesJSON", "")
-            if (phoneNumberJSON.isNullOrBlank()) {
-                requireView().InfoView.visibility = View.VISIBLE
-                requireView().InfoView_txtview.text = "Rules are not configured correctly! Please click to check."
-                requireView().InfoView.setOnClickListener {
-                    findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
-                }
-            } else {
-
-                if (pref.getString("respondSMSNumbersJSON", "").isNullOrEmpty()) {
-                    requireView().InfoView.visibility = View.VISIBLE
-                    requireView().InfoView_txtview.text = "No SAR respond number configured. Please click to setup."
-                    requireView().InfoView.setOnClickListener {
-                        findNavController().navigate(R.id.action_navigation_respond_to_SMSNumbersFragment)
-                    }
-                } else {
-                    requireView().InfoView.visibility = View.GONE
-                }
+        } else if (SilencedForegroundNotification.isServiceAlive(requireContext(), SilencedForegroundNotification::class.java)) {
+            requireView().InfoView.visibility = View.VISIBLE
+            //requireView().InfoView.setBackgroundColor(Color.argb(255,100,255,3))
+            requireView().InfoView_txtview.text = "Alarm is currently silenced.\nPlease see notifcation or click to cancel."
+            requireView().InfoView.setOnClickListener {
+                val intent = Intent(context, SilencedForegroundNotification::class.java)
+                intent.action = "uk.mrs.saralarm.silenceForeground.stop"
+                context?.startService(intent)
             }
+        } else if (pref.getString("rulesJSON", "").isNullOrBlank()) {
+            requireView().InfoView.visibility = View.VISIBLE
+            requireView().InfoView_txtview.text = "Rules are not configured correctly.\nPlease click to check."
+            requireView().InfoView.setOnClickListener {
+                findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
+            }
+        } else if (pref.getString("respondSMSNumbersJSON", "").isNullOrEmpty()) {
+            requireView().InfoView.visibility = View.VISIBLE
+            requireView().InfoView_txtview.text = "No SAR respond number configured. Please click to setup."
+            requireView().InfoView.setOnClickListener {
+                findNavController().navigate(R.id.action_navigation_respond_to_SMSNumbersFragment)
+            }
+        } else {
+            requireView().InfoView.visibility = View.GONE
         }
-
         //Hide or show the optional features
         if (pref.getBoolean("visualShowSARH", true)) {
             requireView().respond_sar_h_button.visibility = View.VISIBLE
@@ -121,9 +133,13 @@ class RespondFragment : Fragment() {
             requireView().respond_sign_on.visibility = View.GONE
             requireView().respond_sign_off.visibility = View.GONE
         }
-
-
         super.onResume()
+    }
+
+    override fun onDestroy() {
+        context?.unregisterReceiver(respondBroadcastReceiver)
+        context?.unregisterReceiver(respondSMSBroadcastReceiver)
+        super.onDestroy()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
@@ -146,7 +162,7 @@ class RespondFragment : Fragment() {
                     requireView().respond_sms_preview_txtview.visibility = View.GONE
                     requireView().respond_preview_date_txtview.visibility = View.GONE
 
-                    val (resultBody, resultDate) = RespondRoutine.setPreviewAsync(requireContext()).await()
+                    val (resultBody, resultDate) = RespondUtil.setPreviewAsync(requireContext()).await()
                     requireView().respond_sms_preview_txtview.text = resultBody
                     requireView().respond_preview_date_txtview.text = "Received: $resultDate"
 
@@ -199,4 +215,23 @@ class RespondFragment : Fragment() {
         AlertDialog.Builder(requireContext()).setTitle("Sign Off").setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
             .setNegativeButton("No", dialogClickListener).show()
     }
+
+    override fun silencedForegroundNotificationClosed() {
+        requireView().InfoView.visibility = View.GONE
+    }
+}
+
+class RespondBroadcastReceiver(private val listener: RespondBroadcastListener) : BroadcastReceiver() {
+
+    override fun onReceive(context: Context, i: Intent) {
+        when (i.action) {
+            "uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed" -> {
+                listener.silencedForegroundNotificationClosed()
+            }
+        }
+    }
+}
+
+interface RespondBroadcastListener {
+    fun silencedForegroundNotificationClosed()
 }

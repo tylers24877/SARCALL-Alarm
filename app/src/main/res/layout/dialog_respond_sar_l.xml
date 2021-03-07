@@ -111,7 +111,6 @@
             app:layout_constraintTop_toBottomOf="@id/sar_l_spinner" />
 
         <TextView
-            android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sar_l_seek_bar_low_time"
@@ -121,7 +120,6 @@
             app:layout_constraintTop_toTopOf="@id/respond_dialog_sar_l_seek" />
 
         <TextView
-            android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sar_l_response_seek_bar_high_time"

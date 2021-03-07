@@ -6,15 +6,13 @@
     <string name="alarm_screen_title">SARCALL</string>
     <string name="app_name">SARCALL Alarm</string>
     <string name="appwidget_text">SARCALL</string>
-    <string name="notification_alarm_channel_id">Alarm Trigger Full Screen</string>
     <string name="placeholder_text">{PLACEHOLDER TEXT}</string>
-    <string name="pref_enabled_summary">Enable or disable the SMS alarm.</string>
+    <string name="pref_enabled_summary">Master switch for the alarm. Enable or disable the SMS alarm.</string>
     <string name="pref_enabled_title">SARCALL Alarm ON/OFF *</string>
     <string name="respond_received_sarcall_sms_heading">Latest SARCALL SMS</string>
     <string name="response_attending_button">SAR A</string>
     <string name="response_date_received">Date Received</string>
     <string name="response_late_button">SAR L</string>
-    <string name="response_no_messages_placeholder">No messages</string>
     <string name="response_permission_placeholder">Permission not granted!</string>
     <string name="response_unavailable_button">SAR N</string>
     <string name="sar_a_response_message_editview">Optional: For example, \"On my way.\"</string>

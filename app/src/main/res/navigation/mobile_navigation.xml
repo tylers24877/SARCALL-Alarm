@@ -2,7 +2,6 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_respond">
     <fragment
         android:id="@+id/navigation_respond"
@@ -37,16 +36,16 @@
     </fragment>
     <fragment
         android:id="@+id/customMessagesFragment"
-        android:name="uk.mrs.saralarm.ui.settings.deepui.custom_messages.CustomMessagesFragment"
+        android:name="uk.mrs.saralarm.ui.settings.extra_ui.custom_messages.CustomMessagesFragment"
         android:label="Predefined Message Editor" />
     <fragment
         android:id="@+id/SMSNumbersFragment"
-        android:name="uk.mrs.saralarm.ui.settings.deepui.phone_numbers.SMSNumbersFragment"
+        android:name="uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers.SMSNumbersFragment"
         android:label="SAR A/L/N Respond Number Editor" />
 
     <fragment
         android:id="@+id/rulesFragment"
-        android:name="uk.mrs.saralarm.ui.settings.deepui.rules.RulesFragment"
+        android:name="uk.mrs.saralarm.ui.settings.extra_ui.rules.RulesFragment"
         android:label="Rules Configurator" />
     <fragment
         android:id="@+id/helpFragment"

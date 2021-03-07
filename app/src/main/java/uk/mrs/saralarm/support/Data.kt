@@ -1,6 +1,6 @@
 package uk.mrs.saralarm.support
 
-import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
+import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
 import java.io.Serializable
 
 data class RuleAlarmData(

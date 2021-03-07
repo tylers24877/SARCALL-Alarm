@@ -27,8 +27,8 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import uk.mrs.saralarm.support.RuleAlarmData
 import uk.mrs.saralarm.support.notification.PostAlarmNotification
-import uk.mrs.saralarm.support.notification.SilencedForeground
-import uk.mrs.saralarm.ui.settings.deepui.rules.support.SoundType
+import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
+import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
 import java.io.FileInputStream
 
 
@@ -170,11 +170,14 @@ class AlarmActivity : Activity() {
         alarm_stop_button.setOnClickListener { finish() }
 
         alarm_silence_button.setOnClickListener {
-            val serviceIntent = Intent(this, SilencedForeground::class.java)
-            serviceIntent.putExtra("startMills", 3600000L)
-            ContextCompat.startForegroundService(this, serviceIntent)
-            Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
-            finish()
+            if (!SilencedForegroundNotification.isServiceAlive(applicationContext, SilencedForegroundNotification::class.java)) {
+                val serviceIntent = Intent(this, SilencedForegroundNotification::class.java)
+                serviceIntent.putExtra("startMills", 3600000L)
+                ContextCompat.startForegroundService(this, serviceIntent)
+                Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
+                FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_silence_started", null)
+                finish()
+            }
         }
 
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)

@@ -17,7 +17,7 @@ import androidx.navigation.fragment.NavHostFragment.findNavController
 import androidx.preference.*
 import com.google.android.material.snackbar.Snackbar
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.WidgetProvider
+import uk.mrs.saralarm.support.WidgetProvider
 
 
 class SettingsFragment : Fragment() {
