@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_fragment_add_fab">Add</string>
+    <string name="settings_fragment_rules_radio_sms_number">SMS Number</string>
+    <string name="settings_fragment_rules_radio_phrase">Phrase</string>
+    <string name="settings_fragment_rules_radio_both">Both</string>
+    <string name="settings_fragment_trigger_sms_number_hint">Trigger SMS Number</string>
+    <string name="fragment_settings_trigger_phrase_hint">Trigger Phrase</string>
+    <string name="fragment_settings_customise_alarm_expander">Customise alarm</string>
+    <string name="fragment_settings_alarm_sound_name_placeholder">Alarm Sound:</string>
+    <string name="fragment_settings_rules_custom_sound_none_set_placeholder">No Alarm Sound Set. Using Default.</string>
+    <string name="fragment_settings_rules_set_alarm_sound_button">Set Alarm Sound</string>
+    <string name="fragment_settings_loop_sound_checkbox">Loop Sound</string>
+    <string name="fragment_settings_rules_custom_visuals_title">Visuals:</string>
+    <string name="fragment_settings_rules_custom_sound_custom_sound_picker">Custom Sound Picker</string>
+    <string name="fragment_settings_rules_custom_sound_system_ringtone_picker_button">System Ringtone Picker</string>
+    <string name="fragment_rules_custom_set_colours_button">Set Colours</string>
+    <string name="fragment_settings_sms_numbers_add_fab">Add</string>
+    <string name="fragment_settings_sms_numbers_recycler_view_text_edit">SMS Number</string>
+    <string name="fragment_settings_rules_custom_visuals_colours_save_close_button"><![CDATA[Save & Close]]></string>
+    <string name="fragment_settings_rules_custom_visuals_colour_placeholder">[PLACEHOLDER]</string>
+
+</resources>

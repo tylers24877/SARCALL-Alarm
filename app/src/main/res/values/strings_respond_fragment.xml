@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fragment_respond_sar_a_response_message_edit_view">Optional: For example, \"On my way.\"</string>
+    <string name="fragment_respond_sar_a_response_message_title">Custom Message:</string>
+    <string name="fragment_respond_sar_a_response_rv_txt_placeholder">Estimated time to RV:</string>
+    <string name="fragment_respond_sar_a_seek_bar_high_time">45m</string>
+    <string name="fragment_respond_sar_a_seek_bar_low_time">0m</string>
+    <string name="fragment_respond_sar_a_send_button">Send</string>
+    <string name="fragment_respond_sar_l_response_custom_message_title">Custom Message:</string>
+    <string name="fragment_respond_sar_l_response_message_hint">Optional: For example, \"On my way.\"</string>
+    <string name="fragment_respond_sar_l_response_seek_bar_high_time">120m</string>
+    <string name="fragment_respond_sar_l_response_seek_bar_title">Estimated time to RV:</string>
+    <string name="fragment_respond_sar_l_response_send_button">Send</string>
+    <string name="fragment_respond_sar_l_response_title">SAR L</string>
+    <string name="fragment_respond_sar_l_seek_bar_low_time">N/A</string>
+    <string name="fragment_respond_sar_n_negative">Take me back</string>
+    <string name="fragment_respond_sar_n_positive">I\'m sure</string>
+    <string name="fragment_respond_received_sarcall_sms_heading">Latest SARCALL SMS</string>
+    <string name="fragment_response_attending_button">SAR A</string>
+    <string name="fragment_response_date_received">Date Received</string>
+    <string name="fragment_response_late_button">SAR L</string>
+    <string name="fragment_response_permission_placeholder">Permission not granted!</string>
+    <string name="fragment_response_unavailable_button">SAR N</string>
+    <string name="fragment_respond_predefined_message_hint">Predefined Message:</string>
+</resources>

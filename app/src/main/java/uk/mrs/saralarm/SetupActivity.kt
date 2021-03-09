@@ -26,7 +26,7 @@ class SetupActivity : AppCompatActivity() {
         setContentView(R.layout.activity_setup)
 
         //Sets the SetupToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
-        setSupportActionBar(SetupToolbar)
+        setSupportActionBar(setup_toolbar)
 
         //Setup OnClick Listener for the setup button. When clicked...
         setup_permission_button.setOnClickListener {
@@ -38,25 +38,22 @@ class SetupActivity : AppCompatActivity() {
                 ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 && ActivityCompat.checkSelfPermission(
                     this,
                     "android.permission.WRITE_EXTERNAL_STORAGE"
-                ) == 0 && ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0
-            ) {
-                //if permissions already granted, go straight to checking overlay.
-                checkOverlayAndMoveOn()
-            } else {
-                //if permissions not granted, request them with request code of 1.
+                ) == 0 &&
+                ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0
+            )
+                checkOverlayAndMoveOn() //if permissions already granted, go straight to checking overlay.
+            else
                 requestPermissions(
                     arrayOf(
                         "android.permission.RECEIVE_SMS", "android.permission.READ_SMS", "android.permission.SEND_SMS", "android.permission.READ_EXTERNAL_STORAGE",
                         "android.permission.WRITE_EXTERNAL_STORAGE"
                     ), 1
-                )
-            }
+                ) //if permissions not granted, request them with request code of 1.
         }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         //if request code of 1 is received
         if (requestCode == 1) {
             for (permission in permissions) {
@@ -78,7 +75,6 @@ class SetupActivity : AppCompatActivity() {
                 !Settings.canDrawOverlays(this)
             } else false
         ) {
-
             val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
                     //If Positive button pressed.
@@ -94,16 +90,15 @@ class SetupActivity : AppCompatActivity() {
                 }
             }
             //Build and display the dialog.
-            val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage(
-                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
-                        "\nPlease enable the permission on the app settings page."
-            )
-                .setPositiveButton("Okay, take me to settings", dialogClickListener).setCancelable(false)
-            builder.setOnCancelListener {
-                checkOverlayAndMoveOn()
+            with(AlertDialog.Builder(this)) {
+                setMessage(
+                    "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
+                            "\nPlease enable the permission on the app settings page."
+                )
+                setPositiveButton("Okay, take me to settings", dialogClickListener).setCancelable(false)
+                setOnCancelListener { checkOverlayAndMoveOn() }
+                show()
             }
-            builder.show()
         } else
             checkBattery() //Move onto checking battery, as overlay granted.
     }

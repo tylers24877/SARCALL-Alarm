@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/customMessageRecyclerView"
+        android:id="@+id/custom_message_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical" />
@@ -14,9 +14,9 @@
         android:id="@+id/custom_message_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right|center_vertical|center_horizontal|center|end"
+        android:layout_gravity="bottom|center_vertical|center_horizontal|center|end"
         android:layout_margin="@dimen/fab_margin"
-        android:contentDescription="Add"
+        android:contentDescription="@string/settings_fragment_add_fab"
         android:src="@drawable/ic_baseline_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />

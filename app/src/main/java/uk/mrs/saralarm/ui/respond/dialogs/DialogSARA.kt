@@ -50,12 +50,12 @@ object DialogSARA {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 if (dialog.sar_a_spinner.selectedItem.toString() == "Enter Custom Message...") {
                     dialog.respond_dialog_sar_a_message_editview.isEnabled = true
-                    dialog.respond_dialog_sar_a_message_inputlayout.visibility = View.VISIBLE
+                    dialog.respond_dialog_sar_a_message_input_layout.visibility = View.VISIBLE
                     dialog.respond_dialog_sar_a_message_title_txtview.visibility = View.VISIBLE
                     return
                 }
                 dialog.respond_dialog_sar_a_message_editview.isEnabled = false
-                dialog.respond_dialog_sar_a_message_inputlayout.visibility = View.GONE
+                dialog.respond_dialog_sar_a_message_input_layout.visibility = View.GONE
                 dialog.respond_dialog_sar_a_message_title_txtview.visibility = View.GONE
             }
 

@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         //Sets the ResponseToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
-        setSupportActionBar(ResponseToolbar)
+        setSupportActionBar(response_toolbar)
 
         //Build the app bar for the activity. The IDs set here are the top level fragments.
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(R.id.navigation_respond, R.id.navigation_settings).build()
@@ -111,9 +111,6 @@ class MainActivity : AppCompatActivity() {
     private fun createBackgroundJobs() {
 
         //Delete old versions of the update checker.
-        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V4") //version 1.5.2 beta
-        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V5") //version 1.5.2 beta
-        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V6") //version 1.5.2 beta
         WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V7") //version 1.5.2 beta
 
         val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
@@ -170,11 +167,8 @@ class MainActivity : AppCompatActivity() {
 
             //Build and display the dialog.
             val builder: AlertDialog.Builder = AlertDialog.Builder(this)
-            builder.setMessage(
-                "The 'Display on top' permission is needed for 'SARCALL Alarm' to activate the alarm." +
-                        "\nPlease enable the permission on the app settings page."
-            )
-                .setPositiveButton("Continue Setup", dialogClickListener)
+            builder.setMessage(getString(R.string.main_activity_display_on_top_permission_request))
+                .setPositiveButton(getString(R.string.main_activity_display_on_top_positive_button), dialogClickListener)
                 .setCancelable(false)
                 .show()
         }

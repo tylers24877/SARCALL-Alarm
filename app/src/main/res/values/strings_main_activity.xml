@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_activity_display_on_top_permission_request">The \'Display on top\' permission is needed for \'SARCALL Alarm\' to activate the alarm.\nPlease enable the permission on the app settings page.</string>
+    <string name="main_activity_display_on_top_positive_button">Continue Setup</string>
+</resources>

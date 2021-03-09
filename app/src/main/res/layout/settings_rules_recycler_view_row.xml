@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rules_recycler_cardview"
+    android:id="@+id/rules_recycler_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
@@ -28,7 +28,7 @@
             app:layout_constraintGuide_begin="48dp" />
 
         <RadioGroup
-            android:id="@+id/rulesRadioGroup"
+            android:id="@+id/rules_radio_group"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -37,26 +37,26 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <RadioButton
-                android:id="@+id/rulesRadioSMSNumber"
+                android:id="@+id/rules_radio_sms_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="SMS Number" />
+                android:text="@string/settings_fragment_rules_radio_sms_number" />
 
             <RadioButton
-                android:id="@+id/rulesRadioTrigger"
+                android:id="@+id/rules_radio_phrase"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Phrase" />
+                android:text="@string/settings_fragment_rules_radio_phrase" />
 
             <RadioButton
-                android:id="@+id/rulesRadioBoth"
+                android:id="@+id/rules_radio_both"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Both" />
+                android:text="@string/settings_fragment_rules_radio_both" />
         </RadioGroup>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/SMSNumbersRulesRecyclerTextInput"
+            android:id="@+id/sms_numbers_rules_recycler_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
@@ -67,17 +67,17 @@
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/rules_vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@id/rulesRadioGroup">
+            app:layout_constraintTop_toBottomOf="@id/rules_radio_group">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/SMSNumbersRulesEditText"
+                android:id="@+id/sms_numbers_rules_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/trigger_sms_number" />
+                android:hint="@string/settings_fragment_trigger_sms_number_hint" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/phraseRulesRecyclerTextInput"
+            android:id="@+id/phrase_rules_recycler_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
@@ -86,34 +86,34 @@
             app:errorEnabled="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/rules_vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@id/SMSNumbersRulesRecyclerTextInput">
+            app:layout_constraintTop_toBottomOf="@id/sms_numbers_rules_recycler_text_input">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/phraseRulesEditText"
+                android:id="@+id/phrase_rules_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
-                android:hint="Trigger Phrase"
+                android:hint="@string/fragment_settings_trigger_phrase_hint"
                 app:boxBackgroundColor="@android:color/transparent" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/customiseAlarmRulesTextView"
+            android:id="@+id/customise_alarm_rules_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
-            android:text="Customise alarm"
+            android:text="@string/fragment_settings_customise_alarm_expander"
             app:drawableEndCompat="@drawable/ic_baseline_expand_more_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/rules_vertical_guideline"
-            app:layout_constraintTop_toBottomOf="@+id/phraseRulesRecyclerTextInput" />
+            app:layout_constraintTop_toBottomOf="@+id/phrase_rules_recycler_text_input" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/customiseAlarmRulesConstraintLayout"
+            android:id="@+id/customise_alarm_rules_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/customiseAlarmRulesTextView">
+            app:layout_constraintTop_toBottomOf="@id/customise_alarm_rules_text_view">
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/customise_rules_vertical_guideline"
@@ -121,60 +121,61 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 app:layout_constraintGuide_begin="48dp" />
+
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/customiseAlarmSetAlarmSoundTextView"
+                android:id="@+id/customise_alarm_set_alarm_sound_text_view"
                 style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Alarm Sound:"
+                android:text="@string/fragment_settings_alarm_sound_name_placeholder"
                 app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/addAlarmRulesTextView"
+                android:id="@+id/add_alarm_rules_text_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingBottom="8dp"
-                android:text="No Alarm Sound Set. Using Default."
-                app:layout_constraintStart_toStartOf="@+id/addAlarmRulesButton"
-                app:layout_constraintTop_toBottomOf="@+id/customiseAlarmSetAlarmSoundTextView" />
+                android:text="@string/fragment_settings_rules_custom_sound_none_set_placeholder"
+                app:layout_constraintStart_toStartOf="@+id/add_alarm_rules_button"
+                app:layout_constraintTop_toBottomOf="@+id/customise_alarm_set_alarm_sound_text_view" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/addAlarmRulesButton"
+                android:id="@+id/add_alarm_rules_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Set Alarm Sound"
+                android:text="@string/fragment_settings_rules_set_alarm_sound_button"
                 app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/addAlarmRulesTextView" />
+                app:layout_constraintTop_toBottomOf="@+id/add_alarm_rules_text_view" />
 
             <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/customiseAlarmLoopingCheckBox"
+                android:id="@+id/customise_alarm_looping_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="Loop Sound"
-                app:layout_constraintBottom_toBottomOf="@+id/addAlarmRulesButton"
+                android:text="@string/fragment_settings_loop_sound_checkbox"
+                app:layout_constraintBottom_toBottomOf="@+id/add_alarm_rules_button"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/addAlarmRulesButton"
-                app:layout_constraintTop_toTopOf="@+id/addAlarmRulesButton" />
+                app:layout_constraintStart_toEndOf="@+id/add_alarm_rules_button"
+                app:layout_constraintTop_toTopOf="@+id/add_alarm_rules_button" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/customiseAlarm_Visuals_TextView"
+                android:id="@+id/customise_alarm_visuals_text_view"
                 style="@style/TextAppearance.MaterialComponents.Subtitle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Visuals:"
+                android:text="@string/fragment_settings_rules_custom_visuals_title"
                 app:layout_constraintStart_toStartOf="@+id/customise_rules_vertical_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/addAlarmRulesButton" />
+                app:layout_constraintTop_toBottomOf="@+id/add_alarm_rules_button" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/addAlarmColoursRulesButton"
+                android:id="@+id/add_alarm_colours_rules_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Set Colours"
+                android:text="@string/fragment_rules_custom_set_colours_button"
                 app:layout_constraintStart_toStartOf="@id/customise_rules_vertical_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/customiseAlarm_Visuals_TextView" />
+                app:layout_constraintTop_toBottomOf="@+id/customise_alarm_visuals_text_view" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

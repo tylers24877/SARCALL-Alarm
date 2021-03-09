@@ -75,7 +75,7 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-        var myTextView: TextInputEditText = itemView.customMessageEditText
+        var myTextView: TextInputEditText = itemView.custom_message_edit_text
 
         init {
             myTextView.addTextChangedListener(object : TextWatcher {
@@ -96,13 +96,13 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
         }
 
         override fun onItemSelected() {
-            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_cardview, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
+            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_card_view, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }
 
         override fun onItemClear() {
-            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_cardview, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
+            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_card_view, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }

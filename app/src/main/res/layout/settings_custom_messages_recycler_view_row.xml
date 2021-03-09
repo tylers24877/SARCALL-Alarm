@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/custom_message_recycler_cardview"
+    android:id="@+id/custom_message_recycler_card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="2dp">
@@ -15,12 +15,12 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_baseline_drag_indicator_24"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/custom_message_recycler_textInput"
+            app:layout_constraintEnd_toStartOf="@+id/custom_message_recycler_text_input"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/custom_message_recycler_textInput"
+            android:id="@+id/custom_message_recycler_text_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
@@ -35,7 +35,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/customMessageEditText"
+                android:id="@+id/custom_message_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:maxLength="135" />

@@ -5,7 +5,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ColoursRecyclerView"
+        android:id="@+id/colours_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="108dp"
@@ -15,24 +15,24 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/ColoursRecyclerAddButton"
+        android:id="@+id/colours_recycler_add_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:text="Add"
+        android:text="@string/settings_fragment_add_fab"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ColoursRecyclerView" />
+        app:layout_constraintTop_toBottomOf="@+id/colours_recycler_view" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/ColoursRecyclerSaveButton"
+        android:id="@+id/colours_recycler_save_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Save &amp; Close"
-        app:layout_constraintEnd_toEndOf="@+id/ColoursRecyclerAddButton"
-        app:layout_constraintStart_toStartOf="@+id/ColoursRecyclerAddButton"
-        app:layout_constraintTop_toBottomOf="@+id/ColoursRecyclerAddButton" />
+        android:text="@string/fragment_settings_rules_custom_visuals_colours_save_close_button"
+        app:layout_constraintEnd_toEndOf="@+id/colours_recycler_add_button"
+        app:layout_constraintStart_toStartOf="@+id/colours_recycler_add_button"
+        app:layout_constraintTop_toBottomOf="@+id/colours_recycler_add_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

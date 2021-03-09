@@ -5,24 +5,24 @@
     android:layout_height="match_parent">
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialogSoundPickerSystemButton"
+        android:id="@+id/dialog_sound_picker_system_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:text="System Ringtone Picker"
+        android:text="@string/fragment_settings_rules_custom_sound_system_ringtone_picker_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialogSoundPickerCustomButton"
+        android:id="@+id/dialog_sound_picker_custom_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Custom Sound Picker"
-        app:layout_constraintEnd_toEndOf="@+id/dialogSoundPickerSystemButton"
-        app:layout_constraintStart_toStartOf="@+id/dialogSoundPickerSystemButton"
-        app:layout_constraintTop_toBottomOf="@+id/dialogSoundPickerSystemButton" />
+        android:text="@string/fragment_settings_rules_custom_sound_custom_sound_picker"
+        app:layout_constraintEnd_toEndOf="@+id/dialog_sound_picker_system_button"
+        app:layout_constraintStart_toStartOf="@+id/dialog_sound_picker_system_button"
+        app:layout_constraintTop_toBottomOf="@+id/dialog_sound_picker_system_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

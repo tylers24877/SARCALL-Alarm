@@ -30,13 +30,13 @@ class CustomMessagesFragment : Fragment() {
         }
         val root: View = inflater.inflate(R.layout.settings_custom_messages_fragment, container, false)
 
-        root.customMessageRecyclerView.layoutManager = LinearLayoutManager(context)
+        root.custom_message_recycler_view.layoutManager = LinearLayoutManager(context)
 
         adapter = CustomMessagesRecyclerViewAdapter(requireContext(), customMessageArray)
 
-        root.customMessageRecyclerView.adapter = adapter
+        root.custom_message_recycler_view.adapter = adapter
 
-        ItemTouchHelper(CustomMessagesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.customMessageRecyclerView)
+        ItemTouchHelper(CustomMessagesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.custom_message_recycler_view)
         root.custom_message_fab.setOnClickListener {
             adapter!!.addItem()
         }

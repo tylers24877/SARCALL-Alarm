@@ -9,17 +9,16 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/alarm_title_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/alarm_screen_title"
+        android:text="@string/alarm_activity_screen_title"
         android:layout_marginTop="24dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="50sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -31,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@+id/alarm_stop_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView">
+        app:layout_constraintTop_toBottomOf="@+id/alarm_title_text_view">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -48,10 +47,10 @@
                 android:layout_height="match_parent">
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/alarmPreviewSMSTextView"
+                    android:id="@+id/alarm_preview_sms_text_view"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/placeholder_text"
+                    android:text="@string/alarm_activity_placeholder_text"
                     android:textSize="20.0sp" />
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.core.widget.NestedScrollView>
@@ -69,7 +68,7 @@
             android:background="@color/divider" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/alarmPreviewSMSNumberTextView"
+            android:id="@+id/alarm_preview_sms_number_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
@@ -87,7 +86,7 @@
         android:layout_centerHorizontal="true"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-        android:text="@string/alarm_button_stop"
+        android:text="@string/alarm_activity_button_stop"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -103,7 +102,7 @@
         android:layout_centerHorizontal="true"
         android:backgroundTint="@color/primary_dark"
         android:paddingTop="10dp"
-        android:text="Silence Alarm for 1hr"
+        android:text="@string/alarm_activity_silence_button"
         android:paddingBottom="10dp"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"

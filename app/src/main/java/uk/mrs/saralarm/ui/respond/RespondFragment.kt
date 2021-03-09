@@ -176,7 +176,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         } else {
             try {
                 requireView().respond_preview_date_txtview.text = ""
-                requireView().respond_sms_preview_txtview.setText(R.string.response_permission_placeholder)
+                requireView().respond_sms_preview_txtview.setText(R.string.fragment_response_permission_placeholder)
             } catch (e: IllegalStateException) {
                 FirebaseCrashlytics.getInstance().recordException(e)
             }

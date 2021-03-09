@@ -59,11 +59,11 @@ class AlarmActivity : Activity() {
             if (intent.getSerializableExtra("ruleAlarmData") != null) {
                 intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
             } else {
-                RuleAlarmData(alarmPreviewSMSBody = "Error Occurred with reading SMS. Error Code = 1")
+                RuleAlarmData(alarmPreviewSMSBody = getString(R.string.alarm_activity_error_Code_1))
             }
 
-        alarmPreviewSMSTextView.text = ruleAlarmData.alarmPreviewSMSBody
-        alarmPreviewSMSNumberTextView.text = "From: " + ruleAlarmData.alarmPreviewSMSNumber
+        alarm_preview_sms_text_view.text = ruleAlarmData.alarmPreviewSMSBody
+        alarm_preview_sms_number_text_view.text = getString(R.string.alarm_activity_preview_sms_number, ruleAlarmData.alarmPreviewSMSNumber)
 
         mp = MediaPlayer()
         mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
@@ -84,7 +84,7 @@ class AlarmActivity : Activity() {
                     mp!!.setDataSource(applicationContext, Uri.parse(ruleAlarmData.soundFile))
                 } catch (e: Exception) {
                     try {
-                        Toast.makeText(applicationContext, "Failed to load system sound. Resorting to default.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, getString(R.string.alarm_activity_sound_load_failed), Toast.LENGTH_LONG).show()
                         mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
                     } catch (e2: Exception) {
                         FirebaseCrashlytics.getInstance().recordException(e2)
@@ -171,30 +171,35 @@ class AlarmActivity : Activity() {
 
         alarm_silence_button.setOnClickListener {
             if (!SilencedForegroundNotification.isServiceAlive(applicationContext, SilencedForegroundNotification::class.java)) {
+                //start the foreground service for managing the silence function.
                 val serviceIntent = Intent(this, SilencedForegroundNotification::class.java)
                 serviceIntent.putExtra("startMills", 3600000L)
                 ContextCompat.startForegroundService(this, serviceIntent)
+
                 Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
                 FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_silence_started", null)
+                //stop the alarm
                 finish()
             }
         }
-
         FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
     override fun onResume() {
         super.onResume()
+        //resume the alarm sound if the app was paused.
         mp?.start()
     }
 
     override fun onPause() {
         super.onPause()
+        //pause the alarm then the app is paused.
         mp?.pause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        //when app is destroy/finish() called, stop the alarm sound and set the volume levels back to original before the alarm was started.
         mp?.stop()
         mp = null
         (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
@@ -202,5 +207,5 @@ class AlarmActivity : Activity() {
         PostAlarmNotification.create(this)
     }
 
-    override fun onBackPressed() {}
+    override fun onBackPressed() {} //override the back button to do nothing.
 }

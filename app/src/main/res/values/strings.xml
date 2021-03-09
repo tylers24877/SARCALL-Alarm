@@ -2,42 +2,17 @@
     <string name="SAR_A">SAR A</string>
     <string name="SAR_N_dialog_title">Are you sure you\'re unavailable?</string>
     <string name="activation_notification_title_template">SARCALL Activated</string>
-    <string name="alarm_button_stop">Stop Alarm</string>
-    <string name="alarm_screen_title">SARCALL</string>
     <string name="app_name">SARCALL Alarm</string>
     <string name="appwidget_text">SARCALL</string>
-    <string name="placeholder_text">{PLACEHOLDER TEXT}</string>
     <string name="pref_enabled_summary">Master switch for the alarm. Enable or disable the SMS alarm.</string>
     <string name="pref_enabled_title">SARCALL Alarm ON/OFF *</string>
-    <string name="respond_received_sarcall_sms_heading">Latest SARCALL SMS</string>
-    <string name="response_attending_button">SAR A</string>
-    <string name="response_date_received">Date Received</string>
-    <string name="response_late_button">SAR L</string>
-    <string name="response_permission_placeholder">Permission not granted!</string>
-    <string name="response_unavailable_button">SAR N</string>
-    <string name="sar_a_response_message_editview">Optional: For example, \"On my way.\"</string>
-    <string name="sar_a_response_message_title">Custom Message:</string>
-    <string name="sar_a_response_rv_txt_placeholder">Estimated time to RV:</string>
-    <string name="sar_a_seek_bar_high_time">45m</string>
-    <string name="sar_a_seek_bar_low_time">0m</string>
-    <string name="sar_a_send_button">Send</string>
-    <string name="sar_l_response_custom_message_title">Custom Message:</string>
-    <string name="sar_l_response_message_hint">Optional: For example, \"On my way.\"</string>
-    <string name="sar_l_response_seek_bar_high_time">120m</string>
-    <string name="sar_l_response_seek_bar_title">Estimated time to RV:</string>
-    <string name="sar_l_response_send_button">Send</string>
-    <string name="sar_l_response_title">SAR L</string>
-    <string name="sar_l_seek_bar_low_time">N/A</string>
-    <string name="sar_n_negitive">Take me back</string>
-    <string name="sar_n_positive">I\'m sure</string>
+
+
     <string name="setup_needed">No rules configured in settings</string>
-    <string name="setup_summery_text">In order for the app to work correctly, please allow the app to access incoming SMS messages and access to device storage.\n
-        You also may be asked to disable battery optimisation for the app. This is to allow SMS messages to be detected at all times.
-        Don\'t worry, this app is very lightweight and it will not drain your battery.</string>
+
     <string name="response_home_button">SAR H</string>
     <string name="respond_sign_on">Sign On</string>
     <string name="respond_sign_off">Sign Off</string>
 
     <string name="SMS_Number_Invalid">"SMS Number looks to be in the wrong format\nIf this is number is definitely correct, please click overwrite below"</string>
-    <string name="trigger_sms_number">Trigger SMS Number</string>
 </resources>

@@ -15,7 +15,7 @@ object DialogSARH {
                 sendSMSResponse(context, view, SARResponseCode.SAR_H, dialog, 0, null)
             }
         }
-        AlertDialog.Builder(context).setMessage("Send SAR-H response message?").setPositiveButton(R.string.sar_n_positive, dialogClickListener)
-            .setNegativeButton(R.string.sar_n_negitive, dialogClickListener).show()
+        AlertDialog.Builder(context).setMessage("Send SAR-H response message?").setPositiveButton(R.string.fragment_respond_sar_n_positive, dialogClickListener)
+            .setNegativeButton(R.string.fragment_respond_sar_n_negative, dialogClickListener).show()
     }
 }

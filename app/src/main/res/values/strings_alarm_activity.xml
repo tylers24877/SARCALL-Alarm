@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alarm_activity_error_Code_1">Error Occurred with reading SMS. Error Code = 1</string>
+    <string name="alarm_activity_preview_sms_number">From: %s</string>
+    <string name="alarm_activity_sound_load_failed">Failed to load system sound. Resorting to default.</string>
+    <string name="alarm_activity_screen_title">SARCALL</string>
+    <string name="alarm_activity_placeholder_text">{PLACEHOLDER TEXT}</string>
+    <string name="alarm_activity_button_stop">Stop Alarm</string>
+    <string name="alarm_activity_silence_button">Silence Alarm for 1hr</string>
+
+
+</resources>

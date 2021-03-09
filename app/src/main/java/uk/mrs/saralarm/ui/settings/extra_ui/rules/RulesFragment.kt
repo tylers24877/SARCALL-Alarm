@@ -50,14 +50,14 @@ class RulesFragment : Fragment(), CoroutineScope {
         }
         val root: View = inflater.inflate(R.layout.settings_rules_fragment, container, false)
 
-        root.rulesRecyclerView.layoutManager = LinearLayoutManager(context)
+        root.rules_recycler_view.layoutManager = LinearLayoutManager(context)
 
         adapter = RulesRecyclerViewAdapter(requireContext(), this, rulesArray, root)
 
-        root.rulesRecyclerView.adapter = adapter
+        root.rules_recycler_view.adapter = adapter
 
-        ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.rulesRecyclerView)
-        root.rulesFab.setOnClickListener {
+        ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.rules_recycler_view)
+        root.rules_fab.setOnClickListener {
             adapter!!.addItem()
             FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
 

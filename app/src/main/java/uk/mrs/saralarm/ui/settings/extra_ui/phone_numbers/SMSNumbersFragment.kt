@@ -31,14 +31,14 @@ class SMSNumbersFragment : Fragment() {
         }
         val root: View = inflater.inflate(R.layout.settings_sms_numbers_fragment, container, false)
 
-        root.SMSNumbersRecyclerView.layoutManager = LinearLayoutManager(context)
+        root.sms_numbers_recycler_view.layoutManager = LinearLayoutManager(context)
 
         adapter = SMSNumbersRecyclerViewAdapter(requireContext(), SMSNumberObjectArray)
 
-        root.SMSNumbersRecyclerView.adapter = adapter
+        root.sms_numbers_recycler_view.adapter = adapter
 
-        ItemTouchHelper(SMSNumbersDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.SMSNumbersRecyclerView)
-        root.SMSNumbersFab.setOnClickListener {
+        ItemTouchHelper(SMSNumbersDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.sms_numbers_recycler_view)
+        root.sms_numbers_fab.setOnClickListener {
             adapter!!.addItem()
         }
 
