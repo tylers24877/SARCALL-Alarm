@@ -44,7 +44,7 @@ object RespondUtil {
             var setBodyAndDate: Pair<String, String> = Pair("No Messages", "")
 
             if (rulesFromJson.isNullOrEmpty()) {
-                Pair(context.getString(R.string.setup_needed), "")
+                Pair(context.getString(R.string.fragment_respond_preview_setup_needed_warning), "")
             } else {
                 for (r in rulesFromJson) {
                     if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {

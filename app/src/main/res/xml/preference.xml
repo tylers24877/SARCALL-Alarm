@@ -2,57 +2,57 @@
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreferenceCategory
-        android:summary="* = Required for the app to function correctly!"
+        android:summary="@string/fragment_settings_pref_required_desc_summary"
         app:iconSpaceReserved="false">
 
     </uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreferenceCategory>
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="prefEnabled"
-        android:summary="@string/pref_enabled_summary"
-        android:title="@string/pref_enabled_title"
+        android:summary="@string/fragment_settings_pref_enabled_summary"
+        android:title="@string/fragment_settings_pref_enabled_title"
         app:iconSpaceReserved="false" />
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        android:summary="Settings related to alarm activation"
-        android:title="Activation"
+        android:summary="@string/fragment_settings_pref_activation_cat_summary"
+        android:title="@string/fragment_settings_pref_activation_cat_title"
         app:iconSpaceReserved="false">
         <uk.mrs.saralarm.ui.settings.extra_ui.rules.RulesPreference
-            android:summary="Configure as many rules as you like using a phrase, SMS number or both. If the &quot;Both&quot; option is selected, a received SMS containing the &quot;phrase&quot; would've had to come from the &quot;SMS Number&quot; to trigger the alarm.\nExample:\n&#8226;SMS number: 07........(SARCALL Number or alternative)\n&#8226;Phrase: LAKESMRT (A phrase common within the callout SMS messages)"
-            android:title="Trigger Rules *"
+            android:summary="@string/fragment_settings_pref_rules_summary"
+            android:title="@string/fragment_settings_pref_rules_title"
             app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
 
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        android:summary="Settings for use on the 'Respond' page of the app"
-        android:title="Respond Page"
+        android:summary="@string/fragment_settings_pref_respond_cat_summary"
+        android:title="@string/fragment_settings_pref_respond_cat_title"
         app:iconSpaceReserved="false">
         <EditTextPreference
             android:key="prefTeamPrefix"
-            android:summary="Used for the Sign On/Off functionality. The format should be like 'LEEMINGMRT', for example"
-            android:title="Team Prefix *"
+            android:summary="@string/fragment_settings_pref_prefix_summary"
+            android:title="@string/fragment_settings_pref_prefix_title"
             app:iconSpaceReserved="false" />
         <uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers.SMSNumbersPreference
-            android:summary="Set the SMS numbers to send the SAR A/L/N SMS to from the &quot;Respond&quot; Page.\nThe SAR A/L/N message can be sent to multiple numbers at the same time."
-            android:title="SAR A/L/N Reply Number *"
+            android:summary="@string/fragment_settings_pref_reply_number_summary"
+            android:title="@string/fragment_settings_pref_reply_number_title"
             app:iconSpaceReserved="false" />
         <uk.mrs.saralarm.ui.settings.extra_ui.custom_messages.CustomMessagesPreference
-            android:summary="Setup response messages to append to the SAR A/L messages. You don't need to enter the &quot;SAR A/L&quot; prefix, just the message itself\nFor example...&quot;On my way to RV from my home.&quot;"
-            android:title="SAR A/L Predefined Response Messages"
+            android:summary="@string/fragment_settings_pref_respond_messages_summary"
+            android:title="@string/fragment_settings_pref_respond_messages_title"
             app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        android:summary="Modify which buttons are displayed on the respond page."
-        android:title="Respond Page Visuals"
+        android:summary="@string/fragment_settings_pref_visuals_cat_summary"
+        android:title="@string/fragment_settings_pref_visuals_cat_title"
         app:iconSpaceReserved="false">
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="visualShowSARH"
-            android:title="Display SAR H Button"
+            android:title="@string/fragment_settings_pref_display_sar_h_button_title"
             app:iconSpaceReserved="false" />
         <SwitchPreferenceCompat
             android:defaultValue="true"
             android:key="visualShowSignOnOff"
-            android:title="Display Sign On/Off Buttons"
+            android:title="@string/fragment_settings_pref_display_status_buttons_title"
             app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
@@ -61,35 +61,25 @@
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="betaChannel"
-            android:summary="Subscribe to the beta version of this app. Be aware, this channel may be unstable."
-            android:title="Beta Channel"
+            android:summary="@string/fragment_settings_pref_beta_summary"
+            android:title="@string/fragment_settings_pref_beta_title"
             app:iconSpaceReserved="false" />
-        <SwitchPreferenceCompat
-            android:defaultValue="true"
-            android:key="prefDateWorkaround"
-            android:summary="Enable fix for sign off date calculation on SARCALL"
-            android:title="Date Workaround"
-            app:iconSpaceReserved="false"
-            app:isPreferenceVisible="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
 
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        android:title="About"
+        android:title="@string/fragment_settings_pref_about_cat_title"
         app:iconSpaceReserved="false">
         <PreferenceScreen
             android:key="appVersion"
-            android:summary="1.0"
-            android:title="Build Version"
+            android:title="@string/fragment_settings_pref_build_version_title"
             app:iconSpaceReserved="false" />
         <PreferenceScreen
             android:key="backgroundWorkerCount"
-            android:summary="1.0"
-            android:title="Background Update Check"
+            android:title="@string/fragment_settings_pref_background_count_title"
             app:iconSpaceReserved="false" />
         <PreferenceScreen
             android:key="backgroundWorkerTime"
-            android:summary="1.0"
-            android:title="Last Background Update Check"
+            android:title="@string/fragment_settings_pref_background_time_title"
             app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
 

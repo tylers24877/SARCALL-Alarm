@@ -1,18 +1,5 @@
 <resources>
-    <string name="SAR_A">SAR A</string>
-    <string name="SAR_N_dialog_title">Are you sure you\'re unavailable?</string>
     <string name="activation_notification_title_template">SARCALL Activated</string>
     <string name="app_name">SARCALL Alarm</string>
     <string name="appwidget_text">SARCALL</string>
-    <string name="pref_enabled_summary">Master switch for the alarm. Enable or disable the SMS alarm.</string>
-    <string name="pref_enabled_title">SARCALL Alarm ON/OFF *</string>
-
-
-    <string name="setup_needed">No rules configured in settings</string>
-
-    <string name="response_home_button">SAR H</string>
-    <string name="respond_sign_on">Sign On</string>
-    <string name="respond_sign_off">Sign Off</string>
-
-    <string name="SMS_Number_Invalid">"SMS Number looks to be in the wrong format\nIf this is number is definitely correct, please click overwrite below"</string>
 </resources>

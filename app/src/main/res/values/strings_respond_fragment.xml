@@ -22,4 +22,11 @@
     <string name="fragment_response_permission_placeholder">Permission not granted!</string>
     <string name="fragment_response_unavailable_button">SAR N</string>
     <string name="fragment_respond_predefined_message_hint">Predefined Message:</string>
+    <string name="fragment_respond_sar_a_title">SAR A</string>
+    <string name="fragment_respond_sar_n_dialog_title">Are you sure you\'re unavailable?</string>
+    <string name="fragment_respond_preview_setup_needed_warning">No rules configured in settings.</string>
+    <string name="fragment_respond_home_button">SAR H</string>
+    <string name="fragment_respond_sign_on_button">Sign On</string>
+    <string name="fragment_respond_sign_off_button">Sign Off</string>
+
 </resources>

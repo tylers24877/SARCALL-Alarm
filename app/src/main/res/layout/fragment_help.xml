@@ -5,42 +5,42 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/help_intro_textView"
+        android:id="@+id/help_intro_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:gravity="center"
-        android:text="If you'd like to leave some feedback or ask any questions, please complete the form below.\n(An internet connection is required)"
+        android:text="@string/fragment_help_summary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/help_webView_Toggle_textView"
+        android:id="@+id/help_web_view_toggle_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="View Feedback Form"
+        android:text="@string/fragment_help_view_feedback_form_toggle"
         android:textStyle="bold"
         app:drawableEndCompat="@drawable/ic_baseline_expand_more_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/help_intro_textView" />
+        app:layout_constraintTop_toBottomOf="@+id/help_intro_text_view" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/help_webViewLayout"
+        android:id="@+id/help_web_view_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/view2"
+        app:layout_constraintBottom_toTopOf="@+id/help_divider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/help_webView_Toggle_textView">
+        app:layout_constraintTop_toBottomOf="@+id/help_web_view_toggle_text_view">
 
         <WebView
-            android:id="@+id/help_webView"
+            android:id="@+id/help_web_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -50,7 +50,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
-        android:id="@+id/view2"
+        android:id="@+id/help_divider"
         android:layout_width="fill_parent"
         android:layout_height="1.0dip"
         android:background="@color/divider"
@@ -65,10 +65,8 @@
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:paddingTop="16dp"
-        android:text="Copyright \u00A9 2020 Tyler Simmonds\nAll rights reserved, unless otherwise agreed in writing."
+        android:text="@string/fragment_help_copyright"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

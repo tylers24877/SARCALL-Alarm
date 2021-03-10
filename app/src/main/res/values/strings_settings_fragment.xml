@@ -19,5 +19,31 @@
     <string name="fragment_settings_sms_numbers_recycler_view_text_edit">SMS Number</string>
     <string name="fragment_settings_rules_custom_visuals_colours_save_close_button"><![CDATA[Save & Close]]></string>
     <string name="fragment_settings_rules_custom_visuals_colour_placeholder">[PLACEHOLDER]</string>
+    <string name="fragment_settings_pref_enabled_title">SARCALL Alarm ON/OFF *</string>
+    <string name="fragment_settings_pref_enabled_summary">Master switch for the alarm. Enable or disable the SMS alarm.</string>
+    <string name="fragment_settings_pref_activation_cat_title">Activation</string>
+    <string name="fragment_settings_pref_activation_cat_summary">Settings related to alarm activation</string>
+    <string name="fragment_settings_pref_required_desc_summary">* = Required for the app to function correctly!</string>
+    <string name="fragment_settings_pref_rules_summary">Configure as many rules as you like using a phrase, SMS number or both. If the \"Both\" option is selected, a received SMS containing the \"phrase\" would\'ve had to come from the \"SMS Number\" to trigger the alarm.\nExample:\n•SMS number: 07........(SARCALL Number or alternative)\n•Phrase: LAKESMRT (A phrase common within the callout SMS messages)</string>
+    <string name="fragment_settings_pref_rules_title">Trigger Rules *</string>
+    <string name="fragment_settings_pref_respond_cat_summary">Settings for use on the \'Respond\' page of the app</string>
+    <string name="fragment_settings_pref_respond_cat_title">Respond Page</string>
+    <string name="fragment_settings_pref_prefix_summary">Used for the Sign On/Off functionality. The format should be like \'LEEMINGMRT\', for example</string>
+    <string name="fragment_settings_pref_prefix_title">Team Prefix *</string>
+    <string name="fragment_settings_pref_reply_number_summary">Set the SMS numbers to send the SAR A/L/N SMS to from the \"Respond\" Page.\nThe SAR A/L/N message can be sent to multiple numbers at the same time.</string>
+    <string name="fragment_settings_pref_reply_number_title">SAR A/L/N Reply Number *</string>
+    <string name="fragment_settings_pref_respond_messages_summary">Setup response messages to append to the SAR A/L messages. You don\'t need to enter the \"SAR A/L\" prefix, just the message itself\nFor example…\"On my way to RV from my home.\"</string>
+    <string name="fragment_settings_pref_respond_messages_title">SAR A/L Predefined Response Messages</string>
+    <string name="fragment_settings_pref_visuals_cat_summary">Modify which buttons are displayed on the respond page.</string>
+    <string name="fragment_settings_pref_visuals_cat_title">Respond Page Visuals</string>
+    <string name="fragment_settings_pref_display_sar_h_button_title">Display SAR H Button</string>
+    <string name="fragment_settings_pref_display_status_buttons_title">Display Sign On/Off Buttons</string>
+    <string name="fragment_settings_pref_beta_summary">Subscribe to the beta version of this app. Be aware, this channel may be unstable.</string>
+    <string name="fragment_settings_pref_beta_title">Beta Channel</string>
+    <string name="fragment_settings_pref_about_cat_title">About</string>
+    <string name="fragment_settings_pref_build_version_title">Build Version</string>
+    <string name="fragment_settings_pref_background_count_title">Background Update Check</string>
+    <string name="fragment_settings_pref_background_time_title">Last Background Update Check</string>
+    <string name="fragment_settings_rules_sms_number_invalid">"SMS Number looks to be in the wrong format or an incorrect length.</string>
 
 </resources>

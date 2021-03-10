@@ -22,19 +22,19 @@ class HelpFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         val root = inflater.inflate(R.layout.fragment_help, container, false)
-        root.help_webView.settings.javaScriptEnabled = true
-        root.help_webView.loadUrl(
+        root.help_web_view.settings.javaScriptEnabled = true
+        root.help_web_view.loadUrl(
             "https://forms.office.com/Pages/ResponsePage.aspx?id=DQSIkWdsW0yxEjajBLZtrQAAAAAAAAAAAAO__cKaX7JUQzY0MURKOFdQNEFMOVRPQThOT08yRExFMy4u"
         )
-        root.help_webView_Toggle_textView.setOnClickListener {
-            if (root.help_webViewLayout.visibility == View.GONE) {
-                root.help_webViewLayout.visibility = View.VISIBLE
+        root.help_web_view_toggle_text_view.setOnClickListener {
+            if (root.help_web_view_layout.visibility == View.GONE) {
+                root.help_web_view_layout.visibility = View.VISIBLE
                 root.help_copyright.visibility = View.GONE
-                root.help_webView_Toggle_textView.drawableEnd = getDrawable(requireContext(), R.drawable.ic_baseline_expand_less_24)
+                root.help_web_view_toggle_text_view.drawableEnd = getDrawable(requireContext(), R.drawable.ic_baseline_expand_less_24)
             } else {
-                root.help_webViewLayout.visibility = View.GONE
+                root.help_web_view_layout.visibility = View.GONE
                 root.help_copyright.visibility = View.VISIBLE
-                root.help_webView_Toggle_textView.drawableEnd = getDrawable(requireContext(), R.drawable.ic_baseline_expand_more_24)
+                root.help_web_view_toggle_text_view.drawableEnd = getDrawable(requireContext(), R.drawable.ic_baseline_expand_more_24)
 
             }
 

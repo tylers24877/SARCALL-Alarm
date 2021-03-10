@@ -77,10 +77,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             displaySignOffDialog()
         }
 
-        context?.registerReceiver(
-            respondBroadcastReceiver,
-            IntentFilter("uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed")
-        )
+        context?.registerReceiver(respondBroadcastReceiver, IntentFilter("uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed"))
         context?.registerReceiver(respondSMSBroadcastReceiver, IntentFilter(RESPOND_SMS_BROADCAST_RECEIVER_SENT))
         return root
     }
@@ -137,8 +134,14 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     }
 
     override fun onDestroy() {
-        context?.unregisterReceiver(respondBroadcastReceiver)
-        context?.unregisterReceiver(respondSMSBroadcastReceiver)
+        try {
+            context?.unregisterReceiver(respondBroadcastReceiver)
+        } catch (e: IllegalStateException) {
+        }
+        try {
+            context?.unregisterReceiver(respondSMSBroadcastReceiver)
+        } catch (e: IllegalStateException) {
+        }
         super.onDestroy()
     }
 
@@ -217,7 +220,10 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     }
 
     override fun silencedForegroundNotificationClosed() {
-        requireView().InfoView.visibility = View.GONE
+        try {
+            requireView().InfoView.visibility = View.GONE
+        } catch (e: IllegalStateException) {
+        }
     }
 }
 

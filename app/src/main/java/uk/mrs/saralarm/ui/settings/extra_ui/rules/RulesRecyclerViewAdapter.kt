@@ -143,12 +143,12 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
         if (mData[holder.layoutPosition].smsNumber.isNotBlank()) {
             try {
                 if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.layoutPosition].smsNumber, "GB"))) {
-                    holder.itemView.sms_numbers_rules_recycler_text_input.error = holder.itemView.context.getString(R.string.SMS_Number_Invalid)
+                    holder.itemView.sms_numbers_rules_recycler_text_input.error = holder.itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
                 } else {
                     holder.itemView.sms_numbers_rules_recycler_text_input.error = ""
                 }
             } catch (e: NumberParseException) {
-                holder.itemView.sms_numbers_rules_recycler_text_input.error = holder.itemView.context.getString(R.string.SMS_Number_Invalid)
+                holder.itemView.sms_numbers_rules_recycler_text_input.error = holder.itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
             }
         }
 
@@ -204,7 +204,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                             try {
                                 val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.toString(), "GB")
                                 if (!phoneUtil.isValidNumber(formattedNumber)) {
-                                    itemView.sms_numbers_rules_recycler_text_input.error = itemView.context.getString(R.string.SMS_Number_Invalid)
+                                    itemView.sms_numbers_rules_recycler_text_input.error = itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
                                 } else {
                                     smsNumberEditing = true
                                     val prevSelection: Int = itemView.sms_numbers_rules_edit_text.selectionStart
@@ -221,7 +221,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
                                 }
                             } catch (e: NumberParseException) {
-                                itemView.sms_numbers_rules_recycler_text_input.error = itemView.context.getString(R.string.SMS_Number_Invalid)
+                                itemView.sms_numbers_rules_recycler_text_input.error = itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
                             }
                             smsNumberEditing = false
                         }
