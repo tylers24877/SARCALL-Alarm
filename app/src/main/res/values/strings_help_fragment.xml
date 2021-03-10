@@ -2,5 +2,5 @@
 <resources>
     <string name="fragment_help_summary">If you\'d like to leave some feedback or ask any questions, please complete the form below.\n(An internet connection is required)</string>
     <string name="fragment_help_view_feedback_form_toggle">View Feedback Form</string>
-    <string name="fragment_help_copyright">Copyright © 2020–2021 Tyler Simmonds</string>
+    <string name="fragment_help_copyright">Copyright © 2020–2021</string>
 </resources>

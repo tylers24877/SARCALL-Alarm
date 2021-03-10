@@ -3,8 +3,6 @@ package uk.mrs.saralarm.ui.respond.dialogs
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Rect
-import android.text.SpannableStringBuilder
-import android.text.style.StyleSpan
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
@@ -16,6 +14,7 @@ import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.dialog_respond_sar_a.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.support.SARResponseCode
+import uk.mrs.saralarm.support.Util
 import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 import java.lang.reflect.Type
 import java.util.*
@@ -39,7 +38,7 @@ object DialogSARA {
             customMessageArray = fromJson
         }
         customMessageArray.removeAll(Collections.singleton(""))
-        customMessageArray.add(0, "Enter Custom Message...")
+        customMessageArray.add(0, context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line))
         val adapter = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, customMessageArray)
         adapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1)
 
@@ -48,7 +47,7 @@ object DialogSARA {
 
         dialog.sar_a_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (dialog.sar_a_spinner.selectedItem.toString() == "Enter Custom Message...") {
+                if (dialog.sar_a_spinner.selectedItem.toString() == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
                     dialog.respond_dialog_sar_a_message_editview.isEnabled = true
                     dialog.respond_dialog_sar_a_message_input_layout.visibility = View.VISIBLE
                     dialog.respond_dialog_sar_a_message_title_txtview.visibility = View.VISIBLE
@@ -75,7 +74,7 @@ object DialogSARA {
                             if (systemService != null) {
                                 (systemService as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0)
                             } else {
-                                throw NullPointerException("null cannot be cast to non-null type android.view.inputmethod.InputMethodManager")
+                                throw NullPointerException()
                             }
                         }
                     }
@@ -100,19 +99,15 @@ object DialogSARA {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (progress >= 0 && progress <= seekBar.max) {
                     val progressCal = progress * 5
-                    val sb = SpannableStringBuilder()
-                    sb.append("Estimated time to arrival: ")
-                    sb.append(progressCal.toString())
-                    sb.append(" minutes")
-                    sb.setSpan(StyleSpan(1), 27, progressCal.toString().length + 27, 18)
-                    dialog.respond_dialog_sar_a_seek_eta_txtview.text = sb
+                    dialog.respond_dialog_sar_a_seek_eta_txtview.text =
+                        Util.fromHtml(context.resources.getQuantityString(R.plurals.fragment_respond_dialog_sar_a_est_time, progressCal, progressCal))
                 }
             }
         })
         dialog.respond_dialog_sar_a_seek.progress = 5
         dialog.respond_dialog_sar_a_submit_button.setOnClickListener {
             val progressCal = dialog.respond_dialog_sar_a_seek.progress * 5
-            if (dialog.sar_a_spinner.selectedItem == "Enter Custom Message...") {
+            if (dialog.sar_a_spinner.selectedItem == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
                 sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, dialog.respond_dialog_sar_a_message_editview.text.toString())
             } else {
                 sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, dialog.sar_a_spinner.selectedItem.toString())

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.fragment_respond.*
 import kotlinx.android.synthetic.main.fragment_respond.view.*
 import kotlinx.coroutines.Dispatchers
@@ -87,14 +86,14 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
         if (!pref.getBoolean("prefEnabled", false)) {
             requireView().InfoView.visibility = View.VISIBLE
-            requireView().InfoView_txtview.text = "SARCALL Alarm not enabled.\nTap to go to settings."
+            requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_view_not_enabled_title)
             requireView().InfoView.setOnClickListener {
                 findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
             }
         } else if (SilencedForegroundNotification.isServiceAlive(requireContext(), SilencedForegroundNotification::class.java)) {
             requireView().InfoView.visibility = View.VISIBLE
             //requireView().InfoView.setBackgroundColor(Color.argb(255,100,255,3))
-            requireView().InfoView_txtview.text = "Alarm is currently silenced.\nPlease see notifcation or click to cancel."
+            requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_view_silenced_title)
             requireView().InfoView.setOnClickListener {
                 val intent = Intent(context, SilencedForegroundNotification::class.java)
                 intent.action = "uk.mrs.saralarm.silenceForeground.stop"
@@ -102,13 +101,13 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             }
         } else if (pref.getString("rulesJSON", "").isNullOrBlank()) {
             requireView().InfoView.visibility = View.VISIBLE
-            requireView().InfoView_txtview.text = "Rules are not configured correctly.\nPlease click to check."
+            requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_view_rules_not_configured_title)
             requireView().InfoView.setOnClickListener {
                 findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
             }
         } else if (pref.getString("respondSMSNumbersJSON", "").isNullOrEmpty()) {
             requireView().InfoView.visibility = View.VISIBLE
-            requireView().InfoView_txtview.text = "No SAR respond number configured. Please click to setup."
+            requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_no_sar_respond_number_title)
             requireView().InfoView.setOnClickListener {
                 findNavController().navigate(R.id.action_navigation_respond_to_SMSNumbersFragment)
             }
@@ -167,13 +166,12 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
 
                     val (resultBody, resultDate) = RespondUtil.setPreviewAsync(requireContext()).await()
                     requireView().respond_sms_preview_txtview.text = resultBody
-                    requireView().respond_preview_date_txtview.text = "Received: $resultDate"
+                    requireView().respond_preview_date_txtview.text = getString(R.string.fragment_respond_preview_date_received, resultDate)
 
                     requireView().respond_sms_loading_bar.visibility = View.GONE
                     requireView().respond_sms_preview_txtview.visibility = View.VISIBLE
                     requireView().respond_preview_date_txtview.visibility = View.VISIBLE
                 } catch (e: IllegalStateException) {
-                    FirebaseCrashlytics.getInstance().recordException(e)
                 }
             }
         } else {
@@ -181,7 +179,6 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                 requireView().respond_preview_date_txtview.text = ""
                 requireView().respond_sms_preview_txtview.setText(R.string.fragment_response_permission_placeholder)
             } catch (e: IllegalStateException) {
-                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
     }
@@ -192,14 +189,15 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                 val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val teamPrefix = pref.getString("prefTeamPrefix", "")
                 if (teamPrefix.isNullOrBlank()) {
-                    Snackbar.make(respond_constraintLayout, "Cannot sign on. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_on_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
                     return@OnClickListener
                 }
                 sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, null, 0, teamPrefix)
             }
         }
-        AlertDialog.Builder(requireContext()).setTitle("Sign On").setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
-            .setNegativeButton("No", dialogClickListener).show()
+        AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_on_title))
+            .setMessage(getString(R.string.fragment_respond_dialog_sign_on_message)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+            .setNegativeButton(getString(R.string.no), dialogClickListener).show()
     }
 
     private fun displaySignOffDialog() {
@@ -209,14 +207,15 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                 val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
                 val teamPrefix = pref.getString("prefTeamPrefix", "")
                 if (teamPrefix.isNullOrBlank()) {
-                    Snackbar.make(respond_constraintLayout, "Cannot sign off. No team prefix set in settings.", Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_off_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
                     return@OnClickListener
                 }
                 sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, null, 0, teamPrefix)
             }
         }
-        AlertDialog.Builder(requireContext()).setTitle("Sign Off").setMessage("Are you sure?").setPositiveButton("Yes", dialogClickListener)
-            .setNegativeButton("No", dialogClickListener).show()
+        AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_off_title))
+            .setMessage(getString(R.string.fragment_respond_dialog_sign_off_message)).setPositiveButton(getString(R.string.yes), dialogClickListener)
+            .setNegativeButton(getString(R.string.no), dialogClickListener).show()
     }
 
     override fun silencedForegroundNotificationClosed() {

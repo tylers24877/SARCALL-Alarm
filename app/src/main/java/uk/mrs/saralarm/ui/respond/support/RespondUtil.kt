@@ -10,7 +10,6 @@ import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -83,8 +82,6 @@ object RespondUtil {
                                         break@work
                                     }
                                 } catch (e: Exception) {
-                                    FirebaseCrashlytics.getInstance().log(c.position.toString())
-                                    FirebaseCrashlytics.getInstance().recordException(e)
                                     setBodyAndDate = Pair("An error occurred at: " + c.position, "")
                                     break@work
                                 }

@@ -9,7 +9,6 @@ import androidx.work.WorkerParameters
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
-import com.google.firebase.analytics.FirebaseAnalytics
 import java.text.DateFormat.getDateTimeInstance
 import java.util.*
 
@@ -25,7 +24,7 @@ class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(contex
         }
         val param = Bundle()
         param.putString("beta", PreferenceManager.getDefaultSharedPreferences(applicationContext).getBoolean("betaChannel", false).toString())
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("background_update_check", param)
+        //FirebaseAnalytics.getInstance(applicationContext).logEvent("background_update_check", param)
 
         val sdf = getDateTimeInstance()
         val currentDate = sdf.format(Date())

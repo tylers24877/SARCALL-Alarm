@@ -10,7 +10,6 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -98,7 +97,6 @@ object SMSSender {
             Toast.makeText(context, "Failed! SARCALL SMS number is formatted wrong. Please check number in settings.", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
             Toast.makeText(context, "Unknown error. Please try again or report issue.", Toast.LENGTH_LONG).show()
-            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 

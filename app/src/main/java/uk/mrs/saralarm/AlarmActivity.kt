@@ -22,8 +22,6 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.android.synthetic.main.activity_alarm.*
 import uk.mrs.saralarm.support.RuleAlarmData
 import uk.mrs.saralarm.support.notification.PostAlarmNotification
@@ -75,26 +73,22 @@ class AlarmActivity : Activity() {
                 try {
                     mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
                 } catch (e: Exception) {
-                    FirebaseCrashlytics.getInstance().recordException(e)
                 }
             }
             SoundType.SYSTEM -> {
                 try {
-                    FirebaseCrashlytics.getInstance().log(Uri.parse(ruleAlarmData.soundFile).toString())
                     mp!!.setDataSource(applicationContext, Uri.parse(ruleAlarmData.soundFile))
                 } catch (e: Exception) {
                     try {
                         Toast.makeText(applicationContext, getString(R.string.alarm_activity_sound_load_failed), Toast.LENGTH_LONG).show()
                         mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
                     } catch (e2: Exception) {
-                        FirebaseCrashlytics.getInstance().recordException(e2)
                     }
                 }
             }
             SoundType.CUSTOM -> {
                 try {
                     val fileInputStream = FileInputStream(ruleAlarmData.soundFile)
-                    FirebaseCrashlytics.getInstance().log(ruleAlarmData.soundFile)
 
                     mp!!.setDataSource(fileInputStream.fd)
                     fileInputStream.close()
@@ -102,7 +96,6 @@ class AlarmActivity : Activity() {
                     try {
                         mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
                     } catch (e2: Exception) {
-                        FirebaseCrashlytics.getInstance().recordException(e2)
                     }
                 }
             }
@@ -112,7 +105,6 @@ class AlarmActivity : Activity() {
             mp!!.prepare()
             mp!!.start()
         } catch (e2: Exception) {
-            FirebaseCrashlytics.getInstance().recordException(e2)
         }
 
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -145,7 +137,6 @@ class AlarmActivity : Activity() {
                 } catch (e: Exception) {
                     when (e) {
                         is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
-                            FirebaseCrashlytics.getInstance().recordException(e)
                         }
                         else -> throw e
                     }
@@ -177,12 +168,12 @@ class AlarmActivity : Activity() {
                 ContextCompat.startForegroundService(this, serviceIntent)
 
                 Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
-                FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_silence_started", null)
+                //FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_silence_started", null)
                 //stop the alarm
                 finish()
             }
         }
-        FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
+        //FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
     override fun onResume() {

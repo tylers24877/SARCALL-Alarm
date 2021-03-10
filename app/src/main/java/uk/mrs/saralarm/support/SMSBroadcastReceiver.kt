@@ -12,7 +12,6 @@ import android.telephony.SmsMessage
 import android.view.Display
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
-import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -97,9 +96,9 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
         if (checkRulesBoth.chosen) {
             if (checkScreenState(context)) {
                 startAlarmForegroundService(context, checkRulesBoth)
-                FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
             } else {
-                FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                 startAlarmForegroundService(context, checkRulesBoth)
             }
         } else {
@@ -107,9 +106,9 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
             if (checkRulesSMSNumber.chosen) {
                 if (checkScreenState(context)) {
                     startAlarmForegroundService(context, checkRulesSMSNumber)
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                    //.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                 } else {
-                    FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                    //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                     startAlarmForegroundService(context, checkRulesSMSNumber)
                 }
             } else {
@@ -117,9 +116,9 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                 if (checkRulesPhrase.chosen) {
                     if (checkScreenState(context)) {
                         startAlarmForegroundService(context, checkRulesPhrase)
-                        FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                        //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
                     } else {
-                        FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                        //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
                         startAlarmForegroundService(context, checkRulesPhrase)
                     }
                 }

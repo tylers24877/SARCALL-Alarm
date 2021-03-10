@@ -25,7 +25,6 @@ import androidx.work.WorkManager
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
-import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.android.synthetic.main.activity_main.*
 import uk.mrs.saralarm.support.UpdateWorker
 import java.util.concurrent.TimeUnit
@@ -39,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         //Load preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
+
 
         //Check if application has NOT been used before.
         //If true, starts the SetupActivity for user to configure permissions on. It will also kill this activity.
@@ -112,12 +112,13 @@ class MainActivity : AppCompatActivity() {
 
         //Delete old versions of the update checker.
         WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V7") //version 1.5.2 beta
+        WorkManager.getInstance(this).cancelUniqueWork("SARCALL_CHECK_UPDATE_V8") //version 1.6.0 beta
 
-        val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 12, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
-            .addTag("SARCALL_CHECK_UPDATE_V8_TAG").build()
+        val build: PeriodicWorkRequest = PeriodicWorkRequest.Builder(UpdateWorker::class.java, 24, TimeUnit.HOURS, 30, TimeUnit.MINUTES)
+            .addTag("SARCALL_CHECK_UPDATE_V9_TAG").build()
         //Enqueue a task using Work Manager for 12 hourly-ish checks
         WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V8", ExistingPeriodicWorkPolicy.KEEP, build)
+            .enqueueUniquePeriodicWork("SARCALL_CHECK_UPDATE_V9", ExistingPeriodicWorkPolicy.KEEP, build)
     }
 
     /**
@@ -160,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                         startActivityForResult(intent, 505)
 
                         //Log to firebase that the user is accepting.
-                        FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
+                        //FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
                     }
                 }
             }

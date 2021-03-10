@@ -2,4 +2,6 @@
     <string name="activation_notification_title_template">SARCALL Activated</string>
     <string name="app_name">SARCALL Alarm</string>
     <string name="appwidget_text">SARCALL</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

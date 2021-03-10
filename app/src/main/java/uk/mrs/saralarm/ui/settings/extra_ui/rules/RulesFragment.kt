@@ -17,8 +17,6 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.settings_rules_fragment.view.*
@@ -59,7 +57,7 @@ class RulesFragment : Fragment(), CoroutineScope {
         ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.rules_recycler_view)
         root.rules_fab.setOnClickListener {
             adapter!!.addItem()
-            FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
+            //FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
 
         }
 
@@ -94,9 +92,7 @@ class RulesFragment : Fragment(), CoroutineScope {
                         adapter!!.mData[position].customAlarmRulesObject.alarmFileName = ""
                         adapter!!.saveData()
                     } catch (e: Exception) {
-                        FirebaseCrashlytics.getInstance().recordException(e)
                     }
-                    FirebaseCrashlytics.getInstance().recordException(e)
                     Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
                 }
             }
@@ -115,7 +111,6 @@ class RulesFragment : Fragment(), CoroutineScope {
                             Toast.makeText(context, "Using default sound.", Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
-                        FirebaseCrashlytics.getInstance().recordException(e)
                         Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
                     }
                 }

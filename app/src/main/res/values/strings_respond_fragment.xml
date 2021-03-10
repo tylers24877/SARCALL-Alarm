@@ -29,4 +29,26 @@
     <string name="fragment_respond_sign_on_button">Sign On</string>
     <string name="fragment_respond_sign_off_button">Sign Off</string>
 
+    <string name="fragment_respond_info_view_not_enabled_title">SARCALL Alarm not enabled.\nTap to go to settings.</string>
+    <string name="fragment_respond_info_view_silenced_title">Alarm is currently silenced.\nPlease see notification or click to cancel.</string>
+    <string name="fragment_respond_info_view_rules_not_configured_title">Rules are not configured correctly.\nPlease click to check.</string>
+    <string name="fragment_respond_info_no_sar_respond_number_title">No SAR respond number configured. Please click to setup.</string>
+    <string name="fragment_respond_preview_date_received">Received: %s</string>
+    <string name="fragment_respond_dialog_sign_on_no_team_prefix_toast">Cannot sign on. No team prefix set in settings.</string>
+    <string name="fragment_respond_dialog_sign_on_title">Sign On</string>
+    <string name="fragment_respond_dialog_sign_on_message">Are you sure?</string>
+    <string name="fragment_respond_dialog_sign_off_no_team_prefix_toast">Cannot sign off. No team prefix set in settings.</string>
+    <string name="fragment_respond_dialog_sign_off_title">Sign Off</string>
+    <string name="fragment_respond_dialog_sign_off_message">Are you sure?</string>
+    <string name="fragment_respond_dialog_all_custom_message_first_line">Enter Custom Message…</string>
+    <string name="fragment_respond_dialog_sar_h_message">Send SAR-H response message?</string>
+
+    <plurals name="fragment_respond_dialog_sar_a_est_time">
+        <item quantity="one">Estimated time to arrival: &lt;b>%d&lt;/b> minute</item>
+        <item quantity="other">Estimated time to arrival: &lt;b>%d&lt;/b> minutes</item>
+    </plurals>
+    <plurals name="fragment_respond_dialog_sar_l_est_time">
+        <item quantity="one">Estimated time to arrival: &lt;b>%d&lt;/b> minute</item>
+        <item quantity="other">Estimated time to arrival: &lt;b>%d&lt;/b> minutes</item>
+    </plurals>
 </resources>
