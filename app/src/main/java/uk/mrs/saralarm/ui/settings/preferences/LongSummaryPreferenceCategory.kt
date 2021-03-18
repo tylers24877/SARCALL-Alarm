@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceViewHolder
 
+
 class LongSummaryPreferenceCategory @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
@@ -16,8 +17,8 @@ class LongSummaryPreferenceCategory @JvmOverloads constructor(
         val summary = holder.findViewById(android.R.id.summary) as? TextView
         summary?.let {
             // Enable multiple line support
-            summary.isSingleLine = false
-            summary.maxLines = 10// Just need to be high enough I guess
+            it.isSingleLine = false
+            it.maxLines = 10// Just need to be high enough I guess
         }
     }
 }

@@ -1,17 +1,21 @@
 package uk.mrs.saralarm.ui.respond
 
+import android.app.Dialog
 import android.content.*
 import android.content.DialogInterface.BUTTON_POSITIVE
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialFadeThrough
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.android.synthetic.main.dialog_respond_sign_on_off_mulitple_teams.*
 import kotlinx.android.synthetic.main.fragment_respond.*
 import kotlinx.android.synthetic.main.fragment_respond.view.*
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +32,7 @@ import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver
 import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver.Companion.RESPOND_SMS_BROADCAST_RECEIVER_SENT
 import uk.mrs.saralarm.ui.respond.support.RespondUtil
 import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
+import java.util.*
 
 
 class RespondFragment : Fragment(), RespondBroadcastListener {
@@ -38,7 +43,6 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root: View = inflater.inflate(R.layout.fragment_respond, container, false)
         if (!(ActivityCompat.checkSelfPermission(requireContext(), "android.permission.RECEIVE_SMS") == 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.WRITE_EXTERNAL_STORAGE") == 0
                     && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_EXTERNAL_STORAGE") == 0
                     && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.SEND_SMS") == 0
                     && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0)
@@ -46,7 +50,6 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             requestPermissions(
                 arrayOf(
                     "android.permission.RECEIVE_SMS",
-                    "android.permission.WRITE_EXTERNAL_STORAGE",
                     "android.permission.READ_EXTERNAL_STORAGE",
                     "android.permission.SEND_SMS",
                     "android.permission.READ_SMS"
@@ -78,6 +81,8 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
 
         context?.registerReceiver(respondBroadcastReceiver, IntentFilter("uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed"))
         context?.registerReceiver(respondSMSBroadcastReceiver, IntentFilter(RESPOND_SMS_BROADCAST_RECEIVER_SENT))
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
         return root
     }
 
@@ -88,7 +93,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             requireView().InfoView.visibility = View.VISIBLE
             requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_view_not_enabled_title)
             requireView().InfoView.setOnClickListener {
-                findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
+                findNavController().navigate(R.id.action_global_navigation_settings)
             }
         } else if (SilencedForegroundNotification.isServiceAlive(requireContext(), SilencedForegroundNotification::class.java)) {
             requireView().InfoView.visibility = View.VISIBLE
@@ -103,7 +108,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             requireView().InfoView.visibility = View.VISIBLE
             requireView().InfoView_txtview.text = getString(R.string.fragment_respond_info_view_rules_not_configured_title)
             requireView().InfoView.setOnClickListener {
-                findNavController().navigate(R.id.action_navigation_respond_to_navigation_settings)
+                findNavController().navigate(R.id.action_global_navigation_settings)
             }
         } else if (pref.getString("respondSMSNumbersJSON", "").isNullOrEmpty()) {
             requireView().InfoView.visibility = View.VISIBLE
@@ -136,10 +141,12 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         try {
             context?.unregisterReceiver(respondBroadcastReceiver)
         } catch (e: IllegalStateException) {
+        } catch (e: IllegalArgumentException) {
         }
         try {
             context?.unregisterReceiver(respondSMSBroadcastReceiver)
         } catch (e: IllegalStateException) {
+        } catch (e: IllegalArgumentException) {
         }
         super.onDestroy()
     }
@@ -184,38 +191,87 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     }
 
     private fun displaySignOnDialog() {
-        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-            if (which == BUTTON_POSITIVE) {
-                val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val teamPrefix = pref.getString("prefTeamPrefix", "")
-                if (teamPrefix.isNullOrBlank()) {
-                    Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_on_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
-                    return@OnClickListener
-                }
-                sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, null, 0, teamPrefix)
-            }
+        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val teamPrefixArray: ArrayList<String> = Gson().fromJson(pref.getString("respondTeamPrefixJSON", ""), object : TypeToken<ArrayList<String>?>() {}.type)
+        teamPrefixArray.removeAll(Collections.singleton(""))
+        if (teamPrefixArray.isNullOrEmpty()) {
+            Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_on_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
+            return
         }
-        AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_on_title))
-            .setMessage(getString(R.string.fragment_respond_dialog_sign_on_message)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-            .setNegativeButton(getString(R.string.no), dialogClickListener).show()
+        if (teamPrefixArray.size > 1) {
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_respond_sign_on_off_mulitple_teams)
+            val window: Window = dialog.window!!
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            window.setGravity(Gravity.CENTER)
+            dialog.show()
+            teamPrefixArray.add("ALL")
+            dialog.respond_dialog_sign_on_off_multiple_teams_spinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_expandable_list_item_1, teamPrefixArray)
+            dialog.respond_dialog_sign_on_off_multiple_teams_select_button.setOnClickListener {
+                if (dialog.respond_dialog_sign_on_off_multiple_teams_spinner.selectedItemPosition == teamPrefixArray.size - 1) {
+                    teamPrefixArray.removeAt(teamPrefixArray.size - 1)
+                    for (individualTeamPrefix in teamPrefixArray) {
+                        sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, dialog, 0, individualTeamPrefix)
+                    }
+                } else {
+                    sendSMSResponse(
+                        requireContext(), requireView(), SARResponseCode.SIGN_ON, dialog, 0,
+                        dialog.respond_dialog_sign_on_off_multiple_teams_spinner.selectedItem as String
+                    )
+                }
+            }
+        } else {
+            val onePrefixDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                if (which == BUTTON_POSITIVE) {
+                    sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, null, 0, teamPrefixArray[0])
+                }
+            }
+            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_on_title))
+                .setMessage(getString(R.string.fragment_respond_dialog_sign_on_message)).setPositiveButton(getString(R.string.yes), onePrefixDialogClickListener)
+                .setNegativeButton(getString(R.string.no), onePrefixDialogClickListener).show()
+        }
     }
 
     private fun displaySignOffDialog() {
-        //Temporary fix until bug in sarcall is fixed
-        val dialogClickListener = DialogInterface.OnClickListener { _, which ->
-            if (which == BUTTON_POSITIVE) {
-                val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-                val teamPrefix = pref.getString("prefTeamPrefix", "")
-                if (teamPrefix.isNullOrBlank()) {
-                    Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_off_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
-                    return@OnClickListener
-                }
-                sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, null, 0, teamPrefix)
-            }
+        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        val teamPrefixArray: ArrayList<String> = Gson().fromJson(pref.getString("respondTeamPrefixJSON", ""), object : TypeToken<ArrayList<String>?>() {}.type)
+        teamPrefixArray.removeAll(Collections.singleton(""))
+        if (teamPrefixArray.isNullOrEmpty()) {
+            Snackbar.make(respond_constraintLayout, getString(R.string.fragment_respond_dialog_sign_off_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
+            return
         }
-        AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_off_title))
-            .setMessage(getString(R.string.fragment_respond_dialog_sign_off_message)).setPositiveButton(getString(R.string.yes), dialogClickListener)
-            .setNegativeButton(getString(R.string.no), dialogClickListener).show()
+        if (teamPrefixArray.size > 1) {
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_respond_sign_on_off_mulitple_teams)
+            val window: Window = dialog.window!!
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            window.setGravity(Gravity.CENTER)
+            dialog.show()
+            teamPrefixArray.add("ALL")
+            dialog.respond_dialog_sign_on_off_multiple_teams_spinner.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_expandable_list_item_1, teamPrefixArray)
+            dialog.respond_dialog_sign_on_off_multiple_teams_select_button.setOnClickListener {
+                if (dialog.respond_dialog_sign_on_off_multiple_teams_spinner.selectedItemPosition == teamPrefixArray.size - 1) {
+                    teamPrefixArray.removeAt(teamPrefixArray.size - 1)
+                    for (individualTeamPrefix in teamPrefixArray) {
+                        sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, dialog, 0, individualTeamPrefix)
+                    }
+                } else {
+                    sendSMSResponse(
+                        requireContext(), requireView(), SARResponseCode.SIGN_OFF, null, 0,
+                        dialog.respond_dialog_sign_on_off_multiple_teams_spinner.selectedItem as String
+                    )
+                }
+            }
+        } else {
+            val onePrefixDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                if (which == BUTTON_POSITIVE) {
+                    sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, null, 0, teamPrefixArray[0])
+                }
+            }
+            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_off_title))
+                .setMessage(getString(R.string.fragment_respond_dialog_sign_off_message)).setPositiveButton(getString(R.string.yes), onePrefixDialogClickListener)
+                .setNegativeButton(getString(R.string.no), onePrefixDialogClickListener).show()
+        }
     }
 
     override fun silencedForegroundNotificationClosed() {

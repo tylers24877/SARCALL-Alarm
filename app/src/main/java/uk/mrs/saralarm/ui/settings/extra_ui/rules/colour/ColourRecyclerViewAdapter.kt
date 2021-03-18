@@ -14,7 +14,6 @@ import android.view.animation.AccelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
-import com.google.i18n.phonenumbers.PhoneNumberUtil
 import kotlinx.android.synthetic.main.colour_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
@@ -24,7 +23,6 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
     var mContext: Context = context
     private val mData: ArrayList<String> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
-    val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
 
     var onSave: ((ArrayList<String>) -> Unit)? = null
 

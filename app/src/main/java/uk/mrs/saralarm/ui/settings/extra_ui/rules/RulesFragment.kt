@@ -8,15 +8,14 @@ import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.settings_rules_fragment.view.*
@@ -61,6 +60,9 @@ class RulesFragment : Fragment(), CoroutineScope {
 
         }
 
+        setHasOptionsMenu(true)
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
         return root
     }
 
@@ -118,7 +120,7 @@ class RulesFragment : Fragment(), CoroutineScope {
         }
     }
 
-    fun getFileName(mCon: Context, uri: Uri): String {
+    private fun getFileName(mCon: Context, uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor: Cursor? = mCon.contentResolver.query(uri, null, null, null, null)
@@ -151,6 +153,14 @@ class RulesFragment : Fragment(), CoroutineScope {
             output.close()
         }
     }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
+        val menuItem: MenuItem = menu.findItem(R.id.action_bar_settings)
+        menuItem.isVisible = false
+    }
+
     override val coroutineContext: CoroutineContext =
         Dispatchers.Main + SupervisorJob()
 

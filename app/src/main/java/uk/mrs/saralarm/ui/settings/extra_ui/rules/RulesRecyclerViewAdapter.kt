@@ -287,10 +287,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
 
             itemView.add_alarm_rules_button.setOnClickListener {
-                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.WRITE_EXTERNAL_STORAGE") == 0
-                    && ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0
-                ) {
-
+                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0) {
                     if (itemView.add_alarm_rules_button.text == "Set Alarm Sound") {
                         when (mData[adapterPosition].choice) {
                             RulesChoice.PHRASE ->
@@ -344,7 +341,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                         notifyItemChanged(adapterPosition)
                     }
                 } else {
-                    Snackbar.make(itemView, ("No read/write permission granted." as CharSequence), Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(itemView, ("No read permission granted." as CharSequence), Snackbar.LENGTH_LONG).show()
                 }
             }
 

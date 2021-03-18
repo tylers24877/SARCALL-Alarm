@@ -22,8 +22,8 @@ class SilencedForegroundNotification : Service() {
     private val id = "SilencedAlarm_01"
 
     var timeLeft = 0L
-    lateinit var countDownTimer: CountDownTimer
-    lateinit var notificationBuilder: NotificationCompat.Builder
+    private lateinit var countDownTimer: CountDownTimer
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
     companion object {
 

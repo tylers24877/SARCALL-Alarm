@@ -59,7 +59,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                 val bundle = intent.extras
                 val messages: Array<SmsMessage?>
                 var strMessage = ""
-                var smsNumber: String
+                val smsNumber: String
                 val format = bundle!!.getString("format")
                 // Retrieve the SMS message received.
                 val pdus = bundle["pdus"] as Array<*>?

@@ -4,7 +4,8 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fadeScrollbars="false"
-    android:scrollbars="vertical">
+    android:scrollbars="vertical"
+    android:transitionName="shared_dialog_sar_a_view">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/respond_dialog_sar_a_constraint_layout"
@@ -31,7 +32,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_seek_eta_txtview" />
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_seek_eta_txt_view" />
 
         <TextView
             android:id="@+id/dialog_sar_a_title"
@@ -55,11 +56,11 @@
             android:background="@android:color/transparent"
             app:boxBackgroundColor="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
-            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_title_txtview">
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txt_view"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_title_txt_view">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/respond_dialog_sar_a_message_editview"
+                android:id="@+id/respond_dialog_sar_a_message_edit_view"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start|center|top"
@@ -84,7 +85,7 @@
             app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_message_input_layout" />
 
         <TextView
-            android:id="@+id/respond_dialog_sar_a_seek_eta_txtview"
+            android:id="@+id/respond_dialog_sar_a_seek_eta_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32.0dip"
@@ -98,7 +99,7 @@
             app:layout_constraintTop_toBottomOf="@id/dialog_sar_a_title" />
 
         <TextView
-            android:id="@+id/respond_dialog_sar_a_message_title_txtview"
+            android:id="@+id/respond_dialog_sar_a_message_title_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16.0dip"
@@ -106,7 +107,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_a_message_input_layout"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txt_view"
             app:layout_constraintTop_toBottomOf="@id/sar_a_spinner" />
 
         <TextView
@@ -128,7 +129,7 @@
             app:layout_constraintTop_toTopOf="@id/respond_dialog_sar_a_seek" />
 
         <TextView
-            android:id="@+id/respond_dialog_sar_a_pre_message_title_txtview"
+            android:id="@+id/respond_dialog_sar_a_pre_message_title_txt_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16.0dip"
@@ -136,7 +137,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_a_message_input_layout"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txtview"
+            app:layout_constraintStart_toStartOf="@id/respond_dialog_sar_a_seek_eta_txt_view"
             app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_seek" />
 
         <Spinner
@@ -152,6 +153,6 @@
             android:spinnerMode="dialog"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_pre_message_title_txtview" />
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_a_pre_message_title_txt_view" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

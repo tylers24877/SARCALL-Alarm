@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="betaChannel"
+        android:summary="@string/fragment_settings_pref_beta_summary"
+        android:title="@string/fragment_settings_pref_beta_title"
+        app:iconSpaceReserved="false" />
+    <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
+        android:title="@string/fragment_settings_pref_about_cat_title"
+        app:iconSpaceReserved="false">
+        <Preference
+            android:key="appVersion"
+            android:title="@string/fragment_settings_pref_build_version_title"
+            app:iconSpaceReserved="false" />
+    </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
+    <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
+        android:title="Update"
+        app:iconSpaceReserved="false">
+        <Preference
+            android:key="backgroundWorkerCount"
+            android:title="@string/fragment_settings_pref_background_count_title"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:key="backgroundWorkerTime"
+            android:title="@string/fragment_settings_pref_background_time_title"
+            app:iconSpaceReserved="false" />
+        <Preference
+            android:summary="https://bit.ly/sarcall-alarm"
+            android:title="Download Latest Version"
+            app:iconSpaceReserved="false">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://bit.ly/sarcall-alarm" />
+        </Preference>
+    </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
+</androidx.preference.PreferenceScreen>

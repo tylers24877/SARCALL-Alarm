@@ -31,22 +31,19 @@ class SetupActivity : AppCompatActivity() {
         //Setup OnClick Listener for the setup button. When clicked...
         setup_permission_button.setOnClickListener {
             //Check if the user has the necessary permissions
-            if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0 && ActivityCompat.checkSelfPermission(
-                    this,
-                    "android.permission.SEND_SMS"
-                ) == 0 &&
-                ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 && ActivityCompat.checkSelfPermission(
-                    this,
-                    "android.permission.WRITE_EXTERNAL_STORAGE"
-                ) == 0 &&
+            if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0
+                && ActivityCompat.checkSelfPermission(this, "android.permission.SEND_SMS") == 0 &&
+                ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 &&
                 ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0
             )
                 checkOverlayAndMoveOn() //if permissions already granted, go straight to checking overlay.
             else
                 requestPermissions(
                     arrayOf(
-                        "android.permission.RECEIVE_SMS", "android.permission.READ_SMS", "android.permission.SEND_SMS", "android.permission.READ_EXTERNAL_STORAGE",
-                        "android.permission.WRITE_EXTERNAL_STORAGE"
+                        "android.permission.RECEIVE_SMS",
+                        "android.permission.READ_SMS",
+                        "android.permission.SEND_SMS",
+                        "android.permission.READ_EXTERNAL_STORAGE"
                     ), 1
                 ) //if permissions not granted, request them with request code of 1.
         }

@@ -14,8 +14,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.preference.PreferenceManager
@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import uk.mrs.saralarm.support.UpdateWorker
 import java.util.concurrent.TimeUnit
@@ -38,6 +39,15 @@ class MainActivity : AppCompatActivity() {
 
         //Load preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
+
+        val teamPrefix = pref.getString("prefTeamPrefix", "")
+        if (!teamPrefix.isNullOrBlank()) {
+            val teamPrefixObjectArray = ArrayList<String>()
+            teamPrefixObjectArray.add(teamPrefix)
+            pref.edit().putString("respondTeamPrefixJSON", Gson().toJson(teamPrefixObjectArray))
+                .remove("prefTeamPrefix")
+                .apply()
+        }
 
 
         //Check if application has NOT been used before.
@@ -56,13 +66,13 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(response_toolbar)
 
         //Build the app bar for the activity. The IDs set here are the top level fragments.
-        val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(R.id.navigation_respond, R.id.navigation_settings).build()
+        val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(R.id.navigation_respond).build()
         //Load the navigation controller for the fragments from the layout XML.
-        val navController: NavController = Navigation.findNavController(this, R.id.nav_host_fragment)
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        //val navController: NavController = Navigation.findNavController(this, R.id.nav_host_fragment)
         //Configures the ActionBar set up earlier to work with the Nav Controller. EG changing actionbar titles to match the current page.
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
-        //Set the BottomNavigationView to the Nav Controller.
-        NavigationUI.setupWithNavController(nav_view, navController)
 
         //Check if what SDK the app is running on. If Version M(23) or higher...
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -177,7 +187,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.main_activity_menu, menu)
+        inflater.inflate(R.menu.appbar_actions, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -186,8 +196,11 @@ class MainActivity : AppCompatActivity() {
             android.R.id.home -> {
                 onBackPressed()
             }
-            R.id.ActionBar_Help -> {
+            R.id.action_bar_help -> {
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_global_helpFragment)
+            }
+            R.id.action_bar_settings -> {
+                Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_global_navigation_settings)
             }
         }
         return true

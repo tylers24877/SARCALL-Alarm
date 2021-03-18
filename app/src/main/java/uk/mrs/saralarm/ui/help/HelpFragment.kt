@@ -5,12 +5,11 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.android.synthetic.main.fragment_help.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.drawableEnd
@@ -39,6 +38,9 @@ class HelpFragment : Fragment() {
             }
 
         }
+        setHasOptionsMenu(true)
+        enterTransition = MaterialFadeThrough()
+        exitTransition = MaterialFadeThrough()
         return root
     }
 
@@ -49,5 +51,12 @@ class HelpFragment : Fragment() {
         } else {
             ResourcesCompat.getDrawable(context.resources, id, null)
         }
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
+        val menuItem: MenuItem = menu.findItem(R.id.action_bar_help)
+        menuItem.isVisible = false
     }
 }

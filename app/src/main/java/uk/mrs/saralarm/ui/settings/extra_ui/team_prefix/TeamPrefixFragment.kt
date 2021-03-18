@@ -1,4 +1,4 @@
-package uk.mrs.saralarm.ui.settings.extra_ui.custom_messages
+package uk.mrs.saralarm.ui.settings.extra_ui.team_prefix
 
 import android.os.Bundle
 import android.view.*
@@ -9,34 +9,35 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.settings_custom_messages_fragment.view.*
+import kotlinx.android.synthetic.main.settings_team_prefix_fragment.view.*
 import uk.mrs.saralarm.R
 import java.lang.reflect.Type
 
-class CustomMessagesFragment : Fragment() {
 
-    private var adapter : CustomMessagesRecyclerViewAdapter? = null
+class TeamPrefixFragment : Fragment() {
+    private var adapter: TeamPrefixRecyclerViewAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val customMessageArray: ArrayList<String>
-        val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("customMessageJSON", "")
+        val teamPrefixObjectArray: ArrayList<String>
+
+        val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("respondTeamPrefixJSON", "")
         if (json.isNullOrBlank()) {
-            customMessageArray = ArrayList()
-            customMessageArray.add("")
+            teamPrefixObjectArray = ArrayList()
+            teamPrefixObjectArray.add("")
         } else {
             val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
-            customMessageArray = Gson().fromJson(json, type)
+            teamPrefixObjectArray = Gson().fromJson(json, type)
         }
-        val root: View = inflater.inflate(R.layout.settings_custom_messages_fragment, container, false)
+        val root: View = inflater.inflate(R.layout.settings_team_prefix_fragment, container, false)
 
-        root.custom_message_recycler_view.layoutManager = LinearLayoutManager(context)
+        root.team_prefix_recycler_view.layoutManager = LinearLayoutManager(context)
 
-        adapter = CustomMessagesRecyclerViewAdapter(requireContext(), customMessageArray)
+        adapter = TeamPrefixRecyclerViewAdapter(requireContext(), teamPrefixObjectArray)
 
-        root.custom_message_recycler_view.adapter = adapter
+        root.team_prefix_recycler_view.adapter = adapter
 
-        ItemTouchHelper(CustomMessagesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.custom_message_recycler_view)
-        root.custom_message_fab.setOnClickListener {
+        ItemTouchHelper(TeamPrefixDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.team_prefix_recycler_view)
+        root.team_prefix_fab.setOnClickListener {
             adapter!!.addItem()
         }
 

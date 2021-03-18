@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreferenceCategory
+    <uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreference
         android:summary="@string/fragment_settings_pref_required_desc_summary"
+        android:enabled="false"
         app:iconSpaceReserved="false">
 
-    </uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreferenceCategory>
+    </uk.mrs.saralarm.ui.settings.preferences.RedSummaryPreference>
     <SwitchPreferenceCompat
         android:defaultValue="false"
         android:key="prefEnabled"
@@ -26,8 +27,7 @@
         android:summary="@string/fragment_settings_pref_respond_cat_summary"
         android:title="@string/fragment_settings_pref_respond_cat_title"
         app:iconSpaceReserved="false">
-        <EditTextPreference
-            android:key="prefTeamPrefix"
+        <uk.mrs.saralarm.ui.settings.extra_ui.team_prefix.TeamPrefixPreference
             android:summary="@string/fragment_settings_pref_prefix_summary"
             android:title="@string/fragment_settings_pref_prefix_title"
             app:iconSpaceReserved="false" />
@@ -55,32 +55,9 @@
             android:title="@string/fragment_settings_pref_display_status_buttons_title"
             app:iconSpaceReserved="false" />
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
-    <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        app:iconSpaceReserved="false"
-        app:title="Advanced">
-        <SwitchPreferenceCompat
-            android:defaultValue="false"
-            android:key="betaChannel"
-            android:summary="@string/fragment_settings_pref_beta_summary"
-            android:title="@string/fragment_settings_pref_beta_title"
-            app:iconSpaceReserved="false" />
-    </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
-
-    <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
-        android:title="@string/fragment_settings_pref_about_cat_title"
-        app:iconSpaceReserved="false">
-        <PreferenceScreen
-            android:key="appVersion"
-            android:title="@string/fragment_settings_pref_build_version_title"
-            app:iconSpaceReserved="false" />
-        <PreferenceScreen
-            android:key="backgroundWorkerCount"
-            android:title="@string/fragment_settings_pref_background_count_title"
-            app:iconSpaceReserved="false" />
-        <PreferenceScreen
-            android:key="backgroundWorkerTime"
-            android:title="@string/fragment_settings_pref_background_time_title"
-            app:iconSpaceReserved="false" />
-    </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
-
+    <Preference
+        android:key="AboutCategory"
+        android:title="Advanced"
+        app:allowDividerAbove="true"
+        app:iconSpaceReserved="false" />
 </androidx.preference.PreferenceScreen>

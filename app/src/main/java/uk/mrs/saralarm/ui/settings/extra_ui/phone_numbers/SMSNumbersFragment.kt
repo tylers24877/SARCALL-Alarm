@@ -1,13 +1,12 @@
 package uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.settings_sms_numbers_fragment.view.*
@@ -16,24 +15,24 @@ import java.lang.reflect.Type
 
 
 class SMSNumbersFragment : Fragment() {
-    var adapter : SMSNumbersRecyclerViewAdapter? = null
+    private var adapter: SMSNumbersRecyclerViewAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val SMSNumberObjectArray: ArrayList<String>
+        val smsNumberObjectArray: ArrayList<String>
 
         val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("respondSMSNumbersJSON", "")
         if (json.isNullOrBlank()) {
-            SMSNumberObjectArray = ArrayList()
-            SMSNumberObjectArray.add("")
+            smsNumberObjectArray = ArrayList()
+            smsNumberObjectArray.add("")
         } else {
             val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
-            SMSNumberObjectArray = Gson().fromJson(json, type)
+            smsNumberObjectArray = Gson().fromJson(json, type)
         }
         val root: View = inflater.inflate(R.layout.settings_sms_numbers_fragment, container, false)
 
         root.sms_numbers_recycler_view.layoutManager = LinearLayoutManager(context)
 
-        adapter = SMSNumbersRecyclerViewAdapter(requireContext(), SMSNumberObjectArray)
+        adapter = SMSNumbersRecyclerViewAdapter(requireContext(), smsNumberObjectArray)
 
         root.sms_numbers_recycler_view.adapter = adapter
 
@@ -42,11 +41,21 @@ class SMSNumbersFragment : Fragment() {
             adapter!!.addItem()
         }
 
+        setHasOptionsMenu(true)
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
         return root
     }
 
     override fun onPause() {
         adapter!!.saveData()
         super.onPause()
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
+        val menuItem: MenuItem = menu.findItem(R.id.action_bar_settings)
+        menuItem.isVisible = false
     }
 }
