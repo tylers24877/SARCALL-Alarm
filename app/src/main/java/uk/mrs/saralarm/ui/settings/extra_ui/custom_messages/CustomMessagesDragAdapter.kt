@@ -28,7 +28,7 @@ class CustomMessagesDragAdapter(adapterCustomMessages: CustomMessagesRecyclerVie
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        mAdapter.removeItems(viewHolder.adapterPosition)
+        mAdapter.removeItems(viewHolder.adapterPosition, true)
     }
 }
 

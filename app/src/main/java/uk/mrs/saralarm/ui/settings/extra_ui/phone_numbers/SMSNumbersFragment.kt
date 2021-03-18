@@ -32,7 +32,7 @@ class SMSNumbersFragment : Fragment() {
 
         root.sms_numbers_recycler_view.layoutManager = LinearLayoutManager(context)
 
-        adapter = SMSNumbersRecyclerViewAdapter(requireContext(), smsNumberObjectArray)
+        adapter = SMSNumbersRecyclerViewAdapter(requireContext(), smsNumberObjectArray, root)
 
         root.sms_numbers_recycler_view.adapter = adapter
 
@@ -48,6 +48,7 @@ class SMSNumbersFragment : Fragment() {
     }
 
     override fun onPause() {
+        adapter!!.undoSnackBar?.dismiss()
         adapter!!.saveData()
         super.onPause()
     }

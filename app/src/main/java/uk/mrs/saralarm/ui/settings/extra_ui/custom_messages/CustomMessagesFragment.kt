@@ -31,7 +31,7 @@ class CustomMessagesFragment : Fragment() {
 
         root.custom_message_recycler_view.layoutManager = LinearLayoutManager(context)
 
-        adapter = CustomMessagesRecyclerViewAdapter(requireContext(), customMessageArray)
+        adapter = CustomMessagesRecyclerViewAdapter(requireContext(), customMessageArray, root)
 
         root.custom_message_recycler_view.adapter = adapter
 
@@ -47,6 +47,7 @@ class CustomMessagesFragment : Fragment() {
     }
 
     override fun onPause() {
+        adapter!!.undoSnackBar?.dismiss()
         adapter!!.saveData()
         super.onPause()
     }

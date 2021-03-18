@@ -15,59 +15,78 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.settings_team_prefix_fragment.view.*
 import kotlinx.android.synthetic.main.settings_team_prefix_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import kotlin.jvm.internal.Intrinsics
 
 
-class TeamPrefixRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<TeamPrefixRecyclerViewAdapter.ViewHolder?>() {
-    var mContext: Context = context
-    private val mData: ArrayList<String> = data
+class TeamPrefixRecyclerViewAdapter(val context: Context,
+                                    val data: ArrayList<String>,
+                                    val view: View
+) : RecyclerView.Adapter<TeamPrefixRecyclerViewAdapter.ViewHolder?>() {
+
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    var undoSnackBar: Snackbar? = null
 
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
-        val original = mData[fromPosition]
-        mData.removeAt(fromPosition)
-        mData.add(toPosition, original)
+        val original = data[fromPosition]
+        data.removeAt(fromPosition)
+        data.add(toPosition, original)
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int) {
-        if (adapterPosition >= 0 && adapterPosition < mData.size) {
-            mData.removeAt(adapterPosition)
+    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+        if (adapterPosition >= 0 && adapterPosition < data.size) {
+            if (allowUndo) {
+                val temp = data[adapterPosition]
+
+                undoSnackBar = Snackbar.make(view, "Deleted", Snackbar.LENGTH_LONG).apply {
+                    setAction("Undo") {
+                        data.add(adapterPosition, temp)
+                        notifyDataSetChanged()
+                    }
+                    duration = 9000
+                }
+                undoSnackBar?.anchorView = view.team_prefix_fab
+                undoSnackBar?.show()
+            }
+            data.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
-        mData.add("")
-        notifyItemInserted(mData.size)
+        undoSnackBar?.dismiss()
+        data.add("")
+        notifyItemInserted(data.size)
     }
 
     fun saveData() {
         val list = ArrayList<String>()
-        val it: Iterator<String> = mData.iterator()
+        val it: Iterator<String> = data.iterator()
         while (it.hasNext()) {
             val t = it.next()
             if (t == "") {
                 list.add(t)
             }
         }
-        mData.removeAll(list)
+        data.removeAll(list)
 
-        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        if (mData.isEmpty())
+        if (data.isEmpty())
             editor.putString("respondTeamPrefixJSON", "")
         else
-            editor.putString("respondTeamPrefixJSON", Gson().toJson(mData))
+            editor.putString("respondTeamPrefixJSON", Gson().toJson(data))
 
         editor.apply()
     }
@@ -78,10 +97,10 @@ class TeamPrefixRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (mData[holder.adapterPosition].isBlank()) {
+        if (data[holder.adapterPosition].isBlank()) {
             holder.myTextView.setText("")
         } else {
-            holder.myTextView.setText(mData[holder.adapterPosition])
+            holder.myTextView.setText(data[holder.adapterPosition])
         }
     }
 
@@ -95,8 +114,8 @@ class TeamPrefixRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
             myTextView.addTextChangedListener(object : TextWatcher {
 
                 override fun afterTextChanged(editable: Editable) {
-                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
-                        mData[adapterPosition] = myTextView.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < data.size) {
+                        data[adapterPosition] = myTextView.text.toString()
                     }
                 }
 
@@ -131,7 +150,7 @@ class TeamPrefixRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
 
         private fun dipToPixels(dipValue: Float): Float {
             val metrics: DisplayMetrics?
-            val resources: Resources = mContext.resources
+            val resources: Resources = context.resources
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(1, dipValue, metrics)
         }

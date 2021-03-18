@@ -32,7 +32,12 @@ class TeamPrefixFragment : Fragment() {
 
         root.team_prefix_recycler_view.layoutManager = LinearLayoutManager(context)
 
-        adapter = TeamPrefixRecyclerViewAdapter(requireContext(), teamPrefixObjectArray)
+        setHasOptionsMenu(true)
+
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
+
+        adapter = TeamPrefixRecyclerViewAdapter(requireContext(), teamPrefixObjectArray, root)
 
         root.team_prefix_recycler_view.adapter = adapter
 
@@ -40,14 +45,11 @@ class TeamPrefixFragment : Fragment() {
         root.team_prefix_fab.setOnClickListener {
             adapter!!.addItem()
         }
-
-        setHasOptionsMenu(true)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
         return root
     }
 
     override fun onPause() {
+        adapter!!.undoSnackBar?.dismiss()
         adapter!!.saveData()
         super.onPause()
     }

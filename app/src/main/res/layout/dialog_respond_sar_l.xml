@@ -39,8 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="7.0dip"
             android:text="@string/fragment_respond_sar_l_response_title"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-            android:textStyle="bold"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            android:textColor="@color/primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

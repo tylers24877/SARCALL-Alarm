@@ -29,7 +29,7 @@ class SMSNumbersDragAdapter(adapterCustomMessages: SMSNumbersRecyclerViewAdapter
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        mAdapter.removeItems(viewHolder.adapterPosition)
+        mAdapter.removeItems(viewHolder.adapterPosition, true)
     }
 
 }

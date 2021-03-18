@@ -15,15 +15,30 @@ android {
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
-    defaultConfig {
-        applicationId "uk.mrs.saralarm"
-        minSdkVersion 21
-        targetSdkVersion 30
+    def versionPropsFile = file("D:\\android\\AndroidStudioProjects\\SARCALLAlarm\\version.properties")
 
-        versionCode 48
-        versionName "1.6.0.1"
+    if (versionPropsFile.canRead()) {
+        Properties versionProps = new Properties()
 
-        multiDexEnabled true
+        versionProps.load(new FileInputStream(versionPropsFile))
+        def name = versionProps['VERSION_NAME']
+        def code = versionProps['VERSION_CODE'].toInteger() + 1
+        versionProps['VERSION_CODE']=code.toString()
+        versionProps.store(versionPropsFile.newWriter(), null)
+
+        defaultConfig {
+            applicationId "uk.mrs.saralarm"
+            minSdkVersion 21
+            targetSdkVersion 30
+
+            versionCode code
+            versionName name
+
+            multiDexEnabled true
+        }
+    }
+    else {
+        throw new Exception("Could not read version.properties!")
     }
 
     buildTypes {

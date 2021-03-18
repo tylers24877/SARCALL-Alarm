@@ -9,9 +9,10 @@
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/ce1aeee69d4b4740105e903f0b207f26/lifecycle-livedata-2.1.0/res" />
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/0c6c017b167fd0bd362aacb33300e002/lifecycle-livedata-2.1.0/res" />
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/b815183a633ee941b15f8c057de9727b/lifecycle-livedata-2.1.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/a995a0d9ab252d1ddeee60e5bc1aafd3/lifecycle-livedata-2.1.0/AndroidManifest.xml" />
       <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/a995a0d9ab252d1ddeee60e5bc1aafd3/lifecycle-livedata-2.1.0/res" />
-      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/a995a0d9ab252d1ddeee60e5bc1aafd3/lifecycle-livedata-2.1.0/jars/classes.jar!/" />
+      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/4fbfcb7ec26aad39e04cafa5ef936069/lifecycle-livedata-2.1.0/jars/classes.jar!/" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/4fbfcb7ec26aad39e04cafa5ef936069/lifecycle-livedata-2.1.0/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/4fbfcb7ec26aad39e04cafa5ef936069/lifecycle-livedata-2.1.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

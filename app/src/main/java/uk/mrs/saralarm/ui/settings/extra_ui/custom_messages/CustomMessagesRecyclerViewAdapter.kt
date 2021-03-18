@@ -14,50 +14,70 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.settings_custom_messages_fragment.view.*
 import kotlinx.android.synthetic.main.settings_custom_messages_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.util.*
 
 
-class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>(){
-    var mContext: Context = context
-    private val mData: ArrayList<String> = data
+class CustomMessagesRecyclerViewAdapter(val context: Context,
+                                        val data: ArrayList<String>,
+                                        val view: View
+) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>() {
+
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
+    var undoSnackBar: Snackbar? = null
 
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
+
     fun swapItems(fromPosition: Int, toPosition: Int) {
-        val original = mData[fromPosition]
-        mData.removeAt(fromPosition)
-        mData.add(toPosition, original)
+        val original = data[fromPosition]
+        data.removeAt(fromPosition)
+        data.add(toPosition, original)
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int) {
-        if (adapterPosition >= 0 && adapterPosition < mData.size) {
-            mData.removeAt(adapterPosition)
+    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+        if (adapterPosition >= 0 && adapterPosition < data.size) {
+            if (allowUndo) {
+                val temp = data[adapterPosition]
+
+                undoSnackBar = Snackbar.make(view, "Deleted", Snackbar.LENGTH_LONG).apply {
+                    setAction("Undo") {
+                        data.add(adapterPosition, temp)
+                        notifyDataSetChanged()
+                    }
+                    duration = 9000
+                }
+                undoSnackBar?.anchorView = view.custom_message_fab
+                undoSnackBar?.show()
+            }
+            data.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
-        mData.add("")
+        undoSnackBar?.dismiss()
+        data.add("")
         notifyDataSetChanged()
     }
 
     fun saveData() {
         //mData.removeAll(Collections.singleton(""))
 
-        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        if (mData.isEmpty())
+        if (data.isEmpty())
             editor.putString("customMessageJSON", "")
         else
-            editor.putString("customMessageJSON", Gson().toJson(mData))
+            editor.putString("customMessageJSON", Gson().toJson(data))
         editor.apply()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -66,11 +86,11 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (mData[holder.layoutPosition].isBlank()) {
+        if (data[holder.layoutPosition].isBlank()) {
             holder.myTextView.setText("")
             holder.myTextView.hint = "Type Here..."
         } else {
-            holder.myTextView.setText(mData[holder.layoutPosition])
+            holder.myTextView.setText(data[holder.layoutPosition])
         }
     }
 
@@ -89,7 +109,7 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
 
                 override fun afterTextChanged(s: Editable) {
 
-                    mData[adapterPosition] = myTextView.text.toString()
+                    data[adapterPosition] = myTextView.text.toString()
 
                 }
             })
@@ -109,7 +129,7 @@ class CustomMessagesRecyclerViewAdapter(context: Context, data: ArrayList<String
 
         private fun dipToPixels(dipValue: Float): Float {
             val metrics: DisplayMetrics?
-            val resources: Resources = mContext.resources
+            val resources: Resources = context.resources
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(1, dipValue, metrics)
         }

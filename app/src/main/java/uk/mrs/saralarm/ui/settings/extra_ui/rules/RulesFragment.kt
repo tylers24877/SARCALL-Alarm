@@ -67,6 +67,7 @@ class RulesFragment : Fragment(), CoroutineScope {
     }
 
     override fun onPause() {
+        adapter!!.undoSnackBar?.dismiss()
         adapter!!.saveData()
         super.onPause()
     }
@@ -82,16 +83,16 @@ class RulesFragment : Fragment(), CoroutineScope {
                 try {
                     val fileName = if (data.data!!.path != null) getFileName(requireContext(), data.data!!) else "alarm_custom_sound" + Random.nextInt(1000000, 1999999).toString()
 
-                    adapter!!.mData[position].customAlarmRulesObject.alarmSoundType = SoundType.CUSTOM
-                    adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + fileName
-                    adapter!!.mData[position].customAlarmRulesObject.alarmFileName = fileName
+                    adapter!!.data[position].customAlarmRulesObject.alarmSoundType = SoundType.CUSTOM
+                    adapter!!.data[position].customAlarmRulesObject.alarmFileLocation = requireContext().filesDir.toString() + File.separator + fileName
+                    adapter!!.data[position].customAlarmRulesObject.alarmFileName = fileName
                     adapter!!.saveData()
                     inputStreamToFile(requireContext(), fileName, data.data!!, requireContext().filesDir)
                 } catch (e: Exception) {
                     try {
-                        adapter!!.mData[position].customAlarmRulesObject.alarmSoundType = SoundType.NONE
-                        adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = ""
-                        adapter!!.mData[position].customAlarmRulesObject.alarmFileName = ""
+                        adapter!!.data[position].customAlarmRulesObject.alarmSoundType = SoundType.NONE
+                        adapter!!.data[position].customAlarmRulesObject.alarmFileLocation = ""
+                        adapter!!.data[position].customAlarmRulesObject.alarmFileName = ""
                         adapter!!.saveData()
                     } catch (e: Exception) {
                     }
@@ -105,9 +106,9 @@ class RulesFragment : Fragment(), CoroutineScope {
                 if (uri != null) {
                     try {
                         if (RingtoneManager.getRingtone(context, uri).getTitle(context).isNotEmpty()) {
-                            adapter!!.mData[position].customAlarmRulesObject.alarmSoundType = SoundType.SYSTEM
-                            adapter!!.mData[position].customAlarmRulesObject.alarmFileLocation = uri.toString()
-                            adapter!!.mData[position].customAlarmRulesObject.alarmFileName = RingtoneManager.getRingtone(context, uri).getTitle(context)
+                            adapter!!.data[position].customAlarmRulesObject.alarmSoundType = SoundType.SYSTEM
+                            adapter!!.data[position].customAlarmRulesObject.alarmFileLocation = uri.toString()
+                            adapter!!.data[position].customAlarmRulesObject.alarmFileName = RingtoneManager.getRingtone(context, uri).getTitle(context)
                             adapter!!.saveData()
                         } else {
                             Toast.makeText(context, "Using default sound.", Toast.LENGTH_SHORT).show()

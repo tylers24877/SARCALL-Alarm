@@ -49,7 +49,7 @@
     <fragment
         android:id="@+id/SMSNumbersFragment"
         android:name="uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers.SMSNumbersFragment"
-        android:label="SAR A/L/N Respond Number Editor" />
+        android:label="Respond Number Editor" />
 
     <fragment
         android:id="@+id/rulesFragment"
@@ -73,7 +73,7 @@
         android:id="@+id/action_global_navigation_settings"
         app:destination="@id/navigation_settings"
         app:launchSingleTop="true"
-        app:popUpTo="@id/navigation_respond"></action>
+        app:popUpTo="@id/navigation_respond" />
     <action
         android:id="@+id/action_navigation_sub_category"
         app:destination="@id/navigation_settings" />

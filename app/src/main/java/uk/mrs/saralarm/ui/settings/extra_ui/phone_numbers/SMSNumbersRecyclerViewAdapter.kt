@@ -14,64 +14,82 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
+import kotlinx.android.synthetic.main.settings_sms_numbers_fragment.view.*
 import kotlinx.android.synthetic.main.settings_sms_numbers_recycler_view_row.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import kotlin.jvm.internal.Intrinsics
 
 
-class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>() {
-    var mContext: Context = context
-    private val mData: ArrayList<String> = data
+class SMSNumbersRecyclerViewAdapter(val context: Context,
+                                    val data: ArrayList<String>,
+                                    val view: View
+) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>() {
+
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
-
+    var undoSnackBar: Snackbar? = null
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
-        val original = mData[fromPosition]
-        mData.removeAt(fromPosition)
-        mData.add(toPosition, original)
+        val original = data[fromPosition]
+        data.removeAt(fromPosition)
+        data.add(toPosition, original)
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int) {
-        if (adapterPosition >= 0 && adapterPosition < mData.size) {
-            mData.removeAt(adapterPosition)
+    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+        if (adapterPosition >= 0 && adapterPosition < data.size) {
+            if (allowUndo) {
+                val temp = data[adapterPosition]
+
+                undoSnackBar = Snackbar.make(view, "Deleted", Snackbar.LENGTH_LONG).apply {
+                    setAction("Undo") {
+                        data.add(adapterPosition, temp)
+                        notifyDataSetChanged()
+                    }
+                    duration = 9000
+                }
+                undoSnackBar?.anchorView = view.sms_numbers_fab
+                undoSnackBar?.show()
+            }
+            data.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
-        mData.add("")
-        notifyItemInserted(mData.size)
+        undoSnackBar?.dismiss()
+        data.add("")
+        notifyItemInserted(data.size)
     }
 
     fun saveData() {
         val list = ArrayList<String>()
-        val it: Iterator<String> = mData.iterator()
+        val it: Iterator<String> = data.iterator()
         while (it.hasNext()) {
             val t = it.next()
             if (t == "") {
                 list.add(t)
             }
         }
-        mData.removeAll(list)
+        data.removeAll(list)
 
-        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        if (mData.isEmpty())
+        if (data.isEmpty())
             editor.putString("respondSMSNumbersJSON", "")
         else
-            editor.putString("respondSMSNumbersJSON", Gson().toJson(mData as Any))
+            editor.putString("respondSMSNumbersJSON", Gson().toJson(data as Any))
 
         editor.apply()
     }
@@ -81,11 +99,11 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (mData[holder.adapterPosition].isBlank()) {
+        if (data[holder.adapterPosition].isBlank()) {
             holder.myTextView.setText("")
         } else {
             try {
-                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.adapterPosition], "GB"))) {
+                if (!phoneUtil.isValidNumber(phoneUtil.parse(data[holder.adapterPosition], "GB"))) {
                     holder.textInput.error = "SMS Number is in the wrong format"
                 } else {
                     holder.textInput.error = ""
@@ -93,7 +111,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
             } catch (e: NumberParseException) {
                 holder.textInput.error = "SMS Number is in the wrong format"
             }
-            holder.myTextView.setText(mData[holder.adapterPosition])
+            holder.myTextView.setText(data[holder.adapterPosition])
         }
     }
 
@@ -131,8 +149,8 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
                         } catch (e: NumberParseException) {
                             textInput.error = "SMS Number is in the wrong format"
                         }
-                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
-                        mData[adapterPosition] = myTextView.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < data.size) {
+                        data[adapterPosition] = myTextView.text.toString()
                     }
                 }
 
@@ -157,7 +175,7 @@ class SMSNumbersRecyclerViewAdapter(context: Context, data: ArrayList<String>) :
 
         private fun dipToPixels(dipValue: Float): Float {
             val metrics: DisplayMetrics?
-            val resources: Resources = mContext.resources
+            val resources: Resources = context.resources
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(1, dipValue, metrics)
         }

@@ -32,8 +32,10 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.android.synthetic.main.colour_dialog_fragment.*
+import kotlinx.android.synthetic.main.settings_rules_fragment.view.*
 import kotlinx.android.synthetic.main.settings_rules_recycler_view_row.view.*
 import kotlinx.android.synthetic.main.settings_rules_sound_dialog.*
+import kotlinx.android.synthetic.main.settings_team_prefix_fragment.view.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourDragAdapter
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourRecyclerViewAdapter
@@ -44,42 +46,58 @@ import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.io.File
 
 
-class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragment, data: ArrayList<RulesObject>, private val root: View) :
+class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFragment,
+                               val data: ArrayList<RulesObject>,
+                               private val root: View
+) :
     RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
-    var mContext: Context = context
-    val mData: ArrayList<RulesObject> = data
+
+    var undoSnackBar: Snackbar? = null
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
 
     override fun getItemCount(): Int {
-        return mData.size
+        return data.size
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int) {
-        val original = mData[fromPosition]
-        mData.removeAt(fromPosition)
-        mData.add(toPosition, original)
+        val original = data[fromPosition]
+        data.removeAt(fromPosition)
+        data.add(toPosition, original)
 
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int) {
-        if (adapterPosition >= 0 && adapterPosition < mData.size) {
-            checkAndRemoveFile(adapterPosition)
-            mData.removeAt(adapterPosition)
+    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+        if (adapterPosition >= 0 && adapterPosition < data.size) {
+            if (allowUndo) {
+                val temp = data[adapterPosition]
+
+                undoSnackBar = Snackbar.make(root, "Deleted", Snackbar.LENGTH_LONG).apply {
+                    setAction("Undo") {
+                        data.add(adapterPosition, temp)
+                        notifyDataSetChanged()
+                    }
+                    duration = 9000
+                }
+                undoSnackBar?.anchorView = root.rules_fab
+                undoSnackBar?.show()
+            }
+            data.removeAt(adapterPosition)
             notifyItemRemoved(adapterPosition)
         }
     }
 
     fun addItem() {
-        mData.add(RulesObject())
+        undoSnackBar?.dismiss()
+        data.add(RulesObject())
         notifyDataSetChanged()
     }
 
     fun saveData() {
         val list = ArrayList<RulesObject>()
 
-        val it: Iterator<RulesObject> = mData.iterator()
+        val it: Iterator<RulesObject> = data.iterator()
 
         while (it.hasNext()) {
             val t = it.next()
@@ -102,15 +120,15 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
         }
         if (list.isNotEmpty()) {
-            mData.removeAll(list)
+            data.removeAll(list)
         }
 
-        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext)
+        val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()
-        if (mData.isEmpty())
+        if (data.isEmpty())
             editor.putString("rulesJSON", "")
         else
-            editor.putString("rulesJSON", Gson().toJson(mData))
+            editor.putString("rulesJSON", Gson().toJson(data))
 
         editor.apply()
         root.post { notifyDataSetChanged() }
@@ -122,7 +140,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        when (mData[holder.layoutPosition].choice) {
+        when (data[holder.layoutPosition].choice) {
             RulesChoice.ALL -> {
                 holder.itemView.rules_radio_group.check(R.id.rules_radio_both)
                 holder.itemView.sms_numbers_rules_recycler_text_input.visibility = View.VISIBLE
@@ -140,9 +158,9 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
         }
 
-        if (mData[holder.layoutPosition].smsNumber.isNotBlank()) {
+        if (data[holder.layoutPosition].smsNumber.isNotBlank()) {
             try {
-                if (!phoneUtil.isValidNumber(phoneUtil.parse(mData[holder.layoutPosition].smsNumber, "GB"))) {
+                if (!phoneUtil.isValidNumber(phoneUtil.parse(data[holder.layoutPosition].smsNumber, "GB"))) {
                     holder.itemView.sms_numbers_rules_recycler_text_input.error = holder.itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
                 } else {
                     holder.itemView.sms_numbers_rules_recycler_text_input.error = ""
@@ -152,32 +170,32 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
         }
 
-        holder.itemView.sms_numbers_rules_edit_text.setText(mData[holder.layoutPosition].smsNumber)
-        holder.itemView.phrase_rules_edit_text.setText(mData[holder.layoutPosition].phrase)
+        holder.itemView.sms_numbers_rules_edit_text.setText(data[holder.layoutPosition].smsNumber)
+        holder.itemView.phrase_rules_edit_text.setText(data[holder.layoutPosition].phrase)
 
-        holder.itemView.customise_alarm_looping_check_box.isChecked = mData[holder.layoutPosition].customAlarmRulesObject.isLooping
+        holder.itemView.customise_alarm_looping_check_box.isChecked = data[holder.layoutPosition].customAlarmRulesObject.isLooping
 
-        when (mData[holder.layoutPosition].customAlarmRulesObject.alarmSoundType) {
+        when (data[holder.layoutPosition].customAlarmRulesObject.alarmSoundType) {
             SoundType.NONE -> {
                 checkAndRemoveFile(holder.layoutPosition)
                 holder.itemView.add_alarm_rules_text_view.text = "No Alarm Sound Set. Using Default."
                 holder.itemView.add_alarm_rules_button.text = "Set Alarm Sound"
             }
             SoundType.SYSTEM -> {
-                if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
-                    holder.itemView.add_alarm_rules_text_view.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                if (data[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
+                    holder.itemView.add_alarm_rules_text_view.text = data[holder.layoutPosition].customAlarmRulesObject.alarmFileName
                     holder.itemView.add_alarm_rules_button.text = "Reset Alarm Sound"
                 }
             }
             SoundType.CUSTOM -> {
-                if (mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
-                    holder.itemView.add_alarm_rules_text_view.text = mData[holder.layoutPosition].customAlarmRulesObject.alarmFileName
+                if (data[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
+                    holder.itemView.add_alarm_rules_text_view.text = data[holder.layoutPosition].customAlarmRulesObject.alarmFileName
                     holder.itemView.add_alarm_rules_button.text = "Reset Alarm Sound"
                 }
             }
         }
         holder.itemView.customise_alarm_rules_constraint_layout.visibility = View.GONE
-        holder.itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
+        holder.itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(context, R.drawable.ic_baseline_expand_more_24)
     }
 
     private fun getDrawable(context: Context, id: Int): Drawable? {
@@ -225,8 +243,8 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                             }
                             smsNumberEditing = false
                         }
-                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
-                        mData[adapterPosition].smsNumber = itemView.sms_numbers_rules_edit_text.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < data.size) {
+                        data[adapterPosition].smsNumber = itemView.sms_numbers_rules_edit_text.text.toString()
                     }
                 }
 
@@ -238,8 +256,8 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             itemView.phrase_rules_edit_text.addTextChangedListener(object : TextWatcher {
 
                 override fun afterTextChanged(s: Editable) {
-                    if (adapterPosition >= 0 && adapterPosition < mData.size) {
-                        mData[adapterPosition].phrase = itemView.phrase_rules_edit_text.text.toString()
+                    if (adapterPosition >= 0 && adapterPosition < data.size) {
+                        data[adapterPosition].phrase = itemView.phrase_rules_edit_text.text.toString()
                     }
                 }
 
@@ -252,17 +270,17 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             itemView.rules_radio_group.setOnCheckedChangeListener { _, checkedId ->
                 when (checkedId) {
                     R.id.rules_radio_both -> {
-                        mData[adapterPosition].choice = RulesChoice.ALL
+                        data[adapterPosition].choice = RulesChoice.ALL
                         itemView.sms_numbers_rules_recycler_text_input.visibility = View.VISIBLE
                         itemView.phrase_rules_recycler_text_input.visibility = View.VISIBLE
                     }
                     R.id.rules_radio_phrase -> {
-                        mData[adapterPosition].choice = RulesChoice.PHRASE
+                        data[adapterPosition].choice = RulesChoice.PHRASE
                         itemView.sms_numbers_rules_recycler_text_input.visibility = View.GONE
                         itemView.phrase_rules_recycler_text_input.visibility = View.VISIBLE
                     }
                     R.id.rules_radio_sms_number -> {
-                        mData[adapterPosition].choice = RulesChoice.SMS_NUMBER
+                        data[adapterPosition].choice = RulesChoice.SMS_NUMBER
                         itemView.sms_numbers_rules_recycler_text_input.visibility = View.VISIBLE
                         itemView.phrase_rules_recycler_text_input.visibility = View.GONE
                     }
@@ -270,45 +288,45 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
             }
 
             itemView.customise_alarm_looping_check_box.setOnCheckedChangeListener { _, isChecked ->
-                mData[adapterPosition].customAlarmRulesObject.isLooping = isChecked
+                data[adapterPosition].customAlarmRulesObject.isLooping = isChecked
             }
 
             itemView.customise_alarm_rules_text_view.setOnClickListener {
                 TransitionManager.beginDelayedTransition(itemView.customise_alarm_rules_constraint_layout, AutoTransition())
                 if (itemView.customise_alarm_rules_constraint_layout.visibility == View.GONE) {
                     itemView.customise_alarm_rules_constraint_layout.visibility = View.VISIBLE
-                    itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_less_24)
+                    itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(context, R.drawable.ic_baseline_expand_less_24)
                 } else {
                     itemView.customise_alarm_rules_constraint_layout.visibility = View.GONE
-                    itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(mContext, R.drawable.ic_baseline_expand_more_24)
+                    itemView.customise_alarm_rules_text_view.drawableEnd = getDrawable(context, R.drawable.ic_baseline_expand_more_24)
 
                 }
 
             }
 
             itemView.add_alarm_rules_button.setOnClickListener {
-                if (ActivityCompat.checkSelfPermission(mContext, "android.permission.READ_EXTERNAL_STORAGE") == 0) {
+                if (ActivityCompat.checkSelfPermission(context, "android.permission.READ_EXTERNAL_STORAGE") == 0) {
                     if (itemView.add_alarm_rules_button.text == "Set Alarm Sound") {
-                        when (mData[adapterPosition].choice) {
+                        when (data[adapterPosition].choice) {
                             RulesChoice.PHRASE ->
-                                if (mData[adapterPosition].phrase == "") {
+                                if (data[adapterPosition].phrase == "") {
                                     Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
                                     return@setOnClickListener
                                 }
                             RulesChoice.SMS_NUMBER ->
-                                if (mData[adapterPosition].smsNumber == "") {
+                                if (data[adapterPosition].smsNumber == "") {
                                     Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
                                     return@setOnClickListener
                                 }
                             RulesChoice.ALL -> {
-                                if (mData[adapterPosition].smsNumber == "" && mData[adapterPosition].phrase == "") {
+                                if (data[adapterPosition].smsNumber == "" && data[adapterPosition].phrase == "") {
                                     Snackbar.make(itemView, ("Unable to add custom sound. Please configure the SMS number/Phrase first." as CharSequence), Snackbar.LENGTH_LONG).show()
                                     return@setOnClickListener
                                 }
                             }
                         }
 
-                        val dialog = Dialog(mContext)
+                        val dialog = Dialog(context)
                         dialog.setContentView(R.layout.settings_rules_sound_dialog)
                         val window: Window = dialog.window!!
                         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -347,16 +365,16 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
 
             itemView.add_alarm_colours_rules_button.setOnClickListener {
-                val dialog = Dialog(mContext)
+                val dialog = Dialog(context)
                 dialog.setContentView(R.layout.colour_dialog_fragment)
                 val window: Window = dialog.window!!
                 window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                 window.setGravity(Gravity.CENTER)
                 dialog.show()
 
-                dialog.colours_recycler_view.layoutManager = LinearLayoutManager(mContext)
+                dialog.colours_recycler_view.layoutManager = LinearLayoutManager(context)
 
-                val colourAdapter = ColourRecyclerViewAdapter(mContext, mData[adapterPosition].customAlarmRulesObject.colorArray)
+                val colourAdapter = ColourRecyclerViewAdapter(context, data[adapterPosition].customAlarmRulesObject.colorArray)
 
                 dialog.colours_recycler_view.adapter = colourAdapter
 
@@ -370,7 +388,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
                     dialog.dismiss()
                 }
                 colourAdapter.onSave = {
-                    mData[adapterPosition].customAlarmRulesObject.colorArray = it
+                    data[adapterPosition].customAlarmRulesObject.colorArray = it
                 }
             }
         }
@@ -389,7 +407,7 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
 
         private fun dipToPixels(dipValue: Float): Float {
             val metrics: DisplayMetrics?
-            val resources: Resources = mContext.resources
+            val resources: Resources = context.resources
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(1, dipValue, metrics)
         }
@@ -398,22 +416,22 @@ class RulesRecyclerViewAdapter(context: Context, val rulesFragment: RulesFragmen
     }
 
     fun checkAndRemoveFile(adapterPosition: Int) {
-        if (mData[adapterPosition].customAlarmRulesObject.alarmFileLocation != "") {
+        if (data[adapterPosition].customAlarmRulesObject.alarmFileLocation != "") {
             var inUse = false
-            for ((index, m) in mData.withIndex()) {
-                if (m.customAlarmRulesObject.alarmFileName == mData[adapterPosition].customAlarmRulesObject.alarmFileName && index != adapterPosition) {
+            for ((index, m) in data.withIndex()) {
+                if (m.customAlarmRulesObject.alarmFileName == data[adapterPosition].customAlarmRulesObject.alarmFileName && index != adapterPosition) {
                     inUse = true
                 }
             }
             if (!inUse) {
-                val deleteFile = File(mData[adapterPosition].customAlarmRulesObject.alarmFileLocation)
+                val deleteFile = File(data[adapterPosition].customAlarmRulesObject.alarmFileLocation)
                 if (deleteFile.isFile && deleteFile.exists()) {
                     deleteFile.delete()
                 }
             }
-            mData[adapterPosition].customAlarmRulesObject.alarmSoundType = SoundType.NONE
-            mData[adapterPosition].customAlarmRulesObject.alarmFileLocation = ""
-            mData[adapterPosition].customAlarmRulesObject.alarmFileName = ""
+            data[adapterPosition].customAlarmRulesObject.alarmSoundType = SoundType.NONE
+            data[adapterPosition].customAlarmRulesObject.alarmFileLocation = ""
+            data[adapterPosition].customAlarmRulesObject.alarmFileName = ""
             saveData()
         }
     }
