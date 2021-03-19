@@ -16,18 +16,16 @@ import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.settings_team_prefix_fragment.view.*
-import kotlinx.android.synthetic.main.settings_team_prefix_recycler_view_row.view.*
-import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.SettingsTeamPrefixFragmentBinding
+import uk.mrs.saralarm.databinding.SettingsTeamPrefixRecyclerViewRowBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import kotlin.jvm.internal.Intrinsics
 
 
 class TeamPrefixRecyclerViewAdapter(val context: Context,
                                     val data: ArrayList<String>,
-                                    val view: View
+                                    val binding: SettingsTeamPrefixFragmentBinding
 ) : RecyclerView.Adapter<TeamPrefixRecyclerViewAdapter.ViewHolder?>() {
 
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -49,14 +47,14 @@ class TeamPrefixRecyclerViewAdapter(val context: Context,
             if (allowUndo) {
                 val temp = data[adapterPosition]
 
-                undoSnackBar = Snackbar.make(view, "Deleted", Snackbar.LENGTH_LONG).apply {
+                undoSnackBar = Snackbar.make(binding.root, "Deleted", Snackbar.LENGTH_LONG).apply {
                     setAction("Undo") {
                         data.add(adapterPosition, temp)
                         notifyDataSetChanged()
                     }
                     duration = 9000
                 }
-                undoSnackBar?.anchorView = view.team_prefix_fab
+                undoSnackBar?.anchorView = binding.teamPrefixFab
                 undoSnackBar?.show()
             }
             data.removeAt(adapterPosition)
@@ -92,58 +90,59 @@ class TeamPrefixRecyclerViewAdapter(val context: Context,
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = mInflater.inflate(R.layout.settings_team_prefix_recycler_view_row, parent, false)
-        return ViewHolder(view)
+        val binding = SettingsTeamPrefixRecyclerViewRowBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (data[holder.adapterPosition].isBlank()) {
-            holder.myTextView.setText("")
+            holder.rowBinding.teamPrefixEditText.setText("")
         } else {
-            holder.myTextView.setText(data[holder.adapterPosition])
+            holder.rowBinding.teamPrefixEditText.setText(data[holder.adapterPosition])
         }
     }
 
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-        var myTextView: TextInputEditText = itemView.team_prefix_edit_text
+    inner class ViewHolder(val rowBinding: SettingsTeamPrefixRecyclerViewRowBinding) : RecyclerView.ViewHolder(rowBinding.root), ItemTouchViewHolder, View.OnClickListener {
 
         init {
-            myTextView.maxLines = 1
-            myTextView.filters += InputFilter.AllCaps()
-            myTextView.addTextChangedListener(object : TextWatcher {
+            rowBinding.apply {
+                teamPrefixEditText.maxLines = 1
+                teamPrefixEditText.filters += InputFilter.AllCaps()
+                teamPrefixEditText.addTextChangedListener(object : TextWatcher {
 
-                override fun afterTextChanged(editable: Editable) {
-                    if (adapterPosition >= 0 && adapterPosition < data.size) {
-                        data[adapterPosition] = myTextView.text.toString()
-                    }
-                }
-
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            })
-            val filter =
-                InputFilter { source, start, end, _, _, _ ->
-                    for (i in start until end) {
-                        if (Character.isWhitespace(source[i])) {
-                            return@InputFilter ""
+                    override fun afterTextChanged(editable: Editable) {
+                        if (adapterPosition >= 0 && adapterPosition < data.size) {
+                            data[adapterPosition] = teamPrefixEditText.text.toString()
                         }
                     }
-                    null
-                }
-            myTextView.filters += arrayOf(filter)
+
+                    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+                    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                })
+                val filter =
+                    InputFilter { source, start, end, _, _, _ ->
+                        for (i in start until end) {
+                            if (Character.isWhitespace(source[i])) {
+                                return@InputFilter ""
+                            }
+                        }
+                        null
+                    }
+                teamPrefixEditText.filters += arrayOf(filter)
+            }
         }
 
         override fun onItemSelected() {
-            val animator = ObjectAnimator.ofFloat(itemView.team_prefix_card_view, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.teamPrefixCardView, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }
 
         override fun onItemClear() {
             Intrinsics.checkNotNullExpressionValue(itemView, "itemView")
-            val animator = ObjectAnimator.ofFloat(itemView.team_prefix_card_view, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.teamPrefixCardView, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }

@@ -1,6 +1,5 @@
 package uk.mrs.saralarm
 
-import android.app.Activity
 import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
@@ -21,8 +20,9 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import kotlinx.android.synthetic.main.activity_alarm.*
+import uk.mrs.saralarm.databinding.ActivityAlarmBinding
 import uk.mrs.saralarm.support.RuleAlarmData
 import uk.mrs.saralarm.support.notification.PostAlarmNotification
 import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
@@ -30,13 +30,17 @@ import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
 import java.io.FileInputStream
 
 
-class AlarmActivity : Activity() {
+class AlarmActivity : AppCompatActivity() {
     private var mp: MediaPlayer? = null
     private var originalAudio = 0
 
+    private lateinit var binding: ActivityAlarmBinding
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_alarm)
+
+        binding = ActivityAlarmBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
@@ -60,8 +64,10 @@ class AlarmActivity : Activity() {
                 RuleAlarmData(alarmPreviewSMSBody = getString(R.string.alarm_activity_error_Code_1))
             }
 
-        alarm_preview_sms_text_view.text = ruleAlarmData.alarmPreviewSMSBody
-        alarm_preview_sms_number_text_view.text = getString(R.string.alarm_activity_preview_sms_number, ruleAlarmData.alarmPreviewSMSNumber)
+        binding.apply {
+            alarmPreviewSmsTextView.text = ruleAlarmData.alarmPreviewSMSBody
+            alarmPreviewSmsNumberTextView.text = getString(R.string.alarm_activity_preview_sms_number, ruleAlarmData.alarmPreviewSMSNumber)
+        }
 
         mp = MediaPlayer()
         mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
@@ -151,16 +157,16 @@ class AlarmActivity : Activity() {
             drawable.addFrame(ColorDrawable(Color.GREEN), 500)
         }
         drawable.isOneShot = false
-        alarm_background.background = drawable
+        binding.alarmBackground.background = drawable
 
         val handler = Handler(Looper.getMainLooper())
 
         handler.postDelayed({ drawable.start() }, 100)
         handler.postDelayed({ finish() }, 300000)
 
-        alarm_stop_button.setOnClickListener { finish() }
+        binding.alarmStopButton.setOnClickListener { finish() }
 
-        alarm_silence_button.setOnClickListener {
+        binding.alarmSilenceButton.setOnClickListener {
             if (!SilencedForegroundNotification.isServiceAlive(applicationContext, SilencedForegroundNotification::class.java)) {
                 //start the foreground service for managing the silence function.
                 val serviceIntent = Intent(this, SilencedForegroundNotification::class.java)

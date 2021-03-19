@@ -15,21 +15,18 @@ import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputEditText
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.settings_custom_messages_fragment.view.*
-import kotlinx.android.synthetic.main.settings_custom_messages_recycler_view_row.view.*
-import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.SettingsCustomMessagesFragmentBinding
+import uk.mrs.saralarm.databinding.SettingsCustomMessagesRecyclerViewRowBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.util.*
 
 
 class CustomMessagesRecyclerViewAdapter(val context: Context,
                                         val data: ArrayList<String>,
-                                        val view: View
+                                        val binding: SettingsCustomMessagesFragmentBinding
 ) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>() {
 
-    private val mInflater: LayoutInflater = LayoutInflater.from(context)
     var undoSnackBar: Snackbar? = null
 
     override fun getItemCount(): Int {
@@ -48,14 +45,14 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
             if (allowUndo) {
                 val temp = data[adapterPosition]
 
-                undoSnackBar = Snackbar.make(view, "Deleted", Snackbar.LENGTH_LONG).apply {
+                undoSnackBar = Snackbar.make(binding.root, "Deleted", Snackbar.LENGTH_LONG).apply {
                     setAction("Undo") {
                         data.add(adapterPosition, temp)
                         notifyDataSetChanged()
                     }
                     duration = 9000
                 }
-                undoSnackBar?.anchorView = view.custom_message_fab
+                undoSnackBar?.anchorView = binding.customMessageFab
                 undoSnackBar?.show()
             }
             data.removeAt(adapterPosition)
@@ -81,24 +78,23 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
         editor.apply()
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = mInflater.inflate(R.layout.settings_custom_messages_recycler_view_row, parent, false)
-        return ViewHolder(view)
+        val binding = SettingsCustomMessagesRecyclerViewRowBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         if (data[holder.layoutPosition].isBlank()) {
-            holder.myTextView.setText("")
-            holder.myTextView.hint = "Type Here..."
+            holder.rowBinding.customMessageEditText.setText("")
+            holder.rowBinding.customMessageEditText.hint = "Type Here..."
         } else {
-            holder.myTextView.setText(data[holder.layoutPosition])
+            holder.rowBinding.customMessageEditText.setText(data[holder.layoutPosition])
         }
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
-        var myTextView: TextInputEditText = itemView.custom_message_edit_text
+    inner class ViewHolder(val rowBinding: SettingsCustomMessagesRecyclerViewRowBinding) : RecyclerView.ViewHolder(rowBinding.root), ItemTouchViewHolder, View.OnClickListener {
 
         init {
-            myTextView.addTextChangedListener(object : TextWatcher {
+            rowBinding.customMessageEditText.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
                 }
@@ -109,20 +105,20 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
 
                 override fun afterTextChanged(s: Editable) {
 
-                    data[adapterPosition] = myTextView.text.toString()
+                    data[adapterPosition] = rowBinding.customMessageEditText.text.toString()
 
                 }
             })
         }
 
         override fun onItemSelected() {
-            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_card_view, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.customMessageRecyclerCardView, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }
 
         override fun onItemClear() {
-            val animator = ObjectAnimator.ofFloat(itemView.custom_message_recycler_card_view, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.customMessageRecyclerCardView, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }

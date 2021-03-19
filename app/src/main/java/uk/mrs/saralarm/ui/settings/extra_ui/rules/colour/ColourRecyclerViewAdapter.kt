@@ -14,12 +14,11 @@ import android.view.animation.AccelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
-import kotlinx.android.synthetic.main.colour_recycler_view_row.view.*
-import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.ColourRecyclerViewRowBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 
 
-class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : RecyclerView.Adapter<ColourRecyclerViewAdapter.ViewHolder?>() {
+class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) : RecyclerView.Adapter<ColourRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
     private val mData: ArrayList<String> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -68,18 +67,18 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view: View = mInflater.inflate(R.layout.colour_recycler_view_row, parent, false)
-        return ViewHolder(view)
+        val binding = ColourRecyclerViewRowBinding.inflate(LayoutInflater.from(context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemView.color_recycler_text_view.text = mData[holder.layoutPosition]
+        holder.rowBinding.colorRecyclerTextView.text = mData[holder.layoutPosition]
         try {
-            holder.itemView.colour_recycler_card_view.setCardBackgroundColor(parseColor(mData[holder.layoutPosition]))
+            holder.rowBinding.colourRecyclerCardView.setCardBackgroundColor(parseColor(mData[holder.layoutPosition]))
         } catch (e: Exception) {
             when (e) {
                 is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
-                    holder.itemView.colour_recycler_card_view.setCardBackgroundColor(Color.WHITE)
+                    holder.rowBinding.colourRecyclerCardView.setCardBackgroundColor(Color.WHITE)
                 }
                 else -> throw e
             }
@@ -121,25 +120,25 @@ class ColourRecyclerViewAdapter(context: Context, data: ArrayList<String>) : Rec
         d.show()
     }
 
-    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), ItemTouchViewHolder, View.OnClickListener {
+    inner class ViewHolder(val rowBinding: ColourRecyclerViewRowBinding) : RecyclerView.ViewHolder(rowBinding.root), ItemTouchViewHolder, View.OnClickListener {
 
         init {
-            itemView.colour_recycler_delete_image_view.setOnClickListener {
+            rowBinding.colourRecyclerDeleteImageView.setOnClickListener {
                 removeItems(adapterPosition)
             }
-            itemView.colour_recycler_edit_image_view.setOnClickListener {
+            rowBinding.colourRecyclerEditImageView.setOnClickListener {
                 setColourUsingPicker(false, adapterPosition, mData[adapterPosition])
             }
         }
 
         override fun onItemSelected() {
-            val animator = ObjectAnimator.ofFloat(itemView.colour_recycler_card_view, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.colourRecyclerCardView, "cardElevation", dipToPixels(2.0f), dipToPixels(10.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }
 
         override fun onItemClear() {
-            val animator = ObjectAnimator.ofFloat(itemView.colour_recycler_card_view, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
+            val animator = ObjectAnimator.ofFloat(rowBinding.colourRecyclerCardView, "cardElevation", dipToPixels(10.0f), dipToPixels(2.0f))
             animator.interpolator = AccelerateInterpolator()
             animator.start()
         }

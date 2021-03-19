@@ -13,23 +13,26 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
-import kotlinx.android.synthetic.main.activity_setup.*
+import uk.mrs.saralarm.databinding.ActivitySetupBinding
 import kotlin.jvm.internal.Intrinsics
 
 
 class SetupActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySetupBinding
+
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivitySetupBinding.inflate(layoutInflater)
         //Loads the layout XML for this Activity and sets the layout as the current view.
-        setContentView(R.layout.activity_setup)
+        setContentView(binding.root)
 
         //Sets the SetupToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
-        setSupportActionBar(setup_toolbar)
+        setSupportActionBar(binding.setupToolbar)
 
         //Setup OnClick Listener for the setup button. When clicked...
-        setup_permission_button.setOnClickListener {
+        binding.setupPermissionButton.setOnClickListener {
             //Check if the user has the necessary permissions
             if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0
                 && ActivityCompat.checkSelfPermission(this, "android.permission.SEND_SMS") == 0 &&

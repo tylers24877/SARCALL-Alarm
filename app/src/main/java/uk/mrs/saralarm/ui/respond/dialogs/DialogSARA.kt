@@ -1,5 +1,6 @@
 package uk.mrs.saralarm.ui.respond.dialogs
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.graphics.Rect
@@ -11,8 +12,8 @@ import android.widget.SeekBar
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.dialog_respond_sar_a.*
 import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.DialogRespondSarABinding
 import uk.mrs.saralarm.support.SARResponseCode
 import uk.mrs.saralarm.support.Util
 import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
@@ -22,9 +23,11 @@ import kotlin.collections.ArrayList
 
 object DialogSARA {
 
+    @SuppressLint("ClickableViewAccessibility")
     fun open(context: Context, view: View) {
+        val binding: DialogRespondSarABinding = DialogRespondSarABinding.inflate(LayoutInflater.from(context))
         val dialog = Dialog(context)
-        dialog.setContentView(R.layout.dialog_respond_sar_a)
+        dialog.setContentView(binding.root)
         val window: Window = dialog.window!!
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
         window.setGravity(Gravity.CENTER)
@@ -42,75 +45,78 @@ object DialogSARA {
         val adapter = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, customMessageArray)
         adapter.setDropDownViewResource(android.R.layout.simple_expandable_list_item_1)
 
-        dialog.sar_a_spinner.adapter = adapter
+
+        binding.apply {
+            sarASpinner.adapter = adapter
 
 
-        dialog.sar_a_spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                if (dialog.sar_a_spinner.selectedItem.toString() == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
-                    dialog.respond_dialog_sar_a_message_edit_view.isEnabled = true
-                    dialog.respond_dialog_sar_a_message_input_layout.visibility = View.VISIBLE
-                    dialog.respond_dialog_sar_a_message_title_txt_view.visibility = View.VISIBLE
-                    return
+            sarASpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                    if (sarASpinner.selectedItem.toString() == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
+                        respondDialogSarAMessageEditView.isEnabled = true
+                        respondDialogSarAMessageInputLayout.visibility = View.VISIBLE
+                        respondDialogSarAMessageTitleTxtView.visibility = View.VISIBLE
+                        return
+                    }
+                    respondDialogSarAMessageEditView.isEnabled = false
+                    respondDialogSarAMessageInputLayout.visibility = View.GONE
+                    respondDialogSarAMessageTitleTxtView.visibility = View.GONE
                 }
-                dialog.respond_dialog_sar_a_message_edit_view.isEnabled = false
-                dialog.respond_dialog_sar_a_message_input_layout.visibility = View.GONE
-                dialog.respond_dialog_sar_a_message_title_txt_view.visibility = View.GONE
-            }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                dialog.respond_dialog_sar_a_message_edit_view.isEnabled = false
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    respondDialogSarAMessageEditView.isEnabled = false
+                }
             }
-        }
-        dialog.respond_dialog_sar_a_constraint_layout.setOnTouchListener { v, event ->
-            when (event?.action) {
-                MotionEvent.ACTION_DOWN ->
-                    if (dialog.respond_dialog_sar_a_message_edit_view.isFocused) {
-                        val outRect = Rect()
-                        dialog.respond_dialog_sar_a_message_edit_view.getGlobalVisibleRect(outRect)
-                        if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                            dialog.respond_dialog_sar_a_message_edit_view.clearFocus()
-                            val systemService = v.context.getSystemService(Context.INPUT_METHOD_SERVICE)
-                            if (systemService != null) {
-                                (systemService as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0)
-                            } else {
-                                throw NullPointerException()
+            respondDialogSarAConstraintLayout.setOnTouchListener { v, event ->
+                when (event?.action) {
+                    MotionEvent.ACTION_DOWN ->
+                        if (respondDialogSarAMessageEditView.isFocused) {
+                            val outRect = Rect()
+                            respondDialogSarAMessageEditView.getGlobalVisibleRect(outRect)
+                            if (!outRect.contains(event.rawX.toInt(), event.rawY.toInt())) {
+                                respondDialogSarAMessageEditView.clearFocus()
+                                val systemService = v.context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                                if (systemService != null) {
+                                    (systemService as InputMethodManager).hideSoftInputFromWindow(v.windowToken, 0)
+                                } else {
+                                    throw NullPointerException()
+                                }
                             }
                         }
+                }
+                view.performClick()
+                v?.onTouchEvent(event) ?: true
+            }
+            respondDialogSarASeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    if (respondDialogSarAMessageEditView.isFocused) {
+                        respondDialogSarAMessageEditView.clearFocus()
                     }
-            }
-            view.performClick()
-            v?.onTouchEvent(event) ?: true
-        }
-        dialog.respond_dialog_sar_a_seek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                if (dialog.respond_dialog_sar_a_message_edit_view.isFocused) {
-                    dialog.respond_dialog_sar_a_message_edit_view.clearFocus()
+                    val systemService = dialog.context.getSystemService(Context.INPUT_METHOD_SERVICE)
+                    val imm = systemService as InputMethodManager
+                    imm.hideSoftInputFromWindow(view.windowToken, 0)
+                    return
                 }
-                val systemService = dialog.context.getSystemService(Context.INPUT_METHOD_SERVICE)
-                val imm = systemService as InputMethodManager
-                imm.hideSoftInputFromWindow(view.windowToken, 0)
-                return
-            }
 
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                if (progress >= 0 && progress <= seekBar.max) {
-                    val progressCal = progress * 5
-                    dialog.respond_dialog_sar_a_seek_eta_txt_view.text =
-                        Util.fromHtml(context.resources.getQuantityString(R.plurals.fragment_respond_dialog_sar_a_est_time, progressCal, progressCal))
+                override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                    if (progress >= 0 && progress <= seekBar.max) {
+                        val progressCal = progress * 5
+                        respondDialogSarASeekEtaTxtView.text =
+                            Util.fromHtml(context.resources.getQuantityString(R.plurals.fragment_respond_dialog_sar_a_est_time, progressCal, progressCal))
+                    }
                 }
-            }
-        })
-        dialog.respond_dialog_sar_a_seek.progress = 5
-        dialog.respond_dialog_sar_a_submit_button.setOnClickListener {
-            val progressCal = dialog.respond_dialog_sar_a_seek.progress * 5
-            if (dialog.sar_a_spinner.selectedItem == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
-                sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, dialog.respond_dialog_sar_a_message_edit_view.text.toString())
-            } else {
-                sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, dialog.sar_a_spinner.selectedItem.toString())
+            })
+            respondDialogSarASeek.progress = 5
+            respondDialogSarASubmitButton.setOnClickListener {
+                val progressCal = respondDialogSarASeek.progress * 5
+                if (sarASpinner.selectedItem == context.getString(R.string.fragment_respond_dialog_all_custom_message_first_line)) {
+                    sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, respondDialogSarAMessageEditView.text.toString())
+                } else {
+                    sendSMSResponse(context, view, SARResponseCode.SAR_A, dialog, progressCal, sarASpinner.selectedItem.toString())
+                }
             }
         }
     }

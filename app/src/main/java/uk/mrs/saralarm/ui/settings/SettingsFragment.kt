@@ -19,12 +19,21 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
 import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.FragmentSettingsBinding
 import uk.mrs.saralarm.support.WidgetProvider
 
 
 class SettingsFragment : Fragment() {
 
+    private var _binding: FragmentSettingsBinding? = null
+
+    // This property is only valid between onCreateView and
+// onDestroyView.
+    private val binding get() = _binding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+
         when (arguments?.getSerializable("sub_category") as SubCategory) {
             SubCategory.NONE ->
                 parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
@@ -35,7 +44,12 @@ class SettingsFragment : Fragment() {
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
         reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
-        return inflater.inflate(R.layout.fragment_settings, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
@@ -130,7 +144,7 @@ class AboutPrefsFragment : PreferenceFragmentCompat() {
     }
 
     @Throws(PackageManager.NameNotFoundException::class)
-    fun appVersion(): String? {
+    fun appVersion(): String {
         val pInfo: PackageInfo =
             requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
         return pInfo.versionName + " (" + getLongVersionCode(pInfo) + ")"

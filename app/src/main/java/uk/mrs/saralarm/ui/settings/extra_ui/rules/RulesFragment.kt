@@ -18,9 +18,9 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.settings_rules_fragment.view.*
 import kotlinx.coroutines.*
 import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.SettingsRulesFragmentBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesObject
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
 import java.io.File
@@ -31,10 +31,15 @@ import kotlin.random.Random
 
 
 class RulesFragment : Fragment(), CoroutineScope {
+    private var _binding: SettingsRulesFragmentBinding? = null
+    val binding get() = _binding!!
+
     private var adapter: RulesRecyclerViewAdapter? = null
 
     var position: Int = 100
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = SettingsRulesFragmentBinding.inflate(inflater, container, false)
+
         val rulesArray: ArrayList<RulesObject>
 
         val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("rulesJSON", "")
@@ -45,25 +50,25 @@ class RulesFragment : Fragment(), CoroutineScope {
             val type: Type = object : TypeToken<ArrayList<RulesObject>?>() {}.type
             rulesArray = Gson().fromJson(json, type)
         }
-        val root: View = inflater.inflate(R.layout.settings_rules_fragment, container, false)
+        binding.apply {
+            rulesRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        root.rules_recycler_view.layoutManager = LinearLayoutManager(context)
+            adapter = RulesRecyclerViewAdapter(requireContext(), this@RulesFragment, rulesArray, this)
 
-        adapter = RulesRecyclerViewAdapter(requireContext(), this, rulesArray, root)
+            rulesRecyclerView.adapter = adapter
 
-        root.rules_recycler_view.adapter = adapter
+            ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(rulesRecyclerView)
+            rulesFab.setOnClickListener {
+                adapter!!.addItem()
+                //FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
 
-        ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.rules_recycler_view)
-        root.rules_fab.setOnClickListener {
-            adapter!!.addItem()
-            //FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
+            }
 
+            setHasOptionsMenu(true)
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
         }
-
-        setHasOptionsMenu(true)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
-        return root
+        return binding.root
     }
 
     override fun onPause() {
@@ -160,6 +165,11 @@ class RulesFragment : Fragment(), CoroutineScope {
         // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
         val menuItem: MenuItem = menu.findItem(R.id.action_bar_settings)
         menuItem.isVisible = false
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override val coroutineContext: CoroutineContext =

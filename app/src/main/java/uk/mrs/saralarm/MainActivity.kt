@@ -26,16 +26,20 @@ import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.google.gson.Gson
-import kotlinx.android.synthetic.main.activity_main.*
+import uk.mrs.saralarm.databinding.ActivityMainBinding
 import uk.mrs.saralarm.support.UpdateWorker
 import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     @SuppressLint("InlinedApi")
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
 
         //Load preferences
         val pref = PreferenceManager.getDefaultSharedPreferences(this)
@@ -60,10 +64,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Loads the layout XML for this Activity and sets the layout as the current view.
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
 
         //Sets the ResponseToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
-        setSupportActionBar(response_toolbar)
+        setSupportActionBar(binding.responseToolbar)
 
         //Build the app bar for the activity. The IDs set here are the top level fragments.
         val appBarConfiguration: AppBarConfiguration = AppBarConfiguration.Builder(R.id.navigation_respond).build()

@@ -9,15 +9,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.android.synthetic.main.settings_sms_numbers_fragment.view.*
 import uk.mrs.saralarm.R
+import uk.mrs.saralarm.databinding.SettingsSmsNumbersFragmentBinding
 import java.lang.reflect.Type
 
 
 class SMSNumbersFragment : Fragment() {
+    private var _binding: SettingsSmsNumbersFragmentBinding? = null
+    val binding get() = _binding!!
+
     private var adapter: SMSNumbersRecyclerViewAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        _binding = SettingsSmsNumbersFragmentBinding.inflate(inflater, container, false)
+
         val smsNumberObjectArray: ArrayList<String>
 
         val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("respondSMSNumbersJSON", "")
@@ -28,23 +33,24 @@ class SMSNumbersFragment : Fragment() {
             val type: Type = object : TypeToken<ArrayList<String>?>() {}.type
             smsNumberObjectArray = Gson().fromJson(json, type)
         }
-        val root: View = inflater.inflate(R.layout.settings_sms_numbers_fragment, container, false)
 
-        root.sms_numbers_recycler_view.layoutManager = LinearLayoutManager(context)
+        binding.apply {
+            smsNumbersRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        adapter = SMSNumbersRecyclerViewAdapter(requireContext(), smsNumberObjectArray, root)
+            adapter = SMSNumbersRecyclerViewAdapter(requireContext(), smsNumberObjectArray, this)
 
-        root.sms_numbers_recycler_view.adapter = adapter
+            smsNumbersRecyclerView.adapter = adapter
 
-        ItemTouchHelper(SMSNumbersDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(root.sms_numbers_recycler_view)
-        root.sms_numbers_fab.setOnClickListener {
-            adapter!!.addItem()
+            ItemTouchHelper(SMSNumbersDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(smsNumbersRecyclerView)
+            smsNumbersFab.setOnClickListener {
+                adapter!!.addItem()
+            }
+
+            setHasOptionsMenu(true)
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
         }
-
-        setHasOptionsMenu(true)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
-        return root
+        return binding.root
     }
 
     override fun onPause() {
@@ -58,5 +64,10 @@ class SMSNumbersFragment : Fragment() {
         // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
         val menuItem: MenuItem = menu.findItem(R.id.action_bar_settings)
         menuItem.isVisible = false
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
