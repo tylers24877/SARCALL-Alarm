@@ -1,17 +1,18 @@
-package uk.mrs.saralarm.ui.settings.extra_ui.rules
+package uk.mrs.saralarm.ui.settings.extra_ui.support
 
+import android.content.Context
+import android.graphics.Canvas
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 
 
-class RulesDragAdapter(adapterCustomMessages: RulesRecyclerViewAdapter, dragDirs: Int, swipeDirs: Int) :
+class DragAdapter(private val dragListener: DragListener, context: Context, dragDirs: Int, swipeDirs: Int) :
     ItemTouchHelper.SimpleCallback(dragDirs, swipeDirs) {
 
-    private val mAdapter: RulesRecyclerViewAdapter = adapterCustomMessages
+    private val dragAdapterUtil = DragAdapterUtil(context)
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-        mAdapter.swapItems(viewHolder.adapterPosition, target.adapterPosition)
+        dragListener.swapItems(viewHolder.adapterPosition, target.adapterPosition)
         return true
     }
 
@@ -30,7 +31,16 @@ class RulesDragAdapter(adapterCustomMessages: RulesRecyclerViewAdapter, dragDirs
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        mAdapter.removeItems(viewHolder.adapterPosition, true)
+        dragListener.removeItems(viewHolder.adapterPosition, true)
     }
 
+    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+        dragAdapterUtil.onChildDraw(c, viewHolder, dX, isCurrentlyActive)
+        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+    }
+}
+
+interface DragListener {
+    fun removeItems(adapterPosition: Int, allowUndo: Boolean)
+    fun swapItems(fromPosition: Int, toPosition: Int)
 }

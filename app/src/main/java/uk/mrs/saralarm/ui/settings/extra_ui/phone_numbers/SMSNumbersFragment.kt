@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.SettingsSmsNumbersFragmentBinding
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapter
 import java.lang.reflect.Type
 
 
@@ -41,7 +42,7 @@ class SMSNumbersFragment : Fragment() {
 
             smsNumbersRecyclerView.adapter = adapter
 
-            ItemTouchHelper(SMSNumbersDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(smsNumbersRecyclerView)
+            ItemTouchHelper(DragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(smsNumbersRecyclerView)
             smsNumbersFab.setOnClickListener {
                 adapter!!.addItem()
             }

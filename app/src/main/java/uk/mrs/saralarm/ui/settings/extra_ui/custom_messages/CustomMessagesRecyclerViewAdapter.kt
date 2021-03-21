@@ -18,6 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesRecyclerViewRowBinding
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.util.*
 
@@ -25,7 +26,7 @@ import java.util.*
 class CustomMessagesRecyclerViewAdapter(val context: Context,
                                         val data: ArrayList<String>,
                                         val binding: SettingsCustomMessagesFragmentBinding
-) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>() {
+) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>(), DragListener {
 
     var undoSnackBar: Snackbar? = null
 
@@ -33,14 +34,14 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
         return data.size
     }
 
-    fun swapItems(fromPosition: Int, toPosition: Int) {
+    override fun swapItems(fromPosition: Int, toPosition: Int) {
         val original = data[fromPosition]
         data.removeAt(fromPosition)
         data.add(toPosition, original)
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+    override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
                 val temp = data[adapterPosition]

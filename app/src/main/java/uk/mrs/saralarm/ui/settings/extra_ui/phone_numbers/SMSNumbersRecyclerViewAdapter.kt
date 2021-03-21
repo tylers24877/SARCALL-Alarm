@@ -21,13 +21,14 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import uk.mrs.saralarm.databinding.SettingsSmsNumbersFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsSmsNumbersRecyclerViewRowBinding
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 
 
 class SMSNumbersRecyclerViewAdapter(val context: Context,
                                     val data: ArrayList<String>,
                                     val binding: SettingsSmsNumbersFragmentBinding
-) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>() {
+) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>(), DragListener {
 
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
     var undoSnackBar: Snackbar? = null
@@ -35,14 +36,14 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
         return data.size
     }
 
-    fun swapItems(fromPosition: Int, toPosition: Int) {
+    override fun swapItems(fromPosition: Int, toPosition: Int) {
         val original = data[fromPosition]
         data.removeAt(fromPosition)
         data.add(toPosition, original)
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+    override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
                 val temp = data[adapterPosition]

@@ -23,6 +23,7 @@ import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.SettingsRulesFragmentBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesObject
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapter
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.reflect.Type
@@ -57,7 +58,7 @@ class RulesFragment : Fragment(), CoroutineScope {
 
             rulesRecyclerView.adapter = adapter
 
-            ItemTouchHelper(RulesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(rulesRecyclerView)
+            ItemTouchHelper(DragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(rulesRecyclerView)
             rulesFab.setOnClickListener {
                 adapter!!.addItem()
                 //FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)

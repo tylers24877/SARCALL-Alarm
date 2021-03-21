@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.SettingsTeamPrefixFragmentBinding
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapter
 import java.lang.reflect.Type
 
 
@@ -45,7 +46,7 @@ class TeamPrefixFragment : Fragment() {
 
             teamPrefixRecyclerView.adapter = adapter
 
-            ItemTouchHelper(TeamPrefixDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(teamPrefixRecyclerView)
+            ItemTouchHelper(DragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(teamPrefixRecyclerView)
             teamPrefixFab.setOnClickListener {
                 adapter!!.addItem()
             }

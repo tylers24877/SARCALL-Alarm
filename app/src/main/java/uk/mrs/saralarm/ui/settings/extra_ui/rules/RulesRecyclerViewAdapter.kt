@@ -38,6 +38,7 @@ import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourRecyclerViewAdapt
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesObject
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.io.File
 
@@ -46,7 +47,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
                                val data: ArrayList<RulesObject>,
                                private val binding: SettingsRulesFragmentBinding
 ) :
-    RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>() {
+    RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>(), DragListener {
 
     var undoSnackBar: Snackbar? = null
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
@@ -55,7 +56,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         return data.size
     }
 
-    fun swapItems(fromPosition: Int, toPosition: Int) {
+    override fun swapItems(fromPosition: Int, toPosition: Int) {
         val original = data[fromPosition]
         data.removeAt(fromPosition)
         data.add(toPosition, original)
@@ -63,7 +64,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
+    override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
                 val temp = data[adapterPosition]

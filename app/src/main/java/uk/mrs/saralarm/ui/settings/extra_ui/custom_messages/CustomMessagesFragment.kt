@@ -11,6 +11,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesFragmentBinding
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapter
 import java.lang.reflect.Type
 
 class CustomMessagesFragment : Fragment() {
@@ -39,7 +40,7 @@ class CustomMessagesFragment : Fragment() {
 
             customMessageRecyclerView.adapter = adapter
 
-            ItemTouchHelper(CustomMessagesDragAdapter(adapter!!, 3, 12)).attachToRecyclerView(customMessageRecyclerView)
+            ItemTouchHelper(DragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(customMessageRecyclerView)
             customMessageFab.setOnClickListener {
                 adapter!!.addItem()
             }
