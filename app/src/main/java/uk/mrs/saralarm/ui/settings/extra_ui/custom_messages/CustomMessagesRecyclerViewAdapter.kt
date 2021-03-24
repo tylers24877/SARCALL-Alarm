@@ -18,7 +18,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesRecyclerViewRowBinding
-import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapterListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.util.*
 
@@ -26,7 +26,7 @@ import java.util.*
 class CustomMessagesRecyclerViewAdapter(val context: Context,
                                         val data: ArrayList<String>,
                                         val binding: SettingsCustomMessagesFragmentBinding
-) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>(), DragListener {
+) : RecyclerView.Adapter<CustomMessagesRecyclerViewAdapter.ViewHolder?>(), DragAdapterListener {
 
     var undoSnackBar: Snackbar? = null
 

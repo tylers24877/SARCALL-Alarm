@@ -38,7 +38,7 @@ import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourRecyclerViewAdapt
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesChoice
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesObject
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
-import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapterListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import java.io.File
 
@@ -47,7 +47,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
                                val data: ArrayList<RulesObject>,
                                private val binding: SettingsRulesFragmentBinding
 ) :
-    RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>(), DragListener {
+    RecyclerView.Adapter<RulesRecyclerViewAdapter.ViewHolder?>(), DragAdapterListener {
 
     var undoSnackBar: Snackbar? = null
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()

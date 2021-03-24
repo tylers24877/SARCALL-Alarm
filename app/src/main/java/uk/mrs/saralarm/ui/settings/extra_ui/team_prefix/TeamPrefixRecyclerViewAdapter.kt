@@ -19,7 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import uk.mrs.saralarm.databinding.SettingsTeamPrefixFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsTeamPrefixRecyclerViewRowBinding
-import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapterListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 import kotlin.jvm.internal.Intrinsics
 
@@ -27,7 +27,7 @@ import kotlin.jvm.internal.Intrinsics
 class TeamPrefixRecyclerViewAdapter(val context: Context,
                                     val data: ArrayList<String>,
                                     val binding: SettingsTeamPrefixFragmentBinding
-) : RecyclerView.Adapter<TeamPrefixRecyclerViewAdapter.ViewHolder?>(), DragListener {
+) : RecyclerView.Adapter<TeamPrefixRecyclerViewAdapter.ViewHolder?>(), DragAdapterListener {
 
     var undoSnackBar: Snackbar? = null
 

@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity() {
         checkOverlay()
     }
 
+
     /**
      * Create/update background jobs for app updater.
      * Checks 12 hourly-ish

@@ -21,14 +21,14 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import uk.mrs.saralarm.databinding.SettingsSmsNumbersFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsSmsNumbersRecyclerViewRowBinding
-import uk.mrs.saralarm.ui.settings.extra_ui.support.DragListener
+import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapterListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 
 
 class SMSNumbersRecyclerViewAdapter(val context: Context,
                                     val data: ArrayList<String>,
                                     val binding: SettingsSmsNumbersFragmentBinding
-) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>(), DragListener {
+) : RecyclerView.Adapter<SMSNumbersRecyclerViewAdapter.ViewHolder?>(), DragAdapterListener {
 
     val phoneUtil: PhoneNumberUtil = PhoneNumberUtil.getInstance()
     var undoSnackBar: Snackbar? = null

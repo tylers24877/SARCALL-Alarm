@@ -92,6 +92,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         context?.registerReceiver(respondSMSBroadcastReceiver, IntentFilter(RESPOND_SMS_BROADCAST_RECEIVER_SENT))
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
+
         return binding.root
     }
 

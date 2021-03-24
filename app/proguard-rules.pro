@@ -21,4 +21,3 @@
 #-renamesourcefileattribute SourceFile
 
 -keepclassmembers enum * { *; }
--keepattributes SourceFile,LineNumberTable

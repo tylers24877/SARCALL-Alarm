@@ -20,15 +20,15 @@
     <string name="fragment_settings_rules_custom_visuals_colours_save_close_button"><![CDATA[Save & Close]]></string>
     <string name="fragment_settings_rules_custom_visuals_colour_placeholder">[PLACEHOLDER]</string>
     <string name="fragment_settings_pref_enabled_title">Enable SARCALL Alarm *</string>
-    <string name="fragment_settings_pref_enabled_summary">Enable for the app to alert you to callouts.\nToggling this will not sign you on/off</string>
+    <string name="fragment_settings_pref_enabled_summary">Enable the app to alert you to callouts.\nToggling this will not sign you on/off.</string>
     <string name="fragment_settings_pref_activation_cat_title">Activation</string>
     <string name="fragment_settings_pref_activation_cat_summary">Settings related to alarm activation</string>
     <string name="fragment_settings_pref_required_desc_summary">* = Required for the app to function correctly</string>
-    <string name="fragment_settings_pref_rules_summary">Configure as many rules as you like using a phrase, SMS number or both. If using \"Both\" option, a received SMS containing the \"phrase\" would\'ve had to come from the \"SMS Number\" to trigger the alarm.\nExample:\n•SMS number: 07........(SARCALL SMS Number)\n•Phrase: LAKESMRT (A phrase common within a callout SMS messages)</string>
+    <string name="fragment_settings_pref_rules_summary">Configure as many rules as you\'d like using a phrase, SMS number or both. If using \"Both\" option, a received SMS containing the \"phrase\" would\'ve had to come from the \"SMS Number\" to trigger the alarm.\nExample:\n•SMS number: 07........(SARCALL SMS number)\n•Phrase: LAKESMRT (a phrase common within a callout SMS messages)</string>
     <string name="fragment_settings_pref_rules_title">Trigger Rules *</string>
     <string name="fragment_settings_pref_respond_cat_summary">Settings for use on the \'Respond\' page of the app</string>
     <string name="fragment_settings_pref_respond_cat_title">Respond Page</string>
-    <string name="fragment_settings_pref_prefix_summary">Used for the Sign On/Off functionality. The format should be like \'LEEMINGMRT\', for example.</string>
+    <string name="fragment_settings_pref_prefix_summary">Used for the Sign On/Off function. The format should be like \'LEEMINGMRT\', for example.</string>
     <string name="fragment_settings_pref_prefix_title">Team Prefix *</string>
     <string name="fragment_settings_pref_reply_number_summary">Set the SMS numbers to send the SAR A/L/N responses to.\nThe SAR A/L/N message can be sent to multiple different numbers at the same time.</string>
     <string name="fragment_settings_pref_reply_number_title">SAR A/L/N Reply Number *</string>
