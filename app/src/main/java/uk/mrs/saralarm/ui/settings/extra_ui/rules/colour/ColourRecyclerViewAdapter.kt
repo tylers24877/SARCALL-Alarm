@@ -21,7 +21,6 @@ import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) : RecyclerView.Adapter<ColourRecyclerViewAdapter.ViewHolder?>() {
     var mContext: Context = context
     private val mData: ArrayList<String> = data
-    private val mInflater: LayoutInflater = LayoutInflater.from(context)
 
     var onSave: ((ArrayList<String>) -> Unit)? = null
 
@@ -147,7 +146,7 @@ class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) :
             val metrics: DisplayMetrics?
             val resources: Resources = mContext.resources
             metrics = resources.displayMetrics
-            return TypedValue.applyDimension(1, dipValue, metrics)
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
         }
 
         override fun onClick(v: View?) {}

@@ -1,5 +1,6 @@
 package uk.mrs.saralarm.ui.respond.support
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -29,6 +30,7 @@ import kotlin.collections.HashSet
 
 object RespondUtil {
 
+    @SuppressLint("Range")
     fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
@@ -99,7 +101,7 @@ object RespondUtil {
 
     private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String): Boolean {
         for (s in SS) {
-            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
+            if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m.replace("\\s".toRegex(), "")).find()) {
                 return true
             }
         }
@@ -122,7 +124,7 @@ object RespondUtil {
     private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Boolean {
         for (s in SS) {
             try {
-                if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
+                if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body.replace("\\s".toRegex(), "")).find()) {
                     val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                     if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
                         return true

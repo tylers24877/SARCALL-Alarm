@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -79,25 +78,23 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
         //Check if what SDK the app is running on. If Version M(23) or higher...
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            //Load Package Name.
-            val packageName = packageName
-            //Load the Power Service from the system.
-            val systemService = getSystemService(Context.POWER_SERVICE)
-            //Checks it does not exist.
-            if (systemService == null) {
-                //Throw an error if it doesn't
-                throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
+        //Load Package Name.
+        val packageName = packageName
+        //Load the Power Service from the system.
+        val systemService = getSystemService(Context.POWER_SERVICE)
+        //Checks it does not exist.
+        if (systemService == null) {
+            //Throw an error if it doesn't
+            throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
             //If the service does exist, check if the app is NOT ignoring battery optimizations.
-            } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
-                //Create a new intent.
-                val i = Intent()
-                //Set the action of the intent to request to ignore battery optimizations
-                i.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
-                i.data = Uri.parse("package:$packageName")
-                //Starts request to ask user.
-                startActivity(i)
-            }
+        } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
+            //Create a new intent.
+            val i = Intent()
+            //Set the action of the intent to request to ignore battery optimizations
+            i.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+            i.data = Uri.parse("package:$packageName")
+            //Starts request to ask user.
+            startActivity(i)
         }
 
         //Check if alarm is enabled. If true,
@@ -161,9 +158,8 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("InlinedApi", "MissingPermission")
     private fun checkOverlay() {
         //Check if cannot draw on top. If true...
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                !Settings.canDrawOverlays(this)
-            } else false
+        if (
+            !Settings.canDrawOverlays(this)
         ) {
             //Create a dialog informing the user.
             val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
@@ -216,10 +212,7 @@ class MainActivity : AppCompatActivity() {
         //Check if the request code matches the request from the CheckOverlay function
         if (requestCode == 505) {
             //Check if the user accepted the permission. If not start the process again.
-            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    !Settings.canDrawOverlays(this)
-                } else false
-            ) {
+            if (!Settings.canDrawOverlays(this)) {
                 checkOverlay()
             }
         }

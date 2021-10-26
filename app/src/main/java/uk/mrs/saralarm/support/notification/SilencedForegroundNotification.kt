@@ -88,17 +88,17 @@ class SilencedForegroundNotification : Service() {
         val add1HourBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7000, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "add1Hour"), FLAG_UPDATE_CURRENT
+                    .putExtra("button", "add1Hour"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         val add10MinutesBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7001, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "add10Minutes"), FLAG_UPDATE_CURRENT
+                    .putExtra("button", "add10Minutes"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         val cancelBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7002, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "cancel"), FLAG_UPDATE_CURRENT
+                    .putExtra("button", "cancel"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         if (!::notificationBuilder.isInitialized) {
             val title = "Alarm Silenced"

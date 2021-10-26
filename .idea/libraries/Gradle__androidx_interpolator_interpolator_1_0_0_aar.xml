@@ -1,18 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: androidx.interpolator:interpolator:1.0.0@aar">
     <CLASSES>
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/5169ad13b8bb6784d4826b687d80a959/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/545ce66e9a0694afe8b8c46694b5408a/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/d4273786d68480d4f50b1710dae23471/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/eb8b516e8f467342fa9de3f7c0c62559/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/551e70ccb69271b87438a3d9fdd3970f/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/75dd0d1ebc1db2c56e5d405c6d606388/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/815bd606acf97c514560583d5e619327/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/3548dc74882d39706a3685a4e6c4ee1d/interpolator-1.0.0/res" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/64e415f501163b45103f528322069681/interpolator-1.0.0/res" />
-      <root url="jar://E:/android/.gradle/caches/transforms-2/files-2.1/bd0a65e480e5019a417b799a6e47c573/interpolator-1.0.0/jars/classes.jar!/" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/bd0a65e480e5019a417b799a6e47c573/interpolator-1.0.0/AndroidManifest.xml" />
-      <root url="file://E:/android/.gradle/caches/transforms-2/files-2.1/bd0a65e480e5019a417b799a6e47c573/interpolator-1.0.0/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-3/a293be790c762e9bf2bf1ded83306ac8/transformed/interpolator-1.0.0/res" />
+      <root url="jar://E:/android/.gradle/caches/transforms-3/9825ca5498c366b52bd49e6ab2f1bf0d/transformed/interpolator-1.0.0/jars/classes.jar!/" />
+      <root url="file://E:/android/.gradle/caches/transforms-3/9825ca5498c366b52bd49e6ab2f1bf0d/transformed/interpolator-1.0.0/res" />
+      <root url="file://E:/android/.gradle/caches/transforms-3/9825ca5498c366b52bd49e6ab2f1bf0d/transformed/interpolator-1.0.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

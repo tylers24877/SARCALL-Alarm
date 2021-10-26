@@ -23,7 +23,7 @@ object PostAlarmNotification {
             .setContentText("SARCALL Alarm activated recently! Tap to respond.")
             .setStyle(NotificationCompat.BigTextStyle().bigText(("SARCALL Alarm activated recently! Tap to respond.")))
             .setAutoCancel(true)
-            .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
+            .setContentIntent(PendingIntent.getActivity(context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_CANCEL_CURRENT))
             .setPriority(2)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setColor(Color.argb(255, 204, 51, 1))

@@ -1,6 +1,7 @@
 package uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Resources
@@ -43,6 +44,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
         notifyItemMoved(fromPosition, toPosition)
     }
 
+    @SuppressLint("ShowToast")
     override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
@@ -172,7 +174,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
             val metrics: DisplayMetrics?
             val resources: Resources = context.resources
             metrics = resources.displayMetrics
-            return TypedValue.applyDimension(1, dipValue, metrics)
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
         }
         override fun onClick(v: View?) {}
     }

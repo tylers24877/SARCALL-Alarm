@@ -96,6 +96,7 @@ object SMSSender {
         } catch (e7: NumberParseException) {
             Toast.makeText(context, "Failed! SARCALL SMS number is formatted wrong. Please check number in settings.", Toast.LENGTH_LONG).show()
         } catch (e: Exception) {
+            print(e.message)
             Toast.makeText(context, "Unknown error. Please try again or report issue.", Toast.LENGTH_LONG).show()
         }
     }
@@ -106,10 +107,15 @@ object SMSSender {
         ) {
 
             val sentPendingIntents = ArrayList<PendingIntent>()
-            val sentPI: PendingIntent = PendingIntent.getBroadcast(context, 0, Intent(RESPOND_SMS_BROADCAST_RECEIVER_SENT), 0)
+            val sentPI: PendingIntent = PendingIntent.getBroadcast(context, 0, Intent(RESPOND_SMS_BROADCAST_RECEIVER_SENT), PendingIntent.FLAG_IMMUTABLE)
 
             try {
-                val sms = SmsManager.getDefault()
+
+                val sms =// if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP_MR1) {
+                // SmsManager.getSmsManagerForSubscriptionId(SmsManager.getDefaultSmsSubscriptionId())
+                    //} else {
+                    SmsManager.getDefault()
+                // }
                 val mSMSMessage = sms.divideMessage(message)
                 for (i in 0 until mSMSMessage.size) {
                     sentPendingIntents.add(i, sentPI)

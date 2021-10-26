@@ -1,5 +1,6 @@
 package uk.mrs.saralarm.ui.settings.extra_ui.rules
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -127,6 +128,7 @@ class RulesFragment : Fragment(), CoroutineScope {
         }
     }
 
+    @SuppressLint("Range")
     private fun getFileName(mCon: Context, uri: Uri): String {
         var result: String? = null
         if (uri.scheme == "content") {

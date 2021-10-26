@@ -75,7 +75,7 @@ class WidgetProvider : AppWidgetProvider() {
     private fun getPendingSelfIntent(context: Context): PendingIntent {
         val intent = Intent(context, javaClass)
         intent.action = WIDGET_CLICK
-        return PendingIntent.getBroadcast(context, 0, intent, 0)
+        return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     companion object {

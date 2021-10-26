@@ -1,6 +1,7 @@
 package uk.mrs.saralarm.ui.settings.extra_ui.rules
 
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -64,6 +65,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         notifyItemMoved(fromPosition, toPosition)
     }
 
+    @SuppressLint("ShowToast")
     override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
@@ -411,7 +413,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
             val metrics: DisplayMetrics?
             val resources: Resources = context.resources
             metrics = resources.displayMetrics
-            return TypedValue.applyDimension(1, dipValue, metrics)
+            return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
         }
 
         override fun onClick(v: View?) {}

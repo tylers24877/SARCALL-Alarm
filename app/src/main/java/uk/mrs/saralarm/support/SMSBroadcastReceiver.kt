@@ -5,8 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.hardware.display.DisplayManager
-import android.os.Build
-import android.os.Build.VERSION
 import android.telephony.PhoneNumberUtils
 import android.telephony.SmsMessage
 import android.view.Display
@@ -67,11 +65,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                     // Fill the msgs array.
                     messages = arrayOfNulls(pdus.size)
                     for (i in messages.indices) {
-                        if (VERSION.SDK_INT >= Build.VERSION_CODES.M) { // If Android version M or newer:
-                            messages[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray, format)
-                        } else { // If Android version L or older:
-                            messages[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray)
-                        }
+                        // If Android version M or newer:
+                        messages[i] = SmsMessage.createFromPdu(pdus[i] as ByteArray, format)
                         // Build the message to show.
                         strMessage += messages[i]?.messageBody
                     }
@@ -127,7 +122,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
     }
     private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String, num: String): RuleAlarmData {
         for (s in SS) {
-            if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m).find()) {
+            if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m.replace("\\s".toRegex(), "")).find()) {
                 return RuleAlarmData(
                     true, s.customAlarmRulesObject.alarmSoundType, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
                     s.customAlarmRulesObject.colorArray, m, num
@@ -156,7 +151,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
     private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): RuleAlarmData {
         for (s in SS) {
             try {
-                if (Pattern.compile(s.phrase, Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body).find()) {
+                if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body.replace("\\s".toRegex(), "")).find()) {
                     val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                     if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
                         return RuleAlarmData(

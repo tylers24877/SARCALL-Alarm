@@ -28,7 +28,7 @@ class AlarmForegroundNotification : Service() {
             .setSmallIcon(uk.mrs.saralarm.R.drawable.ic_baseline_notification_important_24)
             .setContentTitle(title)
             .setContentText("SARCALL Alarm Activated").setAutoCancel(true)
-            .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT))
+            .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setColor(Color.argb(255, 204, 51, 1))
@@ -39,9 +39,8 @@ class AlarmForegroundNotification : Service() {
         fullScreenIntent.putExtra("ruleAlarmData", ruleAlarmData)
         fullScreenIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS or Intent.FLAG_ACTIVITY_NEW_TASK)
 
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                Settings.canDrawOverlays(this)
-            } else true
+        if (
+            Settings.canDrawOverlays(this)
         ) {
             startActivity(fullScreenIntent)
         } else {

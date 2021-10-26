@@ -5,13 +5,11 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.preference.PreferenceManager
 import uk.mrs.saralarm.databinding.ActivitySetupBinding
 import kotlin.jvm.internal.Intrinsics
@@ -34,21 +32,14 @@ class SetupActivity : AppCompatActivity() {
         //Setup OnClick Listener for the setup button. When clicked...
         binding.setupPermissionButton.setOnClickListener {
             //Check if the user has the necessary permissions
-            if (Build.VERSION.SDK_INT < 23 || ActivityCompat.checkSelfPermission(this, "android.permission.RECEIVE_SMS") == 0
-                && ActivityCompat.checkSelfPermission(this, "android.permission.SEND_SMS") == 0 &&
-                ActivityCompat.checkSelfPermission(this, "android.permission.READ_SMS") == 0 &&
-                ActivityCompat.checkSelfPermission(this, "android.permission.READ_EXTERNAL_STORAGE") == 0
-            )
-                checkOverlayAndMoveOn() //if permissions already granted, go straight to checking overlay.
-            else
-                requestPermissions(
-                    arrayOf(
-                        "android.permission.RECEIVE_SMS",
-                        "android.permission.READ_SMS",
-                        "android.permission.SEND_SMS",
-                        "android.permission.READ_EXTERNAL_STORAGE"
-                    ), 1
-                ) //if permissions not granted, request them with request code of 1.
+            requestPermissions(
+                arrayOf(
+                    "android.permission.RECEIVE_SMS",
+                    "android.permission.READ_SMS",
+                    "android.permission.SEND_SMS",
+                    "android.permission.READ_EXTERNAL_STORAGE"
+                ), 1
+            ) //if permissions not granted, request them with request code of 1.
         }
     }
 
@@ -71,9 +62,8 @@ class SetupActivity : AppCompatActivity() {
      */
     @SuppressLint("InlinedApi")
     private fun checkOverlayAndMoveOn() {
-        if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                !Settings.canDrawOverlays(this)
-            } else false
+        if (
+            !Settings.canDrawOverlays(this)
         ) {
             val dialogClickListener: DialogInterface.OnClickListener = DialogInterface.OnClickListener { _, which ->
                 when (which) {
@@ -108,18 +98,16 @@ class SetupActivity : AppCompatActivity() {
      * Once accepted, continue to startApp().
      */
     private fun checkBattery() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val intent = Intent()
-            val packageName = packageName
-            val systemService = getSystemService(Context.POWER_SERVICE)
-            if (systemService == null) {
-                throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
-            } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
-                intent.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
-                intent.data = Uri.parse("package:$packageName")
-                startActivityForResult(intent, 2)
-                return
-            }
+        val intent = Intent()
+        val packageName = packageName
+        val systemService = getSystemService(Context.POWER_SERVICE)
+        if (systemService == null) {
+            throw NullPointerException("null cannot be cast to non-null type android.os.PowerManager")
+        } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
+            intent.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+            intent.data = Uri.parse("package:$packageName")
+            startActivityForResult(intent, 2)
+            return
         }
         //Start app if already granted.
         startApp()
@@ -135,9 +123,8 @@ class SetupActivity : AppCompatActivity() {
         }
         //If request code of 44 (from checkOverlayAndMoveOn())
         if (requestCode == 44) {
-            if (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    Settings.canDrawOverlays(this)
-                } else false
+            if (
+                Settings.canDrawOverlays(this)
             ) {
                 checkBattery()
             } else {
