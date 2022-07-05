@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <resources>
     <string name="fragment_help_summary">If you\'d like to leave some feedback or ask any questions, please complete the form below.\nAn internet connection is required.</string>
     <string name="fragment_help_view_feedback_form_toggle">View Feedback Form</string>

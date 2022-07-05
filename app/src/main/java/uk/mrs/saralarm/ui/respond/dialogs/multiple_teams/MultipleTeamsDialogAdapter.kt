@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.respond.dialogs.multiple_teams
 
 import android.content.Context
@@ -6,7 +13,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import uk.mrs.saralarm.databinding.DialogRespondSignOnOffMulitpleTeamsBinding
 import uk.mrs.saralarm.databinding.DialogRespondSignOnOffMultipleTeamsRowBinding
-import java.util.*
 
 class MultipleTeamsDialogAdapter(val context: Context,
                                  val data: ArrayList<Pair<Boolean, String>>, val dialogBinding: DialogRespondSignOnOffMulitpleTeamsBinding

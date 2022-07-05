@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fadeScrollbars="false"
+    android:scrollbars="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/respond_dialog_sar_n_constraint_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:paddingBottom="100.0dip">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7.0dip"
+            android:text="@string/fragment_respond_sar_n_response_title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
+            android:textColor="@color/primary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/respond_dialog_sar_n_message_input_layout"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32.0dip"
+            android:background="@android:color/transparent"
+            app:boxBackgroundColor="@android:color/transparent"
+            app:counterEnabled="true"
+            app:counterMaxLength="135"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/sar_n_spinner"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_n_message_title_txt_view">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/respond_dialog_sar_n_message_edit_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center|top"
+                android:hint="@string/fragment_respond_sar_l_response_message_hint"
+                android:inputType="textMultiLine"
+                android:maxLength="135"
+                android:scrollbars="vertical" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/respond_dialog_sar_n_submit_button"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50.0dip"
+            android:layout_marginLeft="50.0dip"
+            android:layout_marginTop="37.0dip"
+            android:layout_marginEnd="50.0dip"
+            android:layout_marginRight="50.0dip"
+            android:text="@string/fragment_respond_sar_l_response_send_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_n_message_input_layout" />
+
+        <TextView
+            android:id="@+id/respond_dialog_sar_n_message_title_txt_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16.0dip"
+            android:text="@string/fragment_respond_sar_l_response_custom_message_title"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_n_message_input_layout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/sar_n_spinner"
+            app:layout_constraintTop_toBottomOf="@id/sar_n_spinner" />
+
+        <TextView
+            android:id="@+id/respond_dialog_sar_n_pre_message_title_txt_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/fragment_respond_dialog_sar_l_predefined_message"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="@id/respond_dialog_sar_n_message_input_layout"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+        <Spinner
+            android:id="@+id/sar_n_spinner"
+            android:layout_width="0.0dip"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32.0dip"
+            android:layout_marginLeft="32.0dip"
+            android:layout_marginTop="8.0dip"
+            android:layout_marginEnd="32.0dip"
+            android:layout_marginRight="32.0dip"
+            android:singleLine="false"
+            android:spinnerMode="dialog"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/respond_dialog_sar_n_pre_message_title_txt_view" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

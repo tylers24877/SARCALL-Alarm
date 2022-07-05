@@ -3,6 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/android/AndroidStudioProjects/SARCALLAlarm/app/src/main/res/layout/dialog_respond_sar_l.xml" value="0.2259963768115942" />
+        <entry key="..\:/android/AndroidStudioProjects/SARCALLAlarm/app/src/main/res/layout/dialog_respond_sar_n.xml" value="0.16393442622950818" />
         <entry key="..\:/android/AndroidStudioProjects/SARCALLAlarm/app/src/main/res/layout/widget_app.xml" value="0.13541666666666666" />
       </map>
     </option>

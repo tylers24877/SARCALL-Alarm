@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.support.notification
 
 import android.app.NotificationChannel
@@ -10,7 +17,6 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import uk.mrs.saralarm.MainActivity
 import uk.mrs.saralarm.R
-
 
 object PostAlarmNotification {
 
@@ -31,9 +37,9 @@ object PostAlarmNotification {
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            val chan = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
-            chan.setBypassDnd(true)
-            notificationManager.createNotificationChannel(chan)
+            val notificationChannel = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.setBypassDnd(true)
+            notificationManager.createNotificationChannel(notificationChannel)
 
         }
         notificationManager.notify(1, notificationBuilder.build())

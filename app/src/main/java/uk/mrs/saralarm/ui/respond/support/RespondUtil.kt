@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.respond.support
 
 import android.annotation.SuppressLint
@@ -17,6 +24,7 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import uk.mrs.saralarm.R
@@ -26,10 +34,10 @@ import java.lang.reflect.Type
 import java.text.DateFormat
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.HashSet
 
 object RespondUtil {
 
+    @DelicateCoroutinesApi
     @SuppressLint("Range")
     fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {

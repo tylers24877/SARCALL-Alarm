@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.rules
 
 import android.animation.ObjectAnimator
@@ -33,7 +40,10 @@ import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import com.google.i18n.phonenumbers.Phonenumber
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.databinding.*
+import uk.mrs.saralarm.databinding.ColourDialogFragmentBinding
+import uk.mrs.saralarm.databinding.SettingsRulesFragmentBinding
+import uk.mrs.saralarm.databinding.SettingsRulesRecyclerViewRowBinding
+import uk.mrs.saralarm.databinding.SettingsRulesSoundDialogBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourDragAdapter
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.colour.ColourRecyclerViewAdapter
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.RulesChoice

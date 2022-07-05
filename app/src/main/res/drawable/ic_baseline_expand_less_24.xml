@@ -1,10 +1,17 @@
+<!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:tint="?attr/colorControlNormal"
     android:viewportWidth="24"
     android:viewportHeight="24">
-  <path
-      android:fillColor="@android:color/white"
-      android:pathData="M12,8l-6,6 1.41,1.41L12,10.83l4.59,4.58L18,14z" />
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M12,8l-6,6 1.41,1.41L12,10.83l4.59,4.58L18,14z" />
 </vector>

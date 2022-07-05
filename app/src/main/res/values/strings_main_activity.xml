@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <resources>
     <string name="main_activity_display_on_top_permission_request">The \'Display on top\' permission is needed for \'SARCALL Alarm\' to activate the alarm.\nPlease enable the permission on the app settings page.</string>
     <string name="main_activity_display_on_top_positive_button">Continue Setup</string>

@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.respond
 
 import android.app.Dialog
@@ -15,6 +22,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -180,6 +188,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         }
     }
 
+    @DelicateCoroutinesApi
     private fun updateLatestSMS() {
         if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0) {
             GlobalScope.launch(Dispatchers.Main) {

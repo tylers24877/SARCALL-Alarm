@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.respond.support
 
 import android.app.PendingIntent
@@ -17,7 +24,6 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil
 import uk.mrs.saralarm.support.SARResponseCode
 import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver.Companion.RESPOND_SMS_BROADCAST_RECEIVER_SENT
 import java.lang.reflect.Type
-import java.util.*
 
 object SMSSender {
 
@@ -62,7 +68,7 @@ object SMSSender {
                 }
                 SARResponseCode.SAR_N -> {
                     for (phoneNumber in phoneNumberSet) {
-                        sendSMS(context, "SAR N", phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
+                        sendSMS(context, "SAR N $message", phoneUtil.format(phoneUtil.parse(phoneNumber, "GB"), PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL))
                     }
                     Toast.makeText(context, "SAR N sent to SARCALL", Toast.LENGTH_LONG).show()
                     dialog?.cancel()

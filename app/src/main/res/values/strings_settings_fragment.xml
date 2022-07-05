@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <resources>
     <string name="settings_fragment_add_fab">Add</string>
     <string name="settings_fragment_rules_radio_sms_number">SMS Number</string>

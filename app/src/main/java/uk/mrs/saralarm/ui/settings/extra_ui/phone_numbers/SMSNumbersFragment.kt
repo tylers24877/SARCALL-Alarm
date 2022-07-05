@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers
 
 import android.os.Bundle
@@ -26,7 +33,7 @@ class SMSNumbersFragment : Fragment() {
 
         val smsNumberObjectArray: ArrayList<String>
 
-        val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("respondSMSNumbersJSON", "")
+        val json: String? = context?.let { PreferenceManager.getDefaultSharedPreferences(it).getString("respondSMSNumbersJSON", "") }
         if (json.isNullOrBlank()) {
             smsNumberObjectArray = ArrayList()
             smsNumberObjectArray.add("")

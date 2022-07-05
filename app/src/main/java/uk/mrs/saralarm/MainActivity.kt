@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm
 
 import android.annotation.SuppressLint
@@ -13,6 +20,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
+import androidx.core.content.PackageManagerCompat
+import androidx.core.content.UnusedAppRestrictionsConstants.*
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -24,6 +35,7 @@ import androidx.work.WorkManager
 import com.github.javiersantos.appupdater.AppUpdater
 import com.github.javiersantos.appupdater.enums.Display
 import com.github.javiersantos.appupdater.enums.UpdateFrom
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.gson.Gson
 import uk.mrs.saralarm.databinding.ActivityMainBinding
 import uk.mrs.saralarm.support.UpdateWorker
@@ -97,6 +109,11 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
         }
 
+        val future: ListenableFuture<Int> =
+            PackageManagerCompat.getUnusedAppRestrictionsStatus(this)
+        future.addListener({ onResult(future.get()) }, ContextCompat.getMainExecutor(this))
+
+
         //Check if alarm is enabled. If true,
         if (pref.getBoolean("prefEnabled", false)) {
             //Check if the Rules are configured. If empty...
@@ -115,6 +132,36 @@ class MainActivity : AppCompatActivity() {
         checkOverlay()
     }
 
+    private fun onResult(appRestrictionsStatus: Int) {
+        when (appRestrictionsStatus) {
+            // Couldn't fetch status. Check logs for details.
+            ERROR -> {}
+
+            // Restrictions don't apply to your app on this device.
+            FEATURE_NOT_AVAILABLE -> {}
+
+            // The user has disabled restrictions for your app.
+            DISABLED -> {}
+
+            // If the user doesn't start your app for a few months, the system will
+            // place restrictions on it. See the API_* constants for details.
+            API_30_BACKPORT, API_30, API_31 -> handleRestrictions(appRestrictionsStatus)
+        }
+    }
+
+    private fun handleRestrictions(appRestrictionsStatus: Int) {
+        // If your app works primarily in the background, you can ask the user
+        // to disable these restrictions. Check if you have already asked the
+        // user to disable these restrictions. If not, you can show a message to
+        // the user explaining why permission auto-reset or app hibernation should be
+        // disabled. Then, redirect the user to the page in system settings where they
+        // can disable the feature.
+        val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
+
+        // You must use startActivityForResult(), not startActivity(), even if
+        // you don't use the result code returned in onActivityResult().
+        startActivityForResult(intent, 998)
+    }
 
     /**
      * Create/update background jobs for app updater.
@@ -186,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.appbar_actions, menu)
         return super.onCreateOptionsMenu(menu)

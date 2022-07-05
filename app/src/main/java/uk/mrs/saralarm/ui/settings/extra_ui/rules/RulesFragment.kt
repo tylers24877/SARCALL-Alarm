@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.rules
 
 import android.annotation.SuppressLint
@@ -44,7 +51,7 @@ class RulesFragment : Fragment(), CoroutineScope {
 
         val rulesArray: ArrayList<RulesObject>
 
-        val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("rulesJSON", "")
+        val json: String? = context?.let { PreferenceManager.getDefaultSharedPreferences(it).getString("rulesJSON", "") }
         if (json.isNullOrBlank()) {
             rulesArray = ArrayList()
             rulesArray.add(RulesObject())

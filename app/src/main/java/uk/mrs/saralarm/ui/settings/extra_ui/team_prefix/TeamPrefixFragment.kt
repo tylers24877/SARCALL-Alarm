@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.team_prefix
 
 import android.os.Bundle
@@ -25,7 +32,7 @@ class TeamPrefixFragment : Fragment() {
         _binding = SettingsTeamPrefixFragmentBinding.inflate(inflater, container, false)
         val teamPrefixObjectArray: ArrayList<String>
 
-        val json: String? = PreferenceManager.getDefaultSharedPreferences(context).getString("respondTeamPrefixJSON", "")
+        val json: String? = context?.let { PreferenceManager.getDefaultSharedPreferences(it).getString("respondTeamPrefixJSON", "") }
         if (json.isNullOrBlank()) {
             teamPrefixObjectArray = ArrayList()
             teamPrefixObjectArray.add("")

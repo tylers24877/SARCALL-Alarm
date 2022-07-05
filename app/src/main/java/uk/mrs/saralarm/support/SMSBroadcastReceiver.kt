@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.support
 
 import android.content.BroadcastReceiver
@@ -120,6 +127,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
             }
         }
     }
+
     private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String, num: String): RuleAlarmData {
         for (s in SS) {
             if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m.replace("\\s".toRegex(), "")).find()) {
@@ -167,12 +175,12 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun checkScreenState(context: Context): Boolean {
-            val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
-            for (display in dm.displays) {
-                if (display.state == Display.STATE_ON) {
-                    return true
-                }
+        val dm = context.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
+        for (display in dm.displays) {
+            if (display.state == Display.STATE_ON) {
+                return true
             }
+        }
         return false
     }
 

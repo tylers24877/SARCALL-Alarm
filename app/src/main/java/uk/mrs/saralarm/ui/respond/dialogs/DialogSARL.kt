@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.respond.dialogs
 
 import android.annotation.SuppressLint
@@ -19,7 +26,6 @@ import uk.mrs.saralarm.support.Util
 import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 import java.lang.reflect.Type
 import java.util.*
-import kotlin.collections.ArrayList
 
 object DialogSARL {
     @SuppressLint("ClickableViewAccessibility")

@@ -1,7 +1,15 @@
+<!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <resources>
     <string name="activation_notification_title_template">SARCALL Activated</string>
     <string name="app_name">SARCALL Alarm</string>
     <string name="appwidget_text">SARCALL</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="fragment_respond_sar_n_response_title">SAR N</string>
 </resources>

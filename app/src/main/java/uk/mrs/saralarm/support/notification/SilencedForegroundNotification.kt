@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.support.notification
 
 import android.app.*
@@ -27,7 +34,6 @@ class SilencedForegroundNotification : Service() {
 
     companion object {
 
-        @Suppress("DEPRECATION")
         fun isServiceAlive(context: Context, serviceClass: Class<*>): Boolean {
             val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
             for (service in manager.getRunningServices(50)) {
@@ -88,17 +94,17 @@ class SilencedForegroundNotification : Service() {
         val add1HourBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7000, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "add1Hour"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
+                    .putExtra("button", ButtonData.ONE_HOUR), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         val add10MinutesBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7001, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "add10Minutes"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
+                    .putExtra("button", ButtonData.TEN_MINUTES), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         val cancelBroadcastPendingIntent: PendingIntent =
             PendingIntent.getBroadcast(
                 application, 7002, Intent(application, SilenceBroadcastReceiver::class.java)
-                    .putExtra("button", "cancel"), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
+                    .putExtra("button", ButtonData.CANCEL), PendingIntent.FLAG_IMMUTABLE or FLAG_UPDATE_CURRENT
             )
         if (!::notificationBuilder.isInitialized) {
             val title = "Alarm Silenced"
@@ -130,7 +136,7 @@ class SilencedForegroundNotification : Service() {
             val serviceChannel = NotificationChannel(
                 id,
                 "Alarm Silenced",
-                NotificationManager.IMPORTANCE_LOW
+                NotificationManager.IMPORTANCE_DEFAULT
             )
             getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
         }
@@ -153,19 +159,19 @@ class SilencedForegroundNotification : Service() {
     class SilenceBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, i: Intent) {
             when (i.getSerializableExtra("button")) {
-                "add1Hour" -> {
+                ButtonData.ONE_HOUR -> {
                     val intent = Intent(context, SilencedForegroundNotification::class.java)
                     intent.action = "uk.mrs.saralarm.silenceForeground.changeTimer"
                     intent.putExtra("addMillis", 3600000L) //60 MINUTES
                     context.startService(intent)
                 }
-                "add10Minutes" -> {
+                ButtonData.TEN_MINUTES -> {
                     val intent = Intent(context, SilencedForegroundNotification::class.java)
                     intent.action = "uk.mrs.saralarm.silenceForeground.changeTimer"
                     intent.putExtra("addMillis", 600000L) //10 MINUTES
                     context.startService(intent)
                 }
-                "cancel" -> {
+                ButtonData.CANCEL -> {
                     Toast.makeText(context, "SARCALL Alarm silence ended!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(context, SilencedForegroundNotification::class.java)
                     intent.action = "uk.mrs.saralarm.silenceForeground.stop"
@@ -174,5 +180,9 @@ class SilencedForegroundNotification : Service() {
                 }
             }
         }
+    }
+
+    enum class ButtonData {
+        ONE_HOUR, TEN_MINUTES, CANCEL
     }
 }

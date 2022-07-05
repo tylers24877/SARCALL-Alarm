@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings
 
 import android.appwidget.AppWidgetManager
@@ -14,7 +21,10 @@ import androidx.core.content.pm.PackageInfoCompat.getLongVersionCode
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
@@ -68,7 +78,7 @@ class PrefsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeL
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preference, rootKey)
 
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
 
         (findPreference("prefEnabled") as Preference?)!!.onPreferenceChangeListener = this
 
@@ -101,12 +111,12 @@ class PrefsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeL
 
     override fun onResume() {
         super.onResume()
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.registerOnSharedPreferenceChangeListener(this)
         findPreference<SwitchPreferenceCompat>("prefEnabled")!!.isChecked = PreferenceManager.getDefaultSharedPreferences(requireContext()).getBoolean("prefEnabled", false)
     }
 
     override fun onPause() {
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        preferenceManager.sharedPreferences?.unregisterOnSharedPreferenceChangeListener(this)
         super.onPause()
     }
 
@@ -121,7 +131,7 @@ class PrefsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeL
         return true
     }
 
-    override fun onPreferenceClick(it: Preference?): Boolean {
+    override fun onPreferenceClick(preference: Preference): Boolean {
         //findNavController(this).navigate(R.id.action_navigation_settings_to_customiseAlarmFragment)
         return true
     }
@@ -132,9 +142,9 @@ class AboutPrefsFragment : PreferenceFragmentCompat() {
         setPreferencesFromResource(R.xml.about_preference, rootKey)
 
         preferenceManager.findPreference<Preference>("backgroundWorkerCount")?.summary =
-            preferenceManager.sharedPreferences.getInt("WorkerCount", 0).toString()
+            preferenceManager.sharedPreferences?.getInt("WorkerCount", 0).toString()
         preferenceManager.findPreference<Preference>("backgroundWorkerTime")?.summary =
-            preferenceManager.sharedPreferences.getString("WorkerTime", "None yet...")
+            preferenceManager.sharedPreferences?.getString("WorkerTime", "None yet...")
 
         try {
             preferenceManager.findPreference<Preference>("appVersion")?.summary = appVersion()

@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.custom_messages
 
 import android.animation.ObjectAnimator
@@ -21,7 +28,6 @@ import uk.mrs.saralarm.databinding.SettingsCustomMessagesFragmentBinding
 import uk.mrs.saralarm.databinding.SettingsCustomMessagesRecyclerViewRowBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.support.DragAdapterListener
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
-import java.util.*
 
 
 class CustomMessagesRecyclerViewAdapter(val context: Context,
@@ -80,6 +86,7 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
             editor.putString("customMessageJSON", Gson().toJson(data))
         editor.apply()
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = SettingsCustomMessagesRecyclerViewRowBinding.inflate(LayoutInflater.from(context), parent, false)
         return ViewHolder(binding)
@@ -132,6 +139,7 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
         }
+
         override fun onClick(v: View?) {}
     }
 }

@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm.ui.settings.extra_ui.phone_numbers
 
 import android.animation.ObjectAnimator
@@ -91,6 +98,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
 
         editor.apply()
     }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = SettingsSmsNumbersRecyclerViewRowBinding.inflate(LayoutInflater.from(context), parent, false)
         return ViewHolder(binding)
@@ -176,6 +184,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
             metrics = resources.displayMetrics
             return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
         }
+
         override fun onClick(v: View?) {}
     }
 }

@@ -1,3 +1,10 @@
+/*
+ *  Copyright (C) Tyler Simmonds - All Rights Reserved
+ *  Unauthorised copying of this file, via any medium is prohibited
+ *  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+ *
+ */
+
 package uk.mrs.saralarm
 
 import android.app.KeyguardManager
@@ -7,7 +14,9 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
+import android.media.AudioAttributes
 import android.media.AudioManager
+import android.media.AudioManager.STREAM_VOICE_CALL
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
@@ -70,8 +79,11 @@ class AlarmActivity : AppCompatActivity() {
         }
 
         mp = MediaPlayer()
-        mp!!.setAudioStreamType(AudioManager.STREAM_VOICE_CALL)
-
+        mp!!.setAudioAttributes(
+            AudioAttributes.Builder()
+                .setLegacyStreamType(STREAM_VOICE_CALL)
+                .build()
+        )
         mp!!.isLooping = ruleAlarmData.isLooping
 
         when (ruleAlarmData.soundType) {
@@ -115,9 +127,9 @@ class AlarmActivity : AppCompatActivity() {
 
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
-        val maxVolume = audio.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL)
-        originalAudio = audio.getStreamVolume(AudioManager.STREAM_VOICE_CALL)
-        audio.setStreamVolume(AudioManager.STREAM_VOICE_CALL, maxVolume, 0)
+        val maxVolume = audio.getStreamMaxVolume(STREAM_VOICE_CALL)
+        originalAudio = audio.getStreamVolume(STREAM_VOICE_CALL)
+        audio.setStreamVolume(STREAM_VOICE_CALL, maxVolume, 0)
         audio.mode = AudioManager.MODE_IN_CALL
         audio.isSpeakerphoneOn = true
 
@@ -136,7 +148,7 @@ class AlarmActivity : AppCompatActivity() {
         val drawable = AnimationDrawable()
 
         val colourArray = ruleAlarmData.colorArrayList
-        if (!colourArray.isNullOrEmpty()) {
+        if (colourArray.isNotEmpty()) {
             for (colour in colourArray) {
                 try {
                     drawable.addFrame(ColorDrawable(Color.parseColor(colour)), 500)
@@ -174,12 +186,10 @@ class AlarmActivity : AppCompatActivity() {
                 ContextCompat.startForegroundService(this, serviceIntent)
 
                 Toast.makeText(this, "Alarm Silenced.", Toast.LENGTH_SHORT).show()
-                //FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_silence_started", null)
                 //stop the alarm
                 finish()
             }
         }
-        //FirebaseAnalytics.getInstance(applicationContext).logEvent("alarm_activity_started", null)
     }
 
     override fun onResume() {
@@ -199,7 +209,7 @@ class AlarmActivity : AppCompatActivity() {
         //when app is destroy/finish() called, stop the alarm sound and set the volume levels back to original before the alarm was started.
         mp?.stop()
         mp = null
-        (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(AudioManager.STREAM_VOICE_CALL, originalAudio, 0)
+        (getSystemService(Context.AUDIO_SERVICE) as AudioManager).setStreamVolume(STREAM_VOICE_CALL, originalAudio, 0)
         (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).cancel(0)
         PostAlarmNotification.create(this)
     }

@@ -1,4 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  Copyright (C) Tyler Simmonds - All Rights Reserved
+  ~  Unauthorised copying of this file, via any medium is prohibited
+  ~  Written by Tyler Simmonds on behalf of SARCALL LTD, 2021
+  ~
+  -->
+
 <resources>
     <string name="alarm_activity_error_Code_1">Error Occurred with reading SMS. Error Code = 1</string>
     <string name="alarm_activity_preview_sms_number">From: %s</string>
