@@ -90,7 +90,7 @@ class AlarmActivity : AppCompatActivity() {
             SoundType.NONE -> {
                 try {
                     mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                 }
             }
             SoundType.SYSTEM -> {
@@ -100,7 +100,7 @@ class AlarmActivity : AppCompatActivity() {
                     try {
                         Toast.makeText(applicationContext, getString(R.string.alarm_activity_sound_load_failed), Toast.LENGTH_LONG).show()
                         mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
-                    } catch (e2: Exception) {
+                    } catch (_: Exception) {
                     }
                 }
             }
@@ -113,7 +113,7 @@ class AlarmActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     try {
                         mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
-                    } catch (e2: Exception) {
+                    } catch (_: Exception) {
                     }
                 }
             }
@@ -122,7 +122,7 @@ class AlarmActivity : AppCompatActivity() {
         try {
             mp!!.prepare()
             mp!!.start()
-        } catch (e2: Exception) {
+        } catch (_: Exception) {
         }
 
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
