@@ -86,7 +86,7 @@ class TeamPrefixRecyclerViewAdapter(val context: Context,
                 list.add(t)
             }
         }
-        data.removeAll(list)
+        data.removeAll(list.toSet())
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val editor: SharedPreferences.Editor = sharedPrefs.edit()

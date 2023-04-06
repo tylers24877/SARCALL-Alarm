@@ -74,8 +74,8 @@ class RulesFragment : Fragment(), CoroutineScope {
             }
 
             setHasOptionsMenu(true)
-            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
-            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward = */ true)
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward = */ false)
         }
         return binding.root
     }

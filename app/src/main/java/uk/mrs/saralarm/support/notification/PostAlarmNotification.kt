@@ -35,13 +35,11 @@ object PostAlarmNotification {
             .setColor(Color.argb(255, 204, 51, 1))
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 
-            val notificationChannel = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
-            notificationChannel.setBypassDnd(true)
-            notificationManager.createNotificationChannel(notificationChannel)
+        val notificationChannel = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
+        notificationChannel.setBypassDnd(true)
+        notificationManager.createNotificationChannel(notificationChannel)
 
-        }
         notificationManager.notify(1, notificationBuilder.build())
     }
 }

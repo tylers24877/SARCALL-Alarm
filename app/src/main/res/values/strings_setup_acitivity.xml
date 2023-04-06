@@ -9,7 +9,7 @@
     <string name="setup_activity_setup_permissions_title">Setup Permissions</string>
     <string name="setup_activity_setup_summary_text">In order for the app to work correctly, please allow the app to access incoming SMS messages and access to device storage.\n\n
         You also may be asked to disable battery optimisation for the app. This is to allow SMS messages to be detected at all times.
-        Don\'t worry, the app is very lightweight and it\'ll not drain your battery.</string>
+        Don\'t worry, this will not drain your battery.</string>
     <string name="setup_activity_get_started_title">Get Started</string>
 
 </resources>

@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.os.Build
 import android.provider.Telephony
 import android.telephony.PhoneNumberUtils
 import android.telephony.SmsManager
@@ -38,7 +39,6 @@ import java.util.regex.Pattern
 object RespondUtil {
 
     @DelicateCoroutinesApi
-    @SuppressLint("Range")
     fun setPreviewAsync(context: Context): Deferred<Pair<String, String>> {
         return GlobalScope.async {
             val pref = PreferenceManager.getDefaultSharedPreferences(context)
@@ -59,7 +59,7 @@ object RespondUtil {
                     if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
                         try {
                             rulesBothSet.add(r)
-                        } catch (e: NumberParseException) {
+                        } catch (_: NumberParseException) {
                         }
                     } else if (r.choice == RulesChoice.SMS_NUMBER && r.smsNumber.isNotBlank()) {
                         rulesSMSSet.add(r)
@@ -76,9 +76,9 @@ object RespondUtil {
                             if (c.getString(c.getColumnIndexOrThrow(Telephony.Sms.Inbox.TYPE)).toInt() == 1) {
 
                                 try {
-                                    val smsDate: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.DATE))
-                                    val body: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.BODY))
-                                    val phoneNumberC: String = c.getString(c.getColumnIndex(Telephony.Sms.Inbox.ADDRESS))
+                                    val smsDate: String = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.Inbox.DATE))
+                                    val body: String = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.Inbox.BODY))
+                                    val phoneNumberC: String = c.getString(c.getColumnIndexOrThrow(Telephony.Sms.Inbox.ADDRESS))
                                     val date = Date(smsDate.toLong())
 
                                     if (checkRulesBoth(rulesBothSet, body, phoneNumberC, phoneUtil)) {
@@ -116,18 +116,30 @@ object RespondUtil {
         return false
     }
 
-    private fun checkRulesSMSNumber(rulesSMSSet: HashSet<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Boolean {
+    private val parsedNumbersCache = HashMap<String, Phonenumber.PhoneNumber>()
+    private fun checkRulesSMSNumber(rulesSMSSet: Set<RulesObject>, phoneNumberC: String, phoneUtil: PhoneNumberUtil): Boolean {
         for (s in rulesSMSSet) {
-            try {
-                val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
-                if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), phoneNumberC)) {
+            val smsNumber = s.smsNumber
+            val parsedNumber: Phonenumber.PhoneNumber = (parsedNumbersCache[smsNumber] ?: try {
+                val parsedNumber = phoneUtil.parse(smsNumber, "GB")
+                parsedNumbersCache[smsNumber] = parsedNumber
+                parsedNumber
+            } catch (_: NumberParseException) {
+            }) as Phonenumber.PhoneNumber
+            parsedNumber.let {
+                val formattedNumber = phoneUtil.format(it, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if (PhoneNumberUtils.areSamePhoneNumber(formattedNumber, phoneNumberC,"gb")) {
+                        return true
+                    }
+                } else if (PhoneNumberUtils.compare(formattedNumber, phoneNumberC)) {
                     return true
                 }
-            } catch (e: NumberParseException) {
             }
         }
         return false
     }
+
 
     private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): Boolean {
         for (s in SS) {
@@ -138,7 +150,7 @@ object RespondUtil {
                         return true
                     }
                 }
-            } catch (e: NumberParseException) {
+            } catch (_: NumberParseException) {
             }
         }
         return false

@@ -67,7 +67,7 @@ class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) :
                 list.add(t)
             }
         }
-        mData.removeAll(list)
+        mData.removeAll(list.toSet())
 
         onSave?.invoke(mData)
     }

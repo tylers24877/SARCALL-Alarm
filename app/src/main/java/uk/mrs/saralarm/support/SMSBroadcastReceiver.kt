@@ -50,7 +50,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                     if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
                         try {
                             rulesBothSet.add(r)
-                        } catch (e: NumberParseException) {
+                        } catch (_: NumberParseException) {
                         }
                     } else if (r.choice == RulesChoice.SMS_NUMBER && r.smsNumber.isNotBlank()) {
                         rulesSMSSet.add(r)
@@ -150,7 +150,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                         s.customAlarmRulesObject.colorArray, m, phoneNumberC
                     )
                 }
-            } catch (e: NumberParseException) {
+            } catch (_: NumberParseException) {
             }
         }
         return RuleAlarmData(false)
@@ -168,7 +168,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                         )
                     }
                 }
-            } catch (e: NumberParseException) {
+            } catch (_: NumberParseException) {
             }
         }
         return RuleAlarmData(false)

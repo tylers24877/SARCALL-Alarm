@@ -8,6 +8,7 @@
 package uk.mrs.saralarm
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -16,8 +17,11 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -38,6 +42,7 @@ import com.github.javiersantos.appupdater.enums.UpdateFrom
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.gson.Gson
 import uk.mrs.saralarm.databinding.ActivityMainBinding
+import uk.mrs.saralarm.databinding.DialogUnusedAppPermBinding
 import uk.mrs.saralarm.support.UpdateWorker
 import java.util.concurrent.TimeUnit
 
@@ -45,8 +50,8 @@ import java.util.concurrent.TimeUnit
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    @SuppressLint("InlinedApi")
+    private lateinit var launcher: ActivityResultLauncher<Intent>
+    private lateinit var onUnusedAppLauncher: ActivityResultLauncher<Intent>
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -109,9 +114,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
         }
 
-        val future: ListenableFuture<Int> =
-            PackageManagerCompat.getUnusedAppRestrictionsStatus(this)
-        future.addListener({ onResult(future.get()) }, ContextCompat.getMainExecutor(this))
+       checkIfUnusedAppRestrictionsEnabled()
 
 
         //Check if alarm is enabled. If true,
@@ -129,40 +132,15 @@ class MainActivity : AppCompatActivity() {
             checkForUpdate(pref)
             createBackgroundJobs()
         }
+
+        launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            //Check if the user accepted the permission. If not start the process again.
+                if (!Settings.canDrawOverlays(this))
+                    checkOverlay()
+        }
+        onUnusedAppLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
         checkOverlay()
     }
-
-    private fun onResult(appRestrictionsStatus: Int) {
-        when (appRestrictionsStatus) {
-            // Couldn't fetch status. Check logs for details.
-            ERROR -> {}
-
-            // Restrictions don't apply to your app on this device.
-            FEATURE_NOT_AVAILABLE -> {}
-
-            // The user has disabled restrictions for your app.
-            DISABLED -> {}
-
-            // If the user doesn't start your app for a few months, the system will
-            // place restrictions on it. See the API_* constants for details.
-            API_30_BACKPORT, API_30, API_31 -> handleRestrictions(appRestrictionsStatus)
-        }
-    }
-
-    private fun handleRestrictions(appRestrictionsStatus: Int) {
-        // If your app works primarily in the background, you can ask the user
-        // to disable these restrictions. Check if you have already asked the
-        // user to disable these restrictions. If not, you can show a message to
-        // the user explaining why permission auto-reset or app hibernation should be
-        // disabled. Then, redirect the user to the page in system settings where they
-        // can disable the feature.
-        val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
-
-        // You must use startActivityForResult(), not startActivity(), even if
-        // you don't use the result code returned in onActivityResult().
-        startActivityForResult(intent, 998)
-    }
-
     /**
      * Create/update background jobs for app updater.
      * Checks 12 hourly-ish
@@ -214,12 +192,10 @@ class MainActivity : AppCompatActivity() {
                 when (which) {
                     //Positive
                     DialogInterface.BUTTON_POSITIVE -> {
-                        //Start an activity to display the permission settings to enable to draw on top.
+                        //Create an intent to request the overlay permission
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                        startActivityForResult(intent, 505)
-
-                        //Log to firebase that the user is accepting.
-                        //FirebaseAnalytics.getInstance(applicationContext).logEvent("overlay_accept", null)
+                        //Start the activity to request the permission
+                        launcher.launch(intent)
                     }
                 }
             }
@@ -242,7 +218,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             R.id.action_bar_help -> {
                 Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.action_global_helpFragment)
@@ -253,15 +229,50 @@ class MainActivity : AppCompatActivity() {
         }
         return true
     }
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    private fun checkIfUnusedAppRestrictionsEnabled() {
+        val future: ListenableFuture<Int> =
+            PackageManagerCompat.getUnusedAppRestrictionsStatus(this)
+        future.addListener({
+            when (future.get()) {
+                // If the user doesn't start your app for a few months, the system will
+                // place restrictions on it. See the API_* constants for details.
+                API_30_BACKPORT,
+                API_30 -> {
+                    val onDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
+                            intent.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                            onUnusedAppLauncher.launch(intent)
+                        }
+                    }
+                    val dialog =  AlertDialog.Builder(this)
+                    val dialogBinding: DialogUnusedAppPermBinding = DialogUnusedAppPermBinding.inflate(LayoutInflater.from(dialog.context))
+                    dialogBinding.imageView.setImageResource(R.drawable.api_30)
 
-        //Check if the request code matches the request from the CheckOverlay function
-        if (requestCode == 505) {
-            //Check if the user accepted the permission. If not start the process again.
-            if (!Settings.canDrawOverlays(this)) {
-                checkOverlay()
+                    dialog.setView(dialogBinding.root)
+                    dialog.setPositiveButton("Okay, take me to settings",onDialogClickListener)
+                    dialog.setNegativeButton("Later...", null)
+                    dialog.show()
+                }
+                API_31 ->
+                {
+                    val onDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
+                            intent.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                            onUnusedAppLauncher.launch(intent)
+                        }
+                    }
+                    val dialog =  AlertDialog.Builder(this)
+                    val dialogBinding: DialogUnusedAppPermBinding = DialogUnusedAppPermBinding.inflate(LayoutInflater.from(dialog.context))
+                    dialogBinding.imageView.setImageResource(R.drawable.api_31)
+
+                    dialog.setView(dialogBinding.root)
+                    dialog.setPositiveButton("Okay, take me to settings",onDialogClickListener)
+                    dialog.setNegativeButton("Later...", null)
+                    dialog.show()
+                }
             }
-        }
+        }, ContextCompat.getMainExecutor(this))
     }
 }

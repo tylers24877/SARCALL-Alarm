@@ -48,7 +48,7 @@ class SilencedForegroundNotification : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         var millisseconds = 0L
         if (intent.action.equals("uk.mrs.saralarm.silenceForeground.stop")) {
-            stopForeground(true)
+            stopForeground(STOP_FOREGROUND_REMOVE)
             stopSelfResult(startId)
             stopSelf()
             if (::countDownTimer.isInitialized) {
@@ -57,7 +57,8 @@ class SilencedForegroundNotification : Service() {
             return START_NOT_STICKY
         } else if (intent.action.equals("uk.mrs.saralarm.silenceForeground.changeTimer")) {
             if (::countDownTimer.isInitialized) {
-                millisseconds = intent.getSerializableExtra("addMillis") as Long + timeLeft
+                millisseconds =
+                    intent.getSerializableExtra("addMillis") as Long + timeLeft
             }
         } else {
             millisseconds = intent.getSerializableExtra("startMills") as Long
@@ -132,14 +133,12 @@ class SilencedForegroundNotification : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                id,
-                "Alarm Silenced",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
-        }
+        val serviceChannel = NotificationChannel(
+            id,
+            "Alarm Silenced",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
     }
 
     fun millisToHms(millis: Long): String {
@@ -151,7 +150,6 @@ class SilencedForegroundNotification : Service() {
         )
     }
 
-    @Nullable
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }

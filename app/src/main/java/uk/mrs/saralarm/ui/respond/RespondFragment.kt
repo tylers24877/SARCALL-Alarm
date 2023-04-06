@@ -7,13 +7,18 @@
 
 package uk.mrs.saralarm.ui.respond
 
+import android.Manifest
 import android.app.Dialog
 import android.content.*
 import android.content.DialogInterface.BUTTON_POSITIVE
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
@@ -22,10 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.DialogRespondSignOnOffMulitpleTeamsBinding
 import uk.mrs.saralarm.databinding.FragmentRespondBinding
@@ -57,20 +59,32 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRespondBinding.inflate(inflater, container, false)
 
-        if (!(ActivityCompat.checkSelfPermission(requireContext(), "android.permission.RECEIVE_SMS") == 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_EXTERNAL_STORAGE") == 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.SEND_SMS") == 0
-                    && ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0)
-        ) {
-            requestPermissions(
-                arrayOf(
-                    "android.permission.RECEIVE_SMS",
-                    "android.permission.READ_EXTERNAL_STORAGE",
-                    "android.permission.SEND_SMS",
-                    "android.permission.READ_SMS"
-                ), 0
-            )
+        val permissionsToRequest = arrayOf(
+            Manifest.permission.RECEIVE_SMS,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.SEND_SMS,
+            Manifest.permission.READ_SMS,
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.READ_MEDIA_AUDIO
+            }else "",
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Manifest.permission.POST_NOTIFICATIONS
+            }else ""
+        )
+
+        val permissionsToRequestNotGranted = permissionsToRequest.filter {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                it
+            ) != PackageManager.PERMISSION_GRANTED
         }
+
+        if (permissionsToRequestNotGranted.isNotEmpty()) {
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+
+            }.launch(permissionsToRequestNotGranted.toTypedArray())
+        }
+
         binding.apply {
             respondSarAButton.setOnClickListener {
                 DialogSARA.open(requireContext(), root)
@@ -85,7 +99,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                 DialogSARH.open(requireContext(), root)
             }
             pullToRefresh.setOnRefreshListener {
-                updateLatestSMS()
+                runBlocking { updateLatestSMS() }
                 pullToRefresh.isRefreshing = false
             }
             respondSignOn.setOnClickListener {
@@ -106,7 +120,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
 
     override fun onResume() {
         binding.apply {
-            updateLatestSMS()
+            runBlocking { updateLatestSMS() }
             val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             if (!pref.getBoolean("prefEnabled", false)) {
                 binding.InfoView.visibility = View.VISIBLE
@@ -160,13 +174,13 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     override fun onDestroy() {
         try {
             context?.unregisterReceiver(respondBroadcastReceiver)
-        } catch (e: IllegalStateException) {
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalStateException) {
+        } catch (_: IllegalArgumentException) {
         }
         try {
             context?.unregisterReceiver(respondSMSBroadcastReceiver)
-        } catch (e: IllegalStateException) {
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalStateException) {
+        } catch (_: IllegalArgumentException) {
         }
         super.onDestroy()
     }
@@ -182,13 +196,13 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             val length = permissions.size
             for (i in 0 until length) {
                 if (permissions[i].equals("android.permission.READ_SMS") && grantResults[i] == 0) {
-                    updateLatestSMS()
+                    runBlocking { updateLatestSMS() }
                 }
             }
         }
     }
 
-    @DelicateCoroutinesApi
+    @OptIn(DelicateCoroutinesApi::class)
     private fun updateLatestSMS() {
         if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0) {
             GlobalScope.launch(Dispatchers.Main) {
@@ -205,7 +219,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                         respondSmsLoadingBar.visibility = View.GONE
                         respondSmsPreviewTxtview.visibility = View.VISIBLE
                         respondPreviewDateTxtview.visibility = View.VISIBLE
-                    } catch (e: IllegalStateException) {
+                    } catch (_: IllegalStateException) {
                     }
                 }
             }
@@ -213,7 +227,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
             try {
                 binding.respondSmsPreviewTxtview.setText(R.string.fragment_response_permission_placeholder)
                 binding.respondPreviewDateTxtview.text = ""
-            } catch (e: IllegalStateException) {
+            } catch (_: IllegalStateException) {
             }
         }
     }
@@ -315,7 +329,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     override fun silencedForegroundNotificationClosed() {
         try {
             binding.InfoView.visibility = View.GONE
-        } catch (e: IllegalStateException) {
+        } catch (_: IllegalStateException) {
         }
     }
 }

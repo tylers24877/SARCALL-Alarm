@@ -11,6 +11,7 @@ import android.app.KeyguardManager
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.res.AssetFileDescriptor
 import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.graphics.drawable.ColorDrawable
@@ -18,7 +19,6 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.AudioManager.STREAM_VOICE_CALL
 import android.media.MediaPlayer
-import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -37,6 +37,7 @@ import uk.mrs.saralarm.support.notification.PostAlarmNotification
 import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
 import uk.mrs.saralarm.ui.settings.extra_ui.rules.support.SoundType
 import java.io.FileInputStream
+import java.io.Serializable
 
 
 class AlarmActivity : AppCompatActivity() {
@@ -67,14 +68,14 @@ class AlarmActivity : AppCompatActivity() {
 
 
         val ruleAlarmData =
-            if (intent.getSerializableExtra("ruleAlarmData") != null) {
-                intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
+            if (intent.serializable<RuleAlarmData>("ruleAlarmData") != null) {
+                intent.serializable("ruleAlarmData")
             } else {
                 RuleAlarmData(alarmPreviewSMSBody = getString(R.string.alarm_activity_error_Code_1))
             }
 
         binding.apply {
-            alarmPreviewSmsTextView.text = ruleAlarmData.alarmPreviewSMSBody
+            alarmPreviewSmsTextView.text = ruleAlarmData!!.alarmPreviewSMSBody
             alarmPreviewSmsNumberTextView.text = getString(R.string.alarm_activity_preview_sms_number, ruleAlarmData.alarmPreviewSMSNumber)
         }
 
@@ -84,12 +85,14 @@ class AlarmActivity : AppCompatActivity() {
                 .setLegacyStreamType(STREAM_VOICE_CALL)
                 .build()
         )
-        mp!!.isLooping = ruleAlarmData.isLooping
+        mp!!.isLooping = ruleAlarmData!!.isLooping
+
+        val afd: AssetFileDescriptor = applicationContext.resources.openRawResourceFd(R.raw.siren) ?: return
 
         when (ruleAlarmData.soundType) {
             SoundType.NONE -> {
                 try {
-                    mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                    mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                 } catch (_: Exception) {
                 }
             }
@@ -99,7 +102,7 @@ class AlarmActivity : AppCompatActivity() {
                 } catch (e: Exception) {
                     try {
                         Toast.makeText(applicationContext, getString(R.string.alarm_activity_sound_load_failed), Toast.LENGTH_LONG).show()
-                        mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                        mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     } catch (_: Exception) {
                     }
                 }
@@ -112,7 +115,7 @@ class AlarmActivity : AppCompatActivity() {
                     fileInputStream.close()
                 } catch (e: Exception) {
                     try {
-                        mp!!.setDataSource(applicationContext, RingtoneManager.getActualDefaultRingtoneUri(applicationContext, 1))
+                        mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
                     } catch (_: Exception) {
                     }
                 }
@@ -215,4 +218,9 @@ class AlarmActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {} //override the back button to do nothing.
+
+    inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
+        else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
+    }
 }

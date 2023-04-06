@@ -1,24 +1,38 @@
 package uk.mrs.saralarm
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.view.LayoutInflater
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.IntentCompat
+import androidx.core.content.PackageManagerCompat
+import androidx.core.content.UnusedAppRestrictionsConstants
 import androidx.preference.PreferenceManager
+import com.google.common.util.concurrent.ListenableFuture
 import uk.mrs.saralarm.databinding.ActivitySetupBinding
-import kotlin.jvm.internal.Intrinsics
+import uk.mrs.saralarm.databinding.DialogUnusedAppPermBinding
 
 
 class SetupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySetupBinding
-
+    private lateinit var onTopPermissionLauncher : ActivityResultLauncher<Intent>
+    private lateinit var onBatteryCheckLauncher : ActivityResultLauncher<Intent>
+    private lateinit var onPermissionRequestLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var onUnusedAppLauncher: ActivityResultLauncher<Intent>
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,32 +43,50 @@ class SetupActivity : AppCompatActivity() {
         //Sets the SetupToolbar ID in the layout XML as the ActionBar for this activity. This tells the android API where the toolbar is.
         setSupportActionBar(binding.setupToolbar)
 
+        onTopPermissionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (Settings.canDrawOverlays(this)) {
+                    checkBattery()
+                } else {
+                    checkOverlayAndMoveOn()
+                }
+        }
+
+       onPermissionRequestLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+           checkOverlayAndMoveOn()
+        }
+        onBatteryCheckLauncher =  registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            checkIfUnusedAppRestrictionsEnabled()
+        }
+        onUnusedAppLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            startApp()
+        }
         //Setup OnClick Listener for the setup button. When clicked...
         binding.setupPermissionButton.setOnClickListener {
             //Check if the user has the necessary permissions
-            requestPermissions(
-                arrayOf(
-                    "android.permission.RECEIVE_SMS",
-                    "android.permission.READ_SMS",
-                    "android.permission.SEND_SMS",
-                    "android.permission.READ_EXTERNAL_STORAGE"
-                ), 1
-            ) //if permissions not granted, request them with request code of 1.
-        }
-    }
+            val permissionsToRequest = arrayOf(
+                Manifest.permission.RECEIVE_SMS,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.SEND_SMS,
+                Manifest.permission.READ_SMS,
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.READ_MEDIA_AUDIO
+                }else "",
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    Manifest.permission.POST_NOTIFICATIONS
+                }else ""
+            )
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        //if request code of 1 is received
-        if (requestCode == 1) {
-            for (permission in permissions) {
-                if (Intrinsics.areEqual(permission as Any, "android.permission.READ_SMS" as Any)) {
-                    //Check overlay
-                    checkOverlayAndMoveOn()
-                }
+            val permissionsToRequestNotGranted = permissionsToRequest.filter {
+                ContextCompat.checkSelfPermission(
+                    this,
+                    it
+                ) != PackageManager.PERMISSION_GRANTED
+            }
+            if (permissionsToRequestNotGranted.isNotEmpty()) {
+                onPermissionRequestLauncher.launch(permissionsToRequestNotGranted.toTypedArray())
+            }else checkOverlayAndMoveOn()
             }
         }
-    }
 
     /**
      * Check if app is allowed to draw on top of other apps. If it cannot, permission from the user will be requested.
@@ -71,7 +103,7 @@ class SetupActivity : AppCompatActivity() {
                     DialogInterface.BUTTON_POSITIVE -> {
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
                         //Start an activity to display the permission settings to enable to draw on top.
-                        startActivityForResult(intent, 44)
+                        onTopPermissionLauncher.launch(intent)
                     }
                     DialogInterface.BUTTON_NEGATIVE -> {
                         //Move onto checking battery.
@@ -106,31 +138,58 @@ class SetupActivity : AppCompatActivity() {
         } else if (!(systemService as PowerManager).isIgnoringBatteryOptimizations(packageName)) {
             intent.action = "android.settings.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
             intent.data = Uri.parse("package:$packageName")
-            startActivityForResult(intent, 2)
+           onBatteryCheckLauncher.launch(intent)
             return
-        }
-        //Start app if already granted.
-        startApp()
+        }else checkIfUnusedAppRestrictionsEnabled()
     }
+    private fun checkIfUnusedAppRestrictionsEnabled() {
+        val future: ListenableFuture<Int> =
+            PackageManagerCompat.getUnusedAppRestrictionsStatus(this)
+        future.addListener({
+            when (future.get()) {
+                // If the user doesn't start your app for a few months, the system will
+                // place restrictions on it. See the API_* constants for details.
+                UnusedAppRestrictionsConstants.API_30_BACKPORT,
+                UnusedAppRestrictionsConstants.API_30 -> {
+                    val onDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
+                            intent.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                            onUnusedAppLauncher.launch(intent)
+                        }
+                    }
+                    val dialog =  AlertDialog.Builder(this)
+                    val dialogBinding: DialogUnusedAppPermBinding = DialogUnusedAppPermBinding.inflate(LayoutInflater.from(dialog.context))
+                    dialogBinding.imageView.setImageResource(R.drawable.api_30)
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+                    dialog.setView(dialogBinding.root)
+                    dialog.setPositiveButton("Okay, take me to settings",onDialogClickListener)
+                    dialog.setNegativeButton("Later...", null)
+                    dialog.show()
+                }
+                UnusedAppRestrictionsConstants.API_31 ->
+                {
+                    val onDialogClickListener = DialogInterface.OnClickListener { _, which ->
+                        if (which == DialogInterface.BUTTON_POSITIVE) {
+                            val intent = IntentCompat.createManageUnusedAppRestrictionsIntent(this, packageName)
+                            intent.putExtra(Intent.EXTRA_PACKAGE_NAME, packageName)
+                            onUnusedAppLauncher.launch(intent)
+                        }
+                    }
+                    val dialog =  AlertDialog.Builder(this)
+                    val dialogBinding: DialogUnusedAppPermBinding = DialogUnusedAppPermBinding.inflate(LayoutInflater.from(dialog.context))
+                    dialogBinding.imageView.setImageResource(R.drawable.api_31)
 
-        //If request code of 2 (from checkBattery())
-        if (requestCode == 2) {
-            //Start the app
-            startApp()
-        }
-        //If request code of 44 (from checkOverlayAndMoveOn())
-        if (requestCode == 44) {
-            if (
-                Settings.canDrawOverlays(this)
-            ) {
-                checkBattery()
-            } else {
-                checkOverlayAndMoveOn()
+                    dialog.setView(dialogBinding.root)
+                    dialog.setPositiveButton("Okay, take me to settings",onDialogClickListener)
+                    dialog.setNegativeButton("Later...", null)
+                    dialog.show()
+                }
+                else ->{
+                    startApp()
+                }
             }
-        }
+        }, ContextCompat.getMainExecutor(this))
     }
 
     /**

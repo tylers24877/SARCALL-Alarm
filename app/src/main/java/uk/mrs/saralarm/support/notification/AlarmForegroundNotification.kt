@@ -59,18 +59,15 @@ class AlarmForegroundNotification : Service() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                "Alarm Trigger Foreground",
-                "Foreground Service Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
-        }
+        val serviceChannel = NotificationChannel(
+            "Alarm Trigger Foreground",
+            "Foreground Service Channel",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager.createNotificationChannel(serviceChannel)
     }
 
-    @Nullable
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }

@@ -128,7 +128,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
             }
         }
         if (list.isNotEmpty()) {
-            data.removeAll(list)
+            data.removeAll(list.toSet())
         }
 
         val sharedPrefs: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -314,7 +314,8 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
                 }
 
                 addAlarmRulesButton.setOnClickListener {
-                    if (ActivityCompat.checkSelfPermission(context, "android.permission.READ_EXTERNAL_STORAGE") == 0) {
+                    if (ActivityCompat.checkSelfPermission(context, "android.permission.READ_EXTERNAL_STORAGE") == 0 ||
+                            ActivityCompat.checkSelfPermission(context, "android.permission.READ_MEDIA_AUDIO") == 0) {
                         if (addAlarmRulesButton.text == "Set Alarm Sound") {
                             when (data[adapterPosition].choice) {
                                 RulesChoice.PHRASE ->

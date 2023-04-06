@@ -14,11 +14,13 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.annotation.Keep
 import androidx.core.content.pm.PackageInfoCompat.getLongVersionCode
 import androidx.core.os.bundleOf
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.preference.Preference
@@ -33,7 +35,7 @@ import uk.mrs.saralarm.databinding.FragmentSettingsBinding
 import uk.mrs.saralarm.support.WidgetProvider
 
 
-class SettingsFragment : Fragment() {
+class SettingsFragment : Fragment(), MenuProvider {
 
     private var _binding: FragmentSettingsBinding? = null
 
@@ -44,16 +46,26 @@ class SettingsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
-        when (arguments?.getSerializable("sub_category") as SubCategory) {
-            SubCategory.NONE ->
-                parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
-            SubCategory.ABOUT_CATEGORY ->
-                parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            when (requireArguments().getSerializable("sub_category", SubCategory::class.java)) {
+                SubCategory.NONE ->
+                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
+                SubCategory.ABOUT_CATEGORY ->
+                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
+                else -> {}
+            }
+        }else{
+            when (requireArguments().getSerializable("sub_category") as SubCategory) {
+                SubCategory.NONE ->
+                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
+                SubCategory.ABOUT_CATEGORY ->
+                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
+            }
         }
-        setHasOptionsMenu(true)
+
         enterTransition = MaterialFadeThrough()
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward= */ false)
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward = */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward = */ false)
         return binding.root
     }
 
@@ -62,14 +74,15 @@ class SettingsFragment : Fragment() {
         _binding = null
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         // You can hide the state of the menu item here if you call getActivity().supportInvalidateOptionsMenu(); somewhere in your code
         val menuItem: MenuItem = menu.findItem(R.id.action_bar_settings)
         menuItem.isVisible = false
     }
 
-    @Keep
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return false
+    }
     enum class SubCategory { NONE, ABOUT_CATEGORY }
 }
 
