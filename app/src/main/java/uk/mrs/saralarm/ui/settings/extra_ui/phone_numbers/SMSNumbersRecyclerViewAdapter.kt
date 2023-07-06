@@ -23,6 +23,7 @@ import android.view.animation.AccelerateInterpolator
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.i18n.phonenumbers.NumberParseException
 import com.google.i18n.phonenumbers.PhoneNumberUtil
@@ -115,6 +116,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
                     holder.rowBinding.smsNumbersRecyclerTextInput.error = ""
                 }
             } catch (e: NumberParseException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
                 holder.rowBinding.smsNumbersRecyclerTextInput.error = "SMS Number is in the wrong format"
             }
             holder.rowBinding.smsNumbersEditText.setText(data[holder.adapterPosition])
@@ -152,6 +154,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
                                     smsNumbersEditText.addTextChangedListener(this)
                                 }
                             } catch (e: NumberParseException) {
+                                FirebaseCrashlytics.getInstance().recordException(e)
                                 smsNumbersRecyclerTextInput.error = "SMS Number is in the wrong format"
                             }
                         if (adapterPosition >= 0 && adapterPosition < data.size) {

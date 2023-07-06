@@ -7,18 +7,22 @@
 
 package uk.mrs.saralarm.support.notification
 
-import android.app.*
+import android.app.ActivityManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
+import android.app.Service
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.os.Build
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.widget.Toast
-import androidx.annotation.Nullable
 import androidx.core.app.NotificationCompat
+import com.google.errorprone.annotations.Keep
 import uk.mrs.saralarm.R
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -136,7 +140,7 @@ class SilencedForegroundNotification : Service() {
         val serviceChannel = NotificationChannel(
             id,
             "Alarm Silenced",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_LOW
         )
         getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
     }
@@ -180,6 +184,7 @@ class SilencedForegroundNotification : Service() {
         }
     }
 
+    @Keep
     enum class ButtonData {
         ONE_HOUR, TEN_MINUTES, CANCEL
     }

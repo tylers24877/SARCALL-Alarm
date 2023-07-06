@@ -21,6 +21,7 @@ import android.view.animation.AccelerateInterpolator
 import androidx.recyclerview.widget.RecyclerView
 import com.flask.colorpicker.ColorPickerView
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import uk.mrs.saralarm.databinding.ColourRecyclerViewRowBinding
 import uk.mrs.saralarm.ui.settings.extra_ui.support.ItemTouchViewHolder
 
@@ -86,7 +87,10 @@ class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) :
                 is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
                     holder.rowBinding.colourRecyclerCardView.setCardBackgroundColor(Color.WHITE)
                 }
-                else -> throw e
+                else -> {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    throw e
+                }
             }
         }
     }
@@ -114,7 +118,10 @@ class ColourRecyclerViewAdapter(val context: Context, data: ArrayList<String>) :
             when (e) {
                 is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
                 }
-                else -> throw e
+                else -> {
+                    FirebaseCrashlytics.getInstance().recordException(e)
+                    throw e
+                }
             }
         }
 

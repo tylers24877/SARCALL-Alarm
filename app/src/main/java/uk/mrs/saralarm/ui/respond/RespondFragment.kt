@@ -7,42 +7,51 @@
 
 package uk.mrs.saralarm.ui.respond
 
-import android.Manifest
-import android.app.Dialog
-import android.content.*
-import android.content.DialogInterface.BUTTON_POSITIVE
-import android.content.pm.PackageManager
-import android.os.Build
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
-import android.view.*
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.*
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import uk.me.jstott.jcoord.OSRef
 import uk.mrs.saralarm.R
-import uk.mrs.saralarm.databinding.DialogRespondSignOnOffMulitpleTeamsBinding
 import uk.mrs.saralarm.databinding.FragmentRespondBinding
-import uk.mrs.saralarm.support.SARResponseCode
+import uk.mrs.saralarm.support.Permissions
 import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARA
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARH
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARL
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARN
-import uk.mrs.saralarm.ui.respond.dialogs.multiple_teams.MultipleTeamsDialogAdapter
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSignOff
+import uk.mrs.saralarm.ui.respond.dialogs.DialogSignOn
+import uk.mrs.saralarm.ui.respond.support.NationalGrid
 import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver
 import uk.mrs.saralarm.ui.respond.support.RespondSMSBroadcastReceiver.Companion.RESPOND_SMS_BROADCAST_RECEIVER_SENT
 import uk.mrs.saralarm.ui.respond.support.RespondUtil
-import uk.mrs.saralarm.ui.respond.support.SMSSender.sendSMSResponse
 import java.util.*
+import java.util.regex.Pattern
 
 
 class RespondFragment : Fragment(), RespondBroadcastListener {
@@ -59,29 +68,12 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRespondBinding.inflate(inflater, container, false)
 
-        val permissionsToRequest = arrayOf(
-            Manifest.permission.RECEIVE_SMS,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.SEND_SMS,
-            Manifest.permission.READ_SMS,
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_AUDIO
-            }else "",
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.POST_NOTIFICATIONS
-            }else ""
-        )
-
-        val permissionsToRequestNotGranted = permissionsToRequest.filter {
-            ContextCompat.checkSelfPermission(
-                requireContext(),
-                it
-            ) != PackageManager.PERMISSION_GRANTED
-        }
-
+        val permissionsToRequestNotGranted = Permissions.checkPermissions(requireContext())
         if (permissionsToRequestNotGranted.isNotEmpty()) {
-            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                if (permissions["android.permission.READ_SMS"] == true) {
+                    runBlocking { updateLatestSMS() }
+                }
             }.launch(permissionsToRequestNotGranted.toTypedArray())
         }
 
@@ -103,10 +95,10 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                 pullToRefresh.isRefreshing = false
             }
             respondSignOn.setOnClickListener {
-                displaySignOnDialog()
+                DialogSignOn.open(requireContext(), root, binding)
             }
             respondSignOff.setOnClickListener {
-                displaySignOffDialog()
+                DialogSignOff.open(requireContext(), root, binding)
             }
         }
 
@@ -190,152 +182,94 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         _binding = null
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String?>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 0) {
-            val length = permissions.size
-            for (i in 0 until length) {
-                if (permissions[i].equals("android.permission.READ_SMS") && grantResults[i] == 0) {
-                    runBlocking { updateLatestSMS() }
-                }
-            }
-        }
-    }
-
-    @OptIn(DelicateCoroutinesApi::class)
     private fun updateLatestSMS() {
         if (ActivityCompat.checkSelfPermission(requireContext(), "android.permission.READ_SMS") == 0) {
-            GlobalScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch {
                 binding.apply {
-                    try {
-                        respondSmsLoadingBar.visibility = View.VISIBLE
-                        respondSmsPreviewTxtview.visibility = View.GONE
-                        respondPreviewDateTxtview.visibility = View.GONE
+                    respondSmsLoadingBar.visibility = View.VISIBLE
+                    respondSmsPreviewTxtview.visibility = View.GONE
+                    respondPreviewDateTxtview.visibility = View.GONE
 
-                        val (resultBody, resultDate) = RespondUtil.setPreviewAsync(requireContext()).await()
-                        respondSmsPreviewTxtview.text = resultBody
-                        respondPreviewDateTxtview.text = getString(R.string.fragment_respond_preview_date_received, resultDate)
+                    RespondUtil.setPreviewFlow(requireContext())
+                        .onStart { emit(Pair("", "")) }
+                        .catch { emit(Pair(getString(R.string.fragment_respond_preview_setup_needed_warning), "")) }
+                        .collect { (resultBody, resultDate) ->
+                            val regex = Pattern.compile("\\s([STNHstnh][A-Za-z]\\s?)(\\d{5}\\s?\\d{5}|\\d{4}\\s?\\d{4}|\\d{3}\\s?\\d{3})")
+                            try {
+                                val str = SpannableString(resultBody)
+                                val matcher = regex.matcher(resultBody)
+                                var matchStart: Int
+                                var matchEnd: Int
 
-                        respondSmsLoadingBar.visibility = View.GONE
-                        respondSmsPreviewTxtview.visibility = View.VISIBLE
-                        respondPreviewDateTxtview.visibility = View.VISIBLE
-                    } catch (_: IllegalStateException) {
-                    }
-                }
-            }
-        } else {
-            try {
-                binding.respondSmsPreviewTxtview.setText(R.string.fragment_response_permission_placeholder)
-                binding.respondPreviewDateTxtview.text = ""
-            } catch (_: IllegalStateException) {
-            }
-        }
-    }
+                                while (matcher.find()){
+                                    matchStart = matcher.start(1)
+                                    matchEnd = matcher.end()
 
-    private fun displaySignOnDialog() {
-        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val teamPrefixArray: ArrayList<String>? = Gson().fromJson(pref.getString("respondTeamPrefixJSON", ""), object : TypeToken<ArrayList<String>?>() {}.type)
-        teamPrefixArray?.removeAll(Collections.singleton(""))
-        if (teamPrefixArray.isNullOrEmpty()) {
-            Snackbar.make(binding.respondConstraintLayout, getString(R.string.fragment_respond_dialog_sign_on_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
-            return
-        }
-        if (teamPrefixArray.size > 1) {
-            val pairedArrayList = ArrayList<Pair<Boolean, String>>()
-            for (teamPrefix in teamPrefixArray) {
-                pairedArrayList.add(Pair(false, teamPrefix))
-            }
-            val dialogBinding: DialogRespondSignOnOffMulitpleTeamsBinding = DialogRespondSignOnOffMulitpleTeamsBinding.inflate(layoutInflater)
-            val dialog = Dialog(requireContext())
-            dialog.setContentView(dialogBinding.root)
-            val window: Window = dialog.window!!
-            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            window.setGravity(Gravity.CENTER)
-            dialog.show()
-            dialogBinding.apply {
-                respondDialogSignOnOffMultipleTeamsSelectButton.isEnabled = false
+                                    val match = resultBody.substring(matchStart, matchEnd).uppercase(Locale.ROOT)
+                                    try {
+                                        val northernAndEastings = NationalGrid.fromNationalGrid(match)
+                                        val clickableSpan: ClickableSpan = object : ClickableSpan() {
+                                            override fun onClick(widget: View) {
+                                                val param = Bundle()
+                                                param.putString("null","null")
+                                                FirebaseAnalytics.getInstance(requireContext()).logEvent("grid_reference_clicked", param)
+                                                val os1 = OSRef(northernAndEastings[0], northernAndEastings[1])
+                                                val ll1 = os1.toLatLng()
+                                                val lat = ll1.latitude
+                                                val lon = ll1.longitude
+                                                val matchPlain = match.replace(" ", "+")
 
-                respondDialogSignOnOffMultipleTeamsRecycler.layoutManager = LinearLayoutManager(context)
-                val adapter = MultipleTeamsDialogAdapter(requireContext(), pairedArrayList, dialogBinding)
-                respondDialogSignOnOffMultipleTeamsRecycler.adapter = adapter
+                                                val gmmIntentUri = Uri.parse("geo:0,0?q=$lat,$lon($matchPlain)")
+                                                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                                               mapIntent.setPackage("com.google.android.apps.maps")
+                                               startActivity(mapIntent)
+                                            }
 
-                respondDialogSignOnOffMultipleTeamsSelectButton.setOnClickListener {
-                    for (eachPair in adapter.data) {
-                        if (eachPair.first) {
-                            sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, dialog, 0, eachPair.second)
+                                            override fun updateDrawState(ds: TextPaint) {
+                                                super.updateDrawState(ds)
+                                                ds.isUnderlineText = false
+                                            }
+                                        }
+                                        str.setSpan(clickableSpan, matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                    }catch (_:java.lang.IllegalArgumentException ){ }
+                                }
+                                respondSmsPreviewTxtview.text = str
+                                respondSmsPreviewTxtview.movementMethod = LinkMovementMethod.getInstance()
+                            }catch (e: Exception){
+                                e.printStackTrace()
+                            }
+                            respondPreviewDateTxtview.text = getString(R.string.fragment_respond_preview_date_received, resultDate)
                         }
-                    }
+
+                    respondSmsLoadingBar.visibility = View.GONE
+                    respondSmsPreviewTxtview.visibility = View.VISIBLE
+                    respondPreviewDateTxtview.visibility = View.VISIBLE
                 }
             }
         } else {
-            val onePrefixDialogClickListener = DialogInterface.OnClickListener { _, which ->
-                if (which == BUTTON_POSITIVE) {
-                    sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_ON, null, 0, teamPrefixArray[0])
-                }
+            binding.apply {
+                respondSmsPreviewTxtview.setText(R.string.fragment_response_permission_placeholder)
+                respondPreviewDateTxtview.text = ""
+                respondSmsLoadingBar.visibility = View.GONE
+                respondSmsPreviewTxtview.visibility = View.VISIBLE
+                respondPreviewDateTxtview.visibility = View.VISIBLE
             }
-            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_on_title))
-                .setMessage(getString(R.string.fragment_respond_dialog_sign_on_message)).setPositiveButton(getString(R.string.yes), onePrefixDialogClickListener)
-                .setNegativeButton(getString(R.string.no), onePrefixDialogClickListener).show()
         }
     }
 
-    private fun displaySignOffDialog() {
-        val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
-        val teamPrefixArray: ArrayList<String>? = Gson().fromJson(pref.getString("respondTeamPrefixJSON", ""), object : TypeToken<ArrayList<String>?>() {}.type)
-        teamPrefixArray?.removeAll(Collections.singleton(""))
-        if (teamPrefixArray.isNullOrEmpty()) {
-            Snackbar.make(binding.respondConstraintLayout, getString(R.string.fragment_respond_dialog_sign_off_no_team_prefix_toast), Snackbar.LENGTH_LONG).show()
-            return
-        }
-        if (teamPrefixArray.size > 1) {
-            val pairedArrayList = ArrayList<Pair<Boolean, String>>()
-            for (teamPrefix in teamPrefixArray) {
-                pairedArrayList.add(Pair(false, teamPrefix))
-            }
-            val dialogBinding: DialogRespondSignOnOffMulitpleTeamsBinding = DialogRespondSignOnOffMulitpleTeamsBinding.inflate(layoutInflater)
-            val dialog = Dialog(requireContext())
-            dialog.setContentView(dialogBinding.root)
-            val window: Window = dialog.window!!
-            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-            window.setGravity(Gravity.CENTER)
-            dialog.show()
-            dialogBinding.apply {
-                respondDialogSignOnOffMultipleTeamsSelectButton.isEnabled = false
-
-                respondDialogSignOnOffMultipleTeamsRecycler.layoutManager = LinearLayoutManager(context)
-                val adapter = MultipleTeamsDialogAdapter(requireContext(), pairedArrayList, dialogBinding)
-                respondDialogSignOnOffMultipleTeamsRecycler.adapter = adapter
-
-                respondDialogSignOnOffMultipleTeamsSelectButton.setOnClickListener {
-                    for (eachPair in adapter.data) {
-                        if (eachPair.first) {
-                            sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, dialog, 0, eachPair.second)
-                        }
-                    }
-                }
-            }
-        } else {
-            val onePrefixDialogClickListener = DialogInterface.OnClickListener { _, which ->
-                if (which == BUTTON_POSITIVE) {
-                    sendSMSResponse(requireContext(), requireView(), SARResponseCode.SIGN_OFF, null, 0, teamPrefixArray[0])
-                }
-            }
-            AlertDialog.Builder(requireContext()).setTitle(getString(R.string.fragment_respond_dialog_sign_off_title))
-                .setMessage(getString(R.string.fragment_respond_dialog_sign_off_message)).setPositiveButton(getString(R.string.yes), onePrefixDialogClickListener)
-                .setNegativeButton(getString(R.string.no), onePrefixDialogClickListener).show()
-        }
-    }
 
     override fun silencedForegroundNotificationClosed() {
         try {
             binding.InfoView.visibility = View.GONE
-        } catch (_: IllegalStateException) {
+        } catch (e: IllegalStateException) {
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
+
+
 }
 
 class RespondBroadcastReceiver(private val listener: RespondBroadcastListener) : BroadcastReceiver() {
-
     override fun onReceive(context: Context, i: Intent) {
         when (i.action) {
             "uk.mrs.saralarm.RespondFragment.SilencedForegroundNotificationClosed" -> {

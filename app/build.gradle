@@ -7,8 +7,18 @@
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
     android.buildFeatures.viewBinding = true
 
     signingConfigs {
@@ -38,7 +48,7 @@ android {
             targetSdkVersion 33
 
             versionCode code
-            versionName "1.6.1.0"
+            versionName "1.6.8"
 
             multiDexEnabled true
         }
@@ -65,19 +75,25 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.preference:preference-ktx:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation "androidx.work:work-runtime-ktx:2.8.1"
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.6.0'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'com.github.javiersantos:AppUpdater:2.7'
-    implementation 'com.google.code.gson:gson:2.9.0'
-    implementation 'com.googlecode.libphonenumber:libphonenumber:8.12.10'
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.15'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.github.QuadFlask:colorpicker:0.0.15'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'com.google.firebase:firebase-crashlytics:18.3.7'
+    implementation 'com.google.firebase:firebase-analytics:21.3.0'
+    implementation 'com.google.firebase:firebase-config-ktx:21.4.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation fileTree(dir: 'libs', include: ['*.aar', '*.jar'], exclude: [])
 }

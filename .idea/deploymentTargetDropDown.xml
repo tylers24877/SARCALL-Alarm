@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="deploymentTargetDropDown">
+    <targetSelectedWithDropDown>
+      <Target>
+        <type value="QUICK_BOOT_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\tsimm\.android\avd\Pixel_3a_API_31.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </targetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2023-07-06T13:53:13.689354500Z" />
+    <runningDeviceTargetsSelectedWithDialog>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\tsimm\.android\avd\Pixel_3a_API_31.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="SERIAL_NUMBER" />
+            <value value="adb-2B101FDH2003BW-c8EVM3._adb-tls-connect._tcp" />
+          </Key>
+        </deviceKey>
+      </Target>
+      <Target>
+        <type value="RUNNING_DEVICE_TARGET" />
+        <deviceKey>
+          <Key>
+            <type value="VIRTUAL_DEVICE_PATH" />
+            <value value="C:\Users\tsimm\.android\avd\Pixel_2_API_26.avd" />
+          </Key>
+        </deviceKey>
+      </Target>
+    </runningDeviceTargetsSelectedWithDialog>
+  </component>
+</project>

@@ -30,6 +30,7 @@ import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.android.material.transition.MaterialSharedAxis
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.FragmentSettingsBinding
 import uk.mrs.saralarm.support.WidgetProvider
@@ -46,22 +47,14 @@ class SettingsFragment : Fragment(), MenuProvider {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            when (requireArguments().getSerializable("sub_category", SubCategory::class.java)) {
-                SubCategory.NONE ->
-                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
-                SubCategory.ABOUT_CATEGORY ->
-                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
-                else -> {}
-            }
-        }else{
-            when (requireArguments().getSerializable("sub_category") as SubCategory) {
-                SubCategory.NONE ->
-                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
-                SubCategory.ABOUT_CATEGORY ->
-                    parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
-            }
+        @Keep
+        when (requireArguments().getSerializable("sub_category") as SubCategory) {
+            SubCategory.NONE ->
+                parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, PrefsFragment()).commit()
+            SubCategory.ABOUT_CATEGORY ->
+                parentFragmentManager.beginTransaction().replace(R.id.settings_content_frame, AboutPrefsFragment()).commit()
         }
+
 
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, /* forward = */ true)
@@ -83,6 +76,7 @@ class SettingsFragment : Fragment(), MenuProvider {
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
         return false
     }
+    @Keep
     enum class SubCategory { NONE, ABOUT_CATEGORY }
 }
 
@@ -162,7 +156,7 @@ class AboutPrefsFragment : PreferenceFragmentCompat() {
         try {
             preferenceManager.findPreference<Preference>("appVersion")?.summary = appVersion()
         } catch (e: PackageManager.NameNotFoundException) {
-            e.printStackTrace()
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
     }
 

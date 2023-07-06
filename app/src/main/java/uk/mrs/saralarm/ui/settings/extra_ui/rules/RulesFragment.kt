@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.*
@@ -103,12 +104,14 @@ class RulesFragment : Fragment(), CoroutineScope {
                     adapter!!.saveData()
                     inputStreamToFile(requireContext(), fileName, data.data!!, requireContext().filesDir)
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     try {
                         adapter!!.data[position].customAlarmRulesObject.alarmSoundType = SoundType.NONE
                         adapter!!.data[position].customAlarmRulesObject.alarmFileLocation = ""
                         adapter!!.data[position].customAlarmRulesObject.alarmFileName = ""
                         adapter!!.saveData()
-                    } catch (e: Exception) {
+                    } catch (e1: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e1)
                     }
                     Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
                 }
@@ -128,6 +131,7 @@ class RulesFragment : Fragment(), CoroutineScope {
                             Toast.makeText(context, "Using default sound.", Toast.LENGTH_SHORT).show()
                         }
                     } catch (e: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e)
                         Snackbar.make(requireView(), "Something went wrong", Snackbar.LENGTH_LONG).show()
                     }
                 }

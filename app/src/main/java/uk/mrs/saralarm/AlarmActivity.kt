@@ -31,6 +31,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import uk.mrs.saralarm.databinding.ActivityAlarmBinding
 import uk.mrs.saralarm.support.RuleAlarmData
 import uk.mrs.saralarm.support.notification.PostAlarmNotification
@@ -93,17 +94,20 @@ class AlarmActivity : AppCompatActivity() {
             SoundType.NONE -> {
                 try {
                     mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                } catch (_: Exception) {
+                } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                 }
             }
             SoundType.SYSTEM -> {
                 try {
                     mp!!.setDataSource(applicationContext, Uri.parse(ruleAlarmData.soundFile))
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     try {
                         Toast.makeText(applicationContext, getString(R.string.alarm_activity_sound_load_failed), Toast.LENGTH_LONG).show()
                         mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                    } catch (_: Exception) {
+                    } catch (e1: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e1)
                     }
                 }
             }
@@ -114,9 +118,11 @@ class AlarmActivity : AppCompatActivity() {
                     mp!!.setDataSource(fileInputStream.fd)
                     fileInputStream.close()
                 } catch (e: Exception) {
+                    FirebaseCrashlytics.getInstance().recordException(e)
                     try {
                         mp!!.setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
-                    } catch (_: Exception) {
+                    } catch (e1: Exception) {
+                        FirebaseCrashlytics.getInstance().recordException(e1)
                     }
                 }
             }
@@ -125,7 +131,8 @@ class AlarmActivity : AppCompatActivity() {
         try {
             mp!!.prepare()
             mp!!.start()
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            FirebaseCrashlytics.getInstance().recordException(e)
         }
 
         val audio = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -159,7 +166,10 @@ class AlarmActivity : AppCompatActivity() {
                     when (e) {
                         is IllegalArgumentException, is StringIndexOutOfBoundsException -> {
                         }
-                        else -> throw e
+                        else -> {
+                            FirebaseCrashlytics.getInstance().recordException(e)
+                            throw e
+                        }
                     }
                 }
             }
@@ -222,5 +232,15 @@ class AlarmActivity : AppCompatActivity() {
     inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getSerializableExtra(key, T::class.java)
         else -> @Suppress("DEPRECATION") getSerializableExtra(key) as? T
+    }
+
+    override fun attachBaseContext(newBase: Context) {
+
+        val config =  newBase.resources.configuration
+        if (config.fontScale > 1.00) {
+            config.fontScale = 1.00f
+        }
+        config.densityDpi = newBase.resources.displayMetrics.xdpi.toInt()
+        super.attachBaseContext(newBase.createConfigurationContext(config))
     }
 }

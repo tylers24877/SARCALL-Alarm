@@ -17,6 +17,7 @@ import android.telephony.SmsMessage
 import android.view.Display
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.google.i18n.phonenumbers.NumberParseException
@@ -32,6 +33,7 @@ import java.util.regex.Pattern
 class SMSBroadcastReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        val crash = FirebaseCrashlytics.getInstance()
         val pref: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         if (pref.getBoolean("prefEnabled", true)) {
             val phoneUtil = PhoneNumberUtil.getInstance()
@@ -49,12 +51,16 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                 for (r in rulesFromJson) {
                     if (r.choice == RulesChoice.ALL && r.smsNumber.isNotBlank() && r.phrase.isNotBlank()) {
                         try {
+                            crash.setCustomKey("RulesChoice", RulesChoice.ALL.name)
                             rulesBothSet.add(r)
-                        } catch (_: NumberParseException) {
+                        } catch (e: NumberParseException) {
+                            FirebaseCrashlytics.getInstance().recordException(e)
                         }
                     } else if (r.choice == RulesChoice.SMS_NUMBER && r.smsNumber.isNotBlank()) {
+                        crash.setCustomKey("RulesChoice", RulesChoice.SMS_NUMBER.name)
                         rulesSMSSet.add(r)
                     } else if (r.choice == RulesChoice.PHRASE && r.phrase.isNotBlank()) {
+                        crash.setCustomKey("RulesChoice", RulesChoice.PHRASE.name)
                         rulesPhraseSet.add(r)
                     }
                 }
@@ -79,6 +85,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                     }
                     smsNumber = messages[0]!!.displayOriginatingAddress
                     checkMessages(strMessage, smsNumber, rulesBothSet, rulesSMSSet, rulesPhraseSet, phoneUtil, context)
+                }else{
+                    crash.recordException(Exception("PDUS is null"))
                 }
             }
         }
@@ -93,14 +101,15 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
         phoneUtil: PhoneNumberUtil,
         context: Context
     ) {
+        val crash = FirebaseCrashlytics.getInstance()
 
         val checkRulesBoth = checkRulesBoth(rulesBothSet, strMessage, smsNumber, phoneUtil)
         if (checkRulesBoth.chosen) {
             if (checkScreenState(context)) {
                 startAlarmForegroundService(context, checkRulesBoth)
-                //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                crash.log("alarm_started_unlocked")
             } else {
-                //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                crash.log("alarm_started_locked")
                 startAlarmForegroundService(context, checkRulesBoth)
             }
         } else {
@@ -108,9 +117,10 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
             if (checkRulesSMSNumber.chosen) {
                 if (checkScreenState(context)) {
                     startAlarmForegroundService(context, checkRulesSMSNumber)
-                    //.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                    crash.log("alarm_started_unlocked")
                 } else {
-                    //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                    crash.log("alarm_started_locked")
+
                     startAlarmForegroundService(context, checkRulesSMSNumber)
                 }
             } else {
@@ -118,9 +128,9 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                 if (checkRulesPhrase.chosen) {
                     if (checkScreenState(context)) {
                         startAlarmForegroundService(context, checkRulesPhrase)
-                        //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_unlocked", null)
+                        crash.log("alarm_started_unlocked")
                     } else {
-                        //FirebaseAnalytics.getInstance(context.applicationContext).logEvent("alarm_started_locked", null)
+                        crash.log("alarm_started_locked")
                         startAlarmForegroundService(context, checkRulesPhrase)
                     }
                 }
@@ -130,7 +140,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
 
     private fun checkRulesPhrase(SS: HashSet<RulesObject>, m: String, num: String): RuleAlarmData {
         for (s in SS) {
-            if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(m.replace("\\s".toRegex(), "")).find()) {
+            val regex = Regex(Pattern.quote(s.phrase.replace("\\s", "")), RegexOption.IGNORE_CASE)
+            if (regex.containsMatchIn(Pattern.quote(m.replace("\\s", "")))) {
                 return RuleAlarmData(
                     true, s.customAlarmRulesObject.alarmSoundType, s.customAlarmRulesObject.alarmFileLocation, s.customAlarmRulesObject.isLooping,
                     s.customAlarmRulesObject.colorArray, m, num
@@ -150,7 +161,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                         s.customAlarmRulesObject.colorArray, m, phoneNumberC
                     )
                 }
-            } catch (_: NumberParseException) {
+            } catch (e: NumberParseException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
         return RuleAlarmData(false)
@@ -159,7 +171,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
     private fun checkRulesBoth(SS: Set<RulesObject>, body: String, receivedNumber: String, phoneUtil: PhoneNumberUtil): RuleAlarmData {
         for (s in SS) {
             try {
-                if (Pattern.compile(s.phrase.replace("\\s".toRegex(), ""), Pattern.CASE_INSENSITIVE + Pattern.LITERAL).matcher(body.replace("\\s".toRegex(), "")).find()) {
+                val regex = Regex(Pattern.quote(s.phrase.replace("\\s", "")), RegexOption.IGNORE_CASE)
+                if (regex.containsMatchIn(Pattern.quote(body.replace("\\s", "")))) {
                     val formattedNumber: Phonenumber.PhoneNumber = phoneUtil.parse(s.smsNumber, "GB")
                     if (PhoneNumberUtils.compare(phoneUtil.format(formattedNumber, PhoneNumberUtil.PhoneNumberFormat.INTERNATIONAL), receivedNumber)) {
                         return RuleAlarmData(
@@ -168,7 +181,8 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                         )
                     }
                 }
-            } catch (_: NumberParseException) {
+            } catch (e: NumberParseException) {
+                FirebaseCrashlytics.getInstance().recordException(e)
             }
         }
         return RuleAlarmData(false)
@@ -187,6 +201,7 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
     private fun startAlarmForegroundService(context: Context, ruleAlarmData: RuleAlarmData) {
         //check if the silence foreground service is active, else start alarm
         if (!SilencedForegroundNotification.isServiceAlive(context, SilencedForegroundNotification::class.java)) {
+            FirebaseCrashlytics.getInstance().log("Starting Foreground service")
             val serviceIntent = Intent(context, AlarmForegroundNotification::class.java)
             serviceIntent.putExtra("ruleAlarmData", ruleAlarmData)
             ContextCompat.startForegroundService(context, serviceIntent)

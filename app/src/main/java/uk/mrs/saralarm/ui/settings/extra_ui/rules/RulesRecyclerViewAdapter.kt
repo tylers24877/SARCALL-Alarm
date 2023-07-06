@@ -174,6 +174,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
                     holder.rowBinding.smsNumbersRulesRecyclerTextInput.error = ""
                 }
             } catch (e: NumberParseException) {
+                //FirebaseCrashlytics.getInstance().recordException(e)
                 holder.rowBinding.smsNumbersRulesRecyclerTextInput.error = holder.itemView.context.getString(R.string.fragment_settings_rules_sms_number_invalid)
             }
         }
@@ -248,6 +249,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
 
                                     }
                                 } catch (e: NumberParseException) {
+                                    //FirebaseCrashlytics.getInstance().recordException(e)
                                     smsNumbersRulesRecyclerTextInput.error = context.getString(R.string.fragment_settings_rules_sms_number_invalid)
                                 }
                                 smsNumberEditing = false

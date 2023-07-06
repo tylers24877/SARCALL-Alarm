@@ -126,6 +126,7 @@
                                 android:layout_width="fill_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/alarm_activity_placeholder_text"
+                                android:textIsSelectable="true"
                                 android:textSize="20.0sp"
                                 android:visibility="gone" />
                         </androidx.appcompat.widget.LinearLayoutCompat>

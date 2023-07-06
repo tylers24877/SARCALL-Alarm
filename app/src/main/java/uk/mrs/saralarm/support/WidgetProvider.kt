@@ -15,7 +15,6 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.core.internal.view.SupportMenu
 import androidx.preference.PreferenceManager
 import uk.mrs.saralarm.R
 
@@ -98,7 +97,7 @@ class WidgetProvider : AppWidgetProvider() {
             if (pref.getBoolean("prefEnabled", false)) {
                 views.setTextColor(R.id.appwidget_sarcall_button, -16711936)
             } else {
-                views.setTextColor(R.id.appwidget_sarcall_button, SupportMenu.CATEGORY_MASK)
+                views.setTextColor(R.id.appwidget_sarcall_button, context.resources.getColor(R.color.design_default_color_error))
             }
             views.setTextViewText(R.id.appwidget_sarcall_button, widgetText)
             appWidgetManager.updateAppWidget(appWidgetId, views)
