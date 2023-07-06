@@ -22,6 +22,7 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -31,6 +32,10 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.transition.MaterialFadeThrough
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.what3words.androidwrapper.What3WordsV3
+import com.what3words.javawrapper.response.APIResponse
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -39,6 +44,7 @@ import uk.me.jstott.jcoord.OSRef
 import uk.mrs.saralarm.R
 import uk.mrs.saralarm.databinding.FragmentRespondBinding
 import uk.mrs.saralarm.support.Permissions
+import uk.mrs.saralarm.support.UpdateUtil
 import uk.mrs.saralarm.support.notification.SilencedForegroundNotification
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARA
 import uk.mrs.saralarm.ui.respond.dialogs.DialogSARH
@@ -65,6 +71,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
     private val respondBroadcastReceiver: RespondBroadcastReceiver = RespondBroadcastReceiver(this)
     private val respondSMSBroadcastReceiver: RespondSMSBroadcastReceiver = RespondSMSBroadcastReceiver()
 
+    private lateinit var clickPrefs: SharedPreferences
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentRespondBinding.inflate(inflater, container, false)
 
@@ -107,6 +114,7 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         enterTransition = MaterialFadeThrough()
         exitTransition = MaterialFadeThrough()
 
+        clickPrefs = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return binding.root
     }
 
@@ -194,10 +202,13 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                         .onStart { emit(Pair("", "")) }
                         .catch { emit(Pair(getString(R.string.fragment_respond_preview_setup_needed_warning), "")) }
                         .collect { (resultBody, resultDate) ->
-                            val regex = Pattern.compile("\\s([STNHstnh][A-Za-z]\\s?)(\\d{5}\\s?\\d{5}|\\d{4}\\s?\\d{4}|\\d{3}\\s?\\d{3})")
+                            val regexOSGB = Pattern.compile("\\s([STNHstnh][A-Za-z]\\s?)(\\d{5}\\s?\\d{5}|\\d{4}\\s?\\d{4}|\\d{3}\\s?\\d{3})")
+                            val regexW3W = Pattern.compile("(?:\\p{L}\\p{M}*)+[.｡。･・︒។։။۔።।](?:\\p{L}\\p{M}*)+[.｡。･・︒។։။۔።।](?:\\p{L}\\p{M}*)+")
+
                             try {
                                 val str = SpannableString(resultBody)
-                                val matcher = regex.matcher(resultBody)
+                                val matcher = regexOSGB.matcher(resultBody)
+                                val matcherW3W = regexW3W.matcher(resultBody)
                                 var matchStart: Int
                                 var matchEnd: Int
 
@@ -233,11 +244,93 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
                                         str.setSpan(clickableSpan, matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                                     }catch (_:java.lang.IllegalArgumentException ){ }
                                 }
+
+                                while (matcherW3W.find()){
+                                    matchStart = matcherW3W.start(0)
+                                    matchEnd = matcherW3W.end()
+
+                                    val match = resultBody.substring(matchStart, matchEnd).uppercase(Locale.ROOT)
+                                    val clickableSpan: ClickableSpan = object : ClickableSpan() {
+                                        override fun onClick(widget: View) {
+                                            val param = Bundle()
+                                            param.putString("null","null")
+                                            FirebaseAnalytics.getInstance(requireContext())
+                                                .logEvent("W3W_clicked", param)
+                                            val updateUtil = UpdateUtil()
+
+                                            updateUtil.remoteLiveDataW3WClickLimit.observe(requireActivity()) { clickLimit ->
+                                                val currentTime = System.currentTimeMillis()
+                                                val elapsedTime = currentTime - clickPrefs.getLong(KEY_LAST_CLICK_TIME, 0L)
+
+                                                if (elapsedTime <= 3600000) { // 3600000 milliseconds = 1 hour
+                                                    val clickCount = clickPrefs.getInt(KEY_CLICK_COUNT, 0) + 1
+                                                    if (clickCount > clickLimit.toInt()) {
+                                                        // Perform action when the limit is reached
+                                                        // Example: show a toast message
+                                                        Toast.makeText(context, "Click limit exceeded!", Toast.LENGTH_SHORT).show()
+                                                        return@observe
+                                                    }
+                                                    clickPrefs.edit()
+                                                        .putInt(KEY_CLICK_COUNT, clickCount)
+                                                        .apply()
+                                                } else {
+                                                    clickPrefs.edit()
+                                                        .putInt(KEY_CLICK_COUNT, 1)
+                                                        .apply()
+                                                }
+
+                                                clickPrefs.edit()
+                                                    .putLong(KEY_LAST_CLICK_TIME, currentTime)
+                                                    .apply()
+
+                                                updateUtil.remoteLiveDataW3W.observe(requireActivity()) {
+                                                    val wrapper = What3WordsV3(it, requireContext())
+                                                    CoroutineScope(Dispatchers.IO).launch {
+                                                        //use wrapper.convertTo3wa() with Dispatcher.IO - background thread
+                                                        val result = wrapper.convertToCoordinates(match).execute()
+                                                        CoroutineScope(Dispatchers.Main).launch {
+                                                            //use Dispatcher.Main to update your views with the results if needed - Main thread
+                                                            if (result.isSuccessful) {
+                                                                val gmmIntentUri =
+                                                                    Uri.parse("geo:0,0?q=${result.coordinates.lat},${result.coordinates.lng}($match)")
+
+                                                                val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                                                                mapIntent.setPackage("com.google.android.apps.maps")
+                                                                startActivity(mapIntent)
+                                                            } else {
+                                                                when (result.error) {
+                                                                    APIResponse.What3WordsError.BAD_WORDS -> {
+                                                                        Toast.makeText(requireContext(),"This is not a valid W3W.",Toast.LENGTH_SHORT).show()
+                                                                    }
+                                                                    APIResponse.What3WordsError.NETWORK_ERROR -> {
+                                                                        Toast.makeText(requireContext(),"An internet connection is needed to open W3W.",Toast.LENGTH_SHORT).show()
+                                                                    }
+                                                                    else -> {
+                                                                        Toast.makeText(requireContext(), result.error.message,Toast.LENGTH_LONG).show()
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                updateUtil.remoteConfigurationW3W()
+                                            }
+                                            updateUtil.remoteConfigurationW3WClickLimit()
+                                        }
+
+                                        override fun updateDrawState(ds: TextPaint) {
+                                            super.updateDrawState(ds)
+                                            ds.isUnderlineText = false
+                                        }
+                                    }
+                                    str.setSpan(clickableSpan, matchStart, matchEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                                }
                                 respondSmsPreviewTxtview.text = str
                                 respondSmsPreviewTxtview.movementMethod = LinkMovementMethod.getInstance()
                             }catch (e: Exception){
                                 e.printStackTrace()
                             }
+
                             respondPreviewDateTxtview.text = getString(R.string.fragment_respond_preview_date_received, resultDate)
                         }
 
@@ -264,6 +357,12 @@ class RespondFragment : Fragment(), RespondBroadcastListener {
         } catch (e: IllegalStateException) {
             FirebaseCrashlytics.getInstance().recordException(e)
         }
+    }
+
+    companion object {
+        private const val PREFS_NAME = "ClickPrefs"
+        private const val KEY_CLICK_COUNT = "clickCount"
+        private const val KEY_LAST_CLICK_TIME = "lastClickTime"
     }
 
 

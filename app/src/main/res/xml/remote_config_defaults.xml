@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <defaults>
   <entry>
+    <key>W3W_click_limit</key>
+    <value>15</value>
+  </entry>
+  <entry>
     <key>update</key>
-    <value>{"version":"1.0.0","version_code":"200","url":"http://bit.ly/sarcall-alarm","release_notes":"Version 1.6.3 release. Changelog:\\n- Changes to allow support for Android 13.\\n- Added a default audio file rather than using your default ringtone\\n- Hopefully you'll notice some bug fixes\\nOnce updated, please make sure you open the app."}</value>
+    <value>{"version":"1.6.4","version_code":"352","url":"http://bit.ly/sarcall-alarm","release_notes":"Version 1.6.4 release. Changelog:\n- Changes to allow support for Android 13.\n- Added a default audio file rather than using your default ringtone\n- Hopefully you'll notice some bug fixes\nOnce updated, please make sure you open the app."}</value>
+  </entry>
+  <entry>
+    <key>W3W_API</key>
+    <value>88SVRLYO</value>
   </entry>
 </defaults>

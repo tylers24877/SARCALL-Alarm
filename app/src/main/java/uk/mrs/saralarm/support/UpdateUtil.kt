@@ -34,6 +34,12 @@ class UpdateUtil {
 
     private val _mutableLiveData = MutableLiveData<VersionData>()
     val remoteLiveData: LiveData<VersionData> = _mutableLiveData
+
+    private val _mutableLiveDataW3W = MutableLiveData<String>()
+    val remoteLiveDataW3W: LiveData<String> = _mutableLiveDataW3W
+
+    private val _mutableLiveDataW3WClickLimit = MutableLiveData<Long>()
+    val remoteLiveDataW3WClickLimit: LiveData<Long> = _mutableLiveDataW3WClickLimit
     fun remoteConfiguration(){
         val gson = Gson()
         val remote = remoteConfig.fetchAndActivate()
@@ -49,6 +55,19 @@ class UpdateUtil {
                 )
                 _mutableLiveData.value = vD
             }
+        }
+    }
+
+    fun remoteConfigurationW3W(){
+        val remote = remoteConfig.fetchAndActivate()
+        remote.addOnSuccessListener {
+            _mutableLiveDataW3W.value =  remoteConfig.getString("W3W_API")
+        }
+    }
+    fun remoteConfigurationW3WClickLimit(){
+        val remote = remoteConfig.fetchAndActivate()
+        remote.addOnSuccessListener {
+            _mutableLiveDataW3WClickLimit.value =  remoteConfig.getLong("W3W_click_limit")
         }
     }
 }
