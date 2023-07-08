@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -70,8 +71,7 @@ class RulesFragment : Fragment(), CoroutineScope {
             ItemTouchHelper(DragAdapter(adapter!!, requireContext(), 3, 12)).attachToRecyclerView(rulesRecyclerView)
             rulesFab.setOnClickListener {
                 adapter!!.addItem()
-                //FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
-
+                FirebaseAnalytics.getInstance(requireContext().applicationContext).logEvent("rules_row_added", null)
             }
 
             setHasOptionsMenu(true)

@@ -286,9 +286,10 @@ class MainActivity : AppCompatActivity() {
     override fun attachBaseContext(newBase: Context) {
 
         val config =  newBase.resources.configuration
-        if (config.fontScale > 1.00) {
-            config.fontScale = 1.00f
-        }
+        val pref = PreferenceManager.getDefaultSharedPreferences(newBase)
+        val floatVal: Float = .2f * pref.getInt("fontSize", 5)
+            config.fontScale = floatVal
+
         config.densityDpi = newBase.resources.displayMetrics.xdpi.toInt()
         super.attachBaseContext(newBase.createConfigurationContext(config))
     }

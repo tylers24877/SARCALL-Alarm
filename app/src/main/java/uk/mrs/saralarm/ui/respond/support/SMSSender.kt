@@ -145,7 +145,7 @@ object SMSSender {
     }
     private fun isAirplaneModeOn(context: Context): Boolean {
         return Settings.System.getInt(context.contentResolver,
-            Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
+            Settings.Global.AIRPLANE_MODE_ON, 0) != 0
     }
 
 }

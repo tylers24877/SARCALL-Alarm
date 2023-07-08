@@ -13,6 +13,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import uk.mrs.saralarm.MainActivity
 import uk.mrs.saralarm.R
@@ -35,9 +36,11 @@ object PostAlarmNotification {
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notificationChannel = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
-        notificationChannel.setBypassDnd(true)
-        notificationManager.createNotificationChannel(notificationChannel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel("Post Alarm Trigger", "Post Alarm Trigger", NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.setBypassDnd(true)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
 
         notificationManager.notify(1, notificationBuilder.build())
     }

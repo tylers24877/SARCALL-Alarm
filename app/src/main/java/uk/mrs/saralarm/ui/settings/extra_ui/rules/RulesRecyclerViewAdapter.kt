@@ -22,7 +22,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.DisplayMetrics
 import android.util.TypedValue
-import android.view.*
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.AccelerateInterpolator
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
@@ -75,7 +79,7 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    @SuppressLint("ShowToast")
+    @SuppressLint("ShowToast", "NotifyDataSetChanged")
     override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
@@ -96,12 +100,14 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun addItem() {
         undoSnackBar?.dismiss()
         data.add(RulesObject())
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun saveData() {
         val list = ArrayList<RulesObject>()
 
@@ -187,19 +193,19 @@ class RulesRecyclerViewAdapter(val context: Context, val rulesFragment: RulesFra
         when (data[holder.layoutPosition].customAlarmRulesObject.alarmSoundType) {
             SoundType.NONE -> {
                 checkAndRemoveFile(holder.layoutPosition)
-                holder.rowBinding.addAlarmRulesTextView.text = "No Alarm Sound Set. Using Default."
-                holder.rowBinding.addAlarmRulesButton.text = "Set Alarm Sound"
+                holder.rowBinding.addAlarmRulesTextView.text = context.getString(R.string.no_alarm_sound)
+                holder.rowBinding.addAlarmRulesButton.text = context.getString(R.string.set_alarm_sound)
             }
             SoundType.SYSTEM -> {
                 if (data[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
                     holder.rowBinding.addAlarmRulesTextView.text = data[holder.layoutPosition].customAlarmRulesObject.alarmFileName
-                    holder.rowBinding.addAlarmRulesButton.text = "Reset Alarm Sound"
+                    holder.rowBinding.addAlarmRulesButton.text = context.getString(R.string.reset_alarm_sound)
                 }
             }
             SoundType.CUSTOM -> {
                 if (data[holder.layoutPosition].customAlarmRulesObject.alarmFileName.isNotEmpty()) {
                     holder.rowBinding.addAlarmRulesTextView.text = data[holder.layoutPosition].customAlarmRulesObject.alarmFileName
-                    holder.rowBinding.addAlarmRulesButton.text = "Reset Alarm Sound"
+                    holder.rowBinding.addAlarmRulesButton.text = context.getString(R.string.reset_alarm_sound)
                 }
             }
         }

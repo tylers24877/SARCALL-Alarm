@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import androidx.preference.PreferenceManager
@@ -82,8 +83,10 @@ class UpdateWorker(context: Context?, params: WorkerParameters?) : Worker(contex
 
         val notificationManager: NotificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val notificationChannel = NotificationChannel("App Update", "App Update", NotificationManager.IMPORTANCE_DEFAULT)
-        notificationManager.createNotificationChannel(notificationChannel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel("App Update", "App Update", NotificationManager.IMPORTANCE_DEFAULT)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
 
         notificationManager.notify(1999, notificationBuilder.build())
     }

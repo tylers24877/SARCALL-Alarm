@@ -15,7 +15,6 @@
      */
 package uk.mrs.saralarm.ui.respond.support
 
-import java.util.*
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
@@ -186,26 +185,6 @@ object NationalGrid {
         val multiplier = 10.0.pow(4 - precedingZeroes - floor(log10(c)))
         return c * multiplier
     }
-
-    /**
-     * Convert EastingsNorthings to a NationalGrid reference.
-     *
-     *
-     * This is not a very optimised implementation.
-     *
-     * @param en array of {e,n}
-     * @return optional empty if the ne has no representation
-     */
-    fun toNationalGrid(en: DoubleArray): Optional<String> {
-        for (gs in GRID_SQUARES.values) {
-            if (gs.inside(en)) {
-                val offset = gs.offsetEastingNorthing(en)
-                return Optional.of(String.format("%s %05.0f %05.0f", gs.reference, offset[0], offset[1]))
-            }
-        }
-        return Optional.empty()
-    }
-
     private fun splitOnWhitespace(s: String): List<String> {
         val splits = s.split("\\h+".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val ret: MutableList<String> = ArrayList()
@@ -229,45 +208,6 @@ object NationalGrid {
         /** Return the Reference of this grid square (e.g. SU)  */
         val reference: String, private val easting: Double, private val northing: Double
     ) {
-
-        /**
-         * Is the given Easting-Northing pair inside this grid square?
-         *
-         * @param en An array of Easting-Northing coordinates (in that order)
-         */
-        fun inside(en: DoubleArray): Boolean {
-            return inside(en[0], en[1])
-        }
-
-        /**
-         * Is the given Easting-Northing pair inside this grid square?
-         *
-         * @param e Easting
-         * @param n Northing
-         */
-        fun inside(e: Double, n: Double): Boolean {
-            return northing <= n && n < northing + SIZE_M && easting <= e && e < easting + SIZE_M
-        }
-
-        /**
-         * Return the offset of the provided absolute Easting-Northing within this grid square
-         *
-         * @param en An array of Easting-Northing coordinates (in that order)
-         */
-        fun offsetEastingNorthing(en: DoubleArray): DoubleArray {
-            return offsetEastingNorthing(en[0], en[1])
-        }
-
-        /**
-         * Return the offset of the provided absolute Easting-Northing within this grid square
-         *
-         * @param e Easting
-         * @param n Northing
-         */
-        fun offsetEastingNorthing(e: Double, n: Double): DoubleArray {
-            return doubleArrayOf(e - easting, n - northing)
-        }
-
         /**
          * Convert an Easting-Northing from a relative (to this grid square) pair to an absolute pair
          *

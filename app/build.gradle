@@ -44,11 +44,11 @@ android {
 
         defaultConfig {
             applicationId "uk.mrs.saralarm"
-            minSdkVersion 26
+            minSdkVersion 23
             targetSdkVersion 33
 
             versionCode code
-            versionName "1.6.8"
+            versionName "1.6.10"
 
             multiDexEnabled true
         }

@@ -16,7 +16,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
-import androidx.annotation.Nullable
 import androidx.core.app.NotificationCompat
 import uk.mrs.saralarm.AlarmActivity
 import uk.mrs.saralarm.MainActivity
@@ -28,6 +27,7 @@ class AlarmForegroundNotification : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val ruleAlarmData = intent.getSerializableExtra("ruleAlarmData") as RuleAlarmData
         val title = resources.getString(uk.mrs.saralarm.R.string.activation_notification_title_template)
+
 
         createNotificationChannel()
 
@@ -59,13 +59,16 @@ class AlarmForegroundNotification : Service() {
     }
 
     private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            "Alarm Trigger Foreground",
-            "Foreground Service Channel",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-        val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(serviceChannel)
+        val channelId = "AlarmTriggerForeground"
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+            val channelName = "Foreground Service Channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val serviceChannel = NotificationChannel(channelId, channelName, importance)
+
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(serviceChannel)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {

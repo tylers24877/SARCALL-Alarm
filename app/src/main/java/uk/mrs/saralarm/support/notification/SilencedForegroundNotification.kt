@@ -18,6 +18,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.os.Build
 import android.os.CountDownTimer
 import android.os.IBinder
 import android.widget.Toast
@@ -52,7 +53,12 @@ class SilencedForegroundNotification : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         var millisseconds = 0L
         if (intent.action.equals("uk.mrs.saralarm.silenceForeground.stop")) {
-            stopForeground(STOP_FOREGROUND_REMOVE)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            }else{
+                stopForeground(true)
+            }
             stopSelfResult(startId)
             stopSelf()
             if (::countDownTimer.isInitialized) {
@@ -137,12 +143,14 @@ class SilencedForegroundNotification : Service() {
     }
 
     private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            id,
-            "Alarm Silenced",
-            NotificationManager.IMPORTANCE_LOW
-        )
-        getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                id,
+                "Alarm Silenced",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            getSystemService(NotificationManager::class.java).createNotificationChannel(serviceChannel)
+        }
     }
 
     fun millisToHms(millis: Long): String {

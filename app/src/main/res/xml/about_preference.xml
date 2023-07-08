@@ -13,6 +13,15 @@
         android:summary="@string/fragment_settings_pref_beta_summary"
         android:title="@string/fragment_settings_pref_beta_title"
         app:iconSpaceReserved="false" />
+    <SeekBarPreference
+        android:key="fontSize"
+        android:title="Font Size"
+        android:summary="Change the font size of the app.\nHigher is larger and lower is smaller. Please restart app to take effect."
+        android:max="8"
+        app:min="2"
+        app:showSeekBarValue="true"
+        android:defaultValue="5"
+        app:iconSpaceReserved="false"/>
     <uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory
         android:title="@string/fragment_settings_pref_about_cat_title"
         app:iconSpaceReserved="false">
@@ -33,12 +42,12 @@
             android:title="@string/fragment_settings_pref_background_time_title"
             app:iconSpaceReserved="false" />
         <Preference
-            android:summary="https://bit.ly/sarcall-alarm"
+            android:summary="https://sarcallapp.com/downloads/sarcall_alarm/sarcall_download.html"
             android:title="Download Latest Version"
             app:iconSpaceReserved="false">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="https://bit.ly/sarcall-alarm" />
+                android:data="https://sarcallapp.com/downloads/sarcall_alarm/sarcall_download.html" />
         </Preference>
     </uk.mrs.saralarm.ui.settings.preferences.LongSummaryPreferenceCategory>
 </androidx.preference.PreferenceScreen>

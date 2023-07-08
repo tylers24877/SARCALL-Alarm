@@ -51,5 +51,8 @@
     <string name="fragment_settings_pref_background_count_title">Background Update Check</string>
     <string name="fragment_settings_pref_background_time_title">Last Background Update Check</string>
     <string name="fragment_settings_rules_sms_number_invalid">"SMS Number looks to be in the wrong format or an incorrect length</string>
+    <string name="no_alarm_sound">No Alarm Sound Set. Using Default.</string>
+    <string name="set_alarm_sound">Set Alarm Sound</string>
+    <string name="reset_alarm_sound">Reset Alarm Sound</string>
 
 </resources>

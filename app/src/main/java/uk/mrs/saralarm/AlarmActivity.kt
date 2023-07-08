@@ -227,6 +227,7 @@ class AlarmActivity : AppCompatActivity() {
         PostAlarmNotification.create(this)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {} //override the back button to do nothing.
 
     inline fun <reified T : Serializable> Intent.serializable(key: String): T? = when {

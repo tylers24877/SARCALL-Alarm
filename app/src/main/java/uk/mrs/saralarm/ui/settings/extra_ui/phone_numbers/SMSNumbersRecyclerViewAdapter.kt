@@ -52,7 +52,7 @@ class SMSNumbersRecyclerViewAdapter(val context: Context,
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    @SuppressLint("ShowToast")
+    @SuppressLint("ShowToast", "NotifyDataSetChanged")
     override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {

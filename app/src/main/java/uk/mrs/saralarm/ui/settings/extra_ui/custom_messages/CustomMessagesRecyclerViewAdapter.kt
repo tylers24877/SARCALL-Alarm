@@ -48,7 +48,7 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    @SuppressLint("ShowToast")
+    @SuppressLint("ShowToast", "NotifyDataSetChanged")
     override fun removeItems(adapterPosition: Int, allowUndo: Boolean) {
         if (adapterPosition >= 0 && adapterPosition < data.size) {
             if (allowUndo) {
@@ -69,6 +69,7 @@ class CustomMessagesRecyclerViewAdapter(val context: Context,
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun addItem() {
         undoSnackBar?.dismiss()
         data.add("")

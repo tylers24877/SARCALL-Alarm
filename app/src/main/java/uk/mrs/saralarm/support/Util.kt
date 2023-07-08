@@ -22,7 +22,11 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 object Util {
     fun fromHtml(string: String): Spanned {
-        return Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(string, Html.FROM_HTML_MODE_LEGACY)
+        } else {
+            Html.fromHtml(string)
+        }
     }
     fun canDrawOverlays(context: Context): Boolean {
         if (Settings.canDrawOverlays(context)) return true
@@ -42,10 +46,20 @@ object Util {
             val mgr = context.getSystemService(AppCompatActivity.WINDOW_SERVICE) as WindowManager
             //getSystemService might return null
             val viewToAdd = View(context)
-            val params = WindowManager.LayoutParams(
-                0, 0, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSPARENT
-            )
+            val params = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                WindowManager.LayoutParams(
+                    0, 0, WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, PixelFormat.TRANSPARENT
+                )
+            } else {
+                WindowManager.LayoutParams(
+                    0, // Width (0 means determined by the system)
+                    0, // Height (0 means determined by the system)
+                    WindowManager.LayoutParams.TYPE_SYSTEM_ALERT, // Type: System-level alert window
+                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, // Flags
+                    PixelFormat.TRANSPARENT // Pixel format: Transparent
+                )
+            }
             viewToAdd.layoutParams = params
             mgr.addView(viewToAdd, params)
             mgr.removeView(viewToAdd)

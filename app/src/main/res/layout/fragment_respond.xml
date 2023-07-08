@@ -76,10 +76,11 @@
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/respond_sms_preview_heading_txtview"
                         android:layout_width="wrap_content"
-                        android:layout_height="35.0dip"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="5.0dip"
                         android:layout_marginLeft="5.0dip"
                         android:layout_marginTop="5.0dip"
+                        android:minHeight="35.0dip"
                         android:text="@string/fragment_respond_received_sarcall_sms_heading"
                         android:textSize="25.0sp"
                         android:textStyle="bold"
